@@ -20,20 +20,20 @@ Products.create = (newProduct, result) => {
                 return;
             }
             console.log("created products: ", { id: res.insertId, ...newProduct });
-            result(null, { id: res.insertId, ...newToDos });
+            result(null, { id: res.insertId, ...newProduct });
         });
 };
 
 Products.getAll = (category, searchFor, result) => {
-    console.log("category");
+    
     let queryStr = "select * from products";
     let filterStr = "";
-    if (category.length > 0) {
+    if (category) {
         filterStr += `category='${category}'`;
     };
-    if (searchFor.length > 0) {
+    if (searchFor) {
         if (filterStr.length > 0) { filterStr += " and " };
-        filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%'`;
+        filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
     }
     if (filterStr.length > 0) { queryStr += ` where ${filterStr}` };
 
@@ -44,9 +44,12 @@ Products.getAll = (category, searchFor, result) => {
             return;
         }
         result(null, res);
-    })
+    });
 };
 
+
+
+module.exports = Products;
     
 
 
