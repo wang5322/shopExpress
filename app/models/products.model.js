@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("./db");
-const Products = (product) => {
+const Products = function (product) {
     this.category = product.category;
     this.sellerId = product.sellerId;
     this.productCode = product.productCode;
