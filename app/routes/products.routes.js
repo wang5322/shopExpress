@@ -9,8 +9,9 @@ module.exports = app => {
   
     // Retrieve all products
     router.get("/", products.findAll);
-  
 
+    // TODO: retrive a specific product
+    router.get("/:productName", products.findOne);
   
     app.use('/api/products', router);
   };
