@@ -33,7 +33,7 @@ app.get('/api/test', (req, res) => {
 
 require("./app/routes/products.routes.js")(app);
 
-//app.use(express.static('static'));
+app.use(express.static('static'));
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8181;
