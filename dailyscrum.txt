@@ -11,6 +11,7 @@ Xuerun
 - input data to database
 - create index html
 3. Need assistance / figure things out
+N/A
 
 Shiyuan
 1. Done / not done since last scrum:
