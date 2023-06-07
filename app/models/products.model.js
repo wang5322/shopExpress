@@ -24,11 +24,24 @@ Products.create = (newProduct, result) => {
         });
 };
 
-Products.getAll = (category, searchFor, result) => {
+Products.getAll = (category, searchFor, available, result) => {
     
+    console.log(category,searchFor,available);
+
     let queryStr = "select * from products";
     let filterStr = "";
+    switch (available) {
+        case "both": break;
+        case "false": {
+            filterStr += "available=0";
+            break;
+        }
+        default:
+            filterStr += "available=1";
+    }
+
     if (category) {
+        if (filterStr.length > 0) { filterStr += " and " };
         filterStr += `category='${category}'`;
     };
     if (searchFor) {
@@ -37,6 +50,7 @@ Products.getAll = (category, searchFor, result) => {
     }
     if (filterStr.length > 0) { queryStr += ` where ${filterStr}` };
 
+    //console.log(filterStr);
     db.query(queryStr, (err, res) => {
         if (err) {
             console.log("error: ", err);

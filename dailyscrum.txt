@@ -36,3 +36,17 @@ Shiyu
 - create inventory html
 3. Need assistance / figure things out
 N/A
+
+2023/06/06 
+
+Shiyuan
+
+1.  Done / not done since last scrum:
+- finished the database design
+- created schema on Azure
+- post, api/products
+2. To do until next Scrum:
+- modify get, api/products
+- start api/orders
+3. Need assistance / figure things out
+N/A
