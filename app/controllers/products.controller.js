@@ -32,7 +32,6 @@ exports.create = (req, res) => {
   });
 };
 
-<<<<<<< HEAD
 exports.findAll=(req, res)=> {
     const category = req.query.category ? req.query.category : null; 
     const searchFor = req.query.searchFor ? req.query.searchFor : null; 
@@ -47,36 +46,3 @@ exports.findAll=(req, res)=> {
         else res.status(200).send(data);
     });
 }
-=======
-exports.findAll = (req, res) => {
-  const category = req.query.category ? req.query.category : null;
-  const searchFor = req.query.searchFor ? req.query.searchFor : null;
-  console.log(req.query);
-  Products.getAll(category, searchFor, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Products.",
-      });
-    else res.status(200).send(data);
-  });
-};
-
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-  console.log(req.query);
-  Products.getOne(id, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: `Not found products with id ${id}.`,
-        });
-      } else
-        res.status(500).send({
-          message:
-            err.message || "Some error occured while retrieving the product.",
-        });
-    } else res.status(200).send(data);
-  });
-};
->>>>>>> f15c7648578bb3facb0676fe153250ca20db2cad

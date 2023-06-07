@@ -24,7 +24,6 @@ Products.create = (newProduct, result) => {
   });
 };
 
-<<<<<<< HEAD
 Products.getAll = (category, searchFor, available, result) => {
     
     console.log(category,searchFor,available);
@@ -48,17 +47,6 @@ Products.getAll = (category, searchFor, available, result) => {
     if (searchFor) {
         if (filterStr.length > 0) { filterStr += " and " };
         filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
-=======
-Products.getAll = (category, searchFor, result) => {
-  let queryStr = "select * from products";
-  let filterStr = "";
-  if (category) {
-    filterStr += `category='${category}'`;
-  }
-  if (searchFor) {
-    if (filterStr.length > 0) {
-      filterStr += " and ";
->>>>>>> f15c7648578bb3facb0676fe153250ca20db2cad
     }
     filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
   }
@@ -66,7 +54,6 @@ Products.getAll = (category, searchFor, result) => {
     queryStr += ` where ${filterStr}`;
   }
 
-<<<<<<< HEAD
     //console.log(filterStr);
     db.query(queryStr, (err, res) => {
         if (err) {
@@ -76,16 +63,6 @@ Products.getAll = (category, searchFor, result) => {
         }
         result(null, res);
     });
-=======
-  db.query(queryStr, (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
-    result(null, res);
-  });
->>>>>>> f15c7648578bb3facb0676fe153250ca20db2cad
 };
 
 Products.getOne = (id, result) => {
