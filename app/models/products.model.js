@@ -65,7 +65,7 @@ Products.getAll = (category, searchFor, available, result) => {
     });
 };
 
-Products.getOne = (id, result) => {
+Products.getById = (id, result) => {
   let queryStr = `select * from products where id = ${id}`;
   db.query(queryStr, (err, res) => {
     if (err) {
@@ -73,6 +73,94 @@ Products.getOne = (id, result) => {
       result(null, err);
       return;
     }
+    result(null, res);
+  });
+};
+
+Products.updateById = (id, products, result) => {
+  let queryStr = `UPDATE products SET category =?,sellerId =?,productCode=?,productName=?,productDesc =?, price = ?, stockNum = ?, imageUrl=?, available=? WHERE id =?`;
+  db.query(
+    queryStr,
+    [
+      products.category,
+      products.sellerId,
+      products.productCode,
+      products.productName,
+      products.productDesc,
+      products.price,
+      products.stockNum,
+      products.imageUrl,
+      products.available,
+      id,
+    ],
+    (err, res) => {
+      //TODO: validate enums
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        // not found Todos with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log("updated products: ", { id: id, ...products });
+      result(null, { id: id, ...products });
+    }
+  );
+};
+
+Products.updateStockById = (id, stockNum, result) => {
+  const queryStr = `UPDATE products SET stockNum = ? WHERE id = ?`;
+  db.query(queryStr, [stockNum, id], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    if (res.affectedRows == 0) {
+      // not found Todos with the product
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    console.log("updated product with id: ", id);
+    result(null, res);
+  });
+};
+
+Products.removeById = (id, result) => {
+  let queryStr = `DELETE FROM products WHERE id=?`;
+  db.query(queryStr, id, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+
+    if (res.affectedRows == 0) {
+      // not found Todos with the product
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    console.log("deleted product with id: ", id);
+    result(null, res);
+  });
+};
+
+Products.removeAll = (result) => {
+  sql.query("DELETE FROM products", (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+
+    console.log(`deleted ${res.affectedRows} products`);
     result(null, res);
   });
 };
