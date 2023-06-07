@@ -1,0 +1,25 @@
+2023/06/06 
+
+Xuerun
+
+1.  Done / not done since last scrum:
+- write description for the project
+-create use case diagram 
+- create mockups for main, buyer order history 
+2. To do until next Scrum:
+- finish editing use case diagram and admin mock-up 
+- input data to database
+- create index html
+3. Need assistance / figure things out
+N/A
+
+Shiyuan
+1. Done / not done since last scrum:
+- design the database and draw the ER diagram
+2. To do until next Scrum:
+- modify the database design
+- finish the ER 
+- create the database on Azure
+- test the database connection in api code
+3. need assistance
+- not yet
