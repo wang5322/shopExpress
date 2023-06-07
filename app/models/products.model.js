@@ -2,28 +2,29 @@
 
 const db = require("./db");
 const Products = function (product) {
-    this.category = product.category;
-    this.sellerId = product.sellerId;
-    this.productCode = product.productCode;
-    this.productName = product.productName;
-    this.productDesc = product.productDesc;
-    this.price = product.price;
-    this.stockNum = product.stockNum;
-    this.imageUrl = product.imageUrl;
-    this.available = product.available;
+  this.category = product.category;
+  this.sellerId = product.sellerId;
+  this.productCode = product.productCode;
+  this.productName = product.productName;
+  this.productDesc = product.productDesc;
+  this.price = product.price;
+  this.stockNum = product.stockNum;
+  this.imageUrl = product.imageUrl;
+  this.available = product.available;
 };
 Products.create = (newProduct, result) => {
-    db.query("INSERT INTO products SET ?", newProduct, (err, res) => {
-            if (err) {
-                console.log("error: ", err);
-                result(err, null);
-                return;
-            }
-            console.log("created products: ", { id: res.insertId, ...newProduct });
-            result(null, { id: res.insertId, ...newProduct });
-        });
+  db.query("INSERT INTO products SET ?", newProduct, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    console.log("created products: ", { id: res.insertId, ...newProduct });
+    result(null, { id: res.insertId, ...newProduct });
+  });
 };
 
+<<<<<<< HEAD
 Products.getAll = (category, searchFor, available, result) => {
     
     console.log(category,searchFor,available);
@@ -47,9 +48,25 @@ Products.getAll = (category, searchFor, available, result) => {
     if (searchFor) {
         if (filterStr.length > 0) { filterStr += " and " };
         filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
+=======
+Products.getAll = (category, searchFor, result) => {
+  let queryStr = "select * from products";
+  let filterStr = "";
+  if (category) {
+    filterStr += `category='${category}'`;
+  }
+  if (searchFor) {
+    if (filterStr.length > 0) {
+      filterStr += " and ";
+>>>>>>> f15c7648578bb3facb0676fe153250ca20db2cad
     }
-    if (filterStr.length > 0) { queryStr += ` where ${filterStr}` };
+    filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
+  }
+  if (filterStr.length > 0) {
+    queryStr += ` where ${filterStr}`;
+  }
 
+<<<<<<< HEAD
     //console.log(filterStr);
     db.query(queryStr, (err, res) => {
         if (err) {
@@ -59,13 +76,28 @@ Products.getAll = (category, searchFor, available, result) => {
         }
         result(null, res);
     });
+=======
+  db.query(queryStr, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    result(null, res);
+  });
+>>>>>>> f15c7648578bb3facb0676fe153250ca20db2cad
 };
 
-
+Products.getOne = (id, result) => {
+  let queryStr = `select * from products where id = ${id}`;
+  db.query(queryStr, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+    result(null, res);
+  });
+};
 
 module.exports = Products;
-    
-
-
-
-
