@@ -82,3 +82,25 @@ Orders.updateById = (id, order, result) => {
         }
     );
 };
+
+
+//delete an order
+Orders.remove = (id, result) => {
+    db.query("DELETE FROM orders WHERE id = ?", id, (err, res) => {
+        if (err) {
+            console.log("error: ", err);
+            result(null, err);
+            return;
+        }
+  
+        if (res.affectedRows == 0) {
+            // not found order with the id
+            result({ kind: "not_found" }, null);
+            return;
+        }
+  
+        console.log("deleted order with id: ", id);
+        result(null, res);
+    });
+};
+  
