@@ -1,8 +1,31 @@
 
 body{
-    background-color: rgb(241, 241, 241);
+    background-color: rgb(228, 228, 228);
+}
+
+footer{
+    text-align: center;
+    font-size: small;
 }
 
 .icon-link{
-    color:grey;
+    color:rgb(107, 106, 106);
+}
+
+.editPane{
+    background-color: whitesmoke;
+
+}
+
+.labelform{
+    margin-top: .5em;
+    margin-bottom:  .25em;
+}
+
+.form-sm{
+    width: 200px;
+}
+
+.label-sm{
+    width:300px;
 }
