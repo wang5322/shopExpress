@@ -37,7 +37,7 @@ Shiyu
 3. Need assistance / figure things out
 N/A
 
-2023/06/06 
+2023/06/07 
 
 Shiyuan
 
@@ -50,3 +50,29 @@ Shiyuan
 - start api/orders
 3. Need assistance / figure things out
 N/A
+
+Xuerun
+
+1.  Done / not done since last scrum:
+- finished editing use case diagram and admin mock-up 
+- finished input data to database
+- finished create index html, but not finish with buttons and API
+2. To do until next Scrum:
+-continue with buttons and API in index html
+-create register/login html and connect the register/login system to database
+3. Need assistance / figure things out
+N/A
+
+Shiyu
+
+1.  Done / not done since last scrum:
+- updated the shopping cart mockup to group products from same sellers together
+- finished creating products api(GETbyId, PATCH, PUT, DELETE)
+- finished creating inventory.html & css
+- finished inputing home&fashion data to database
+2. To do until next Scrum:
+-add javascript to inventory to manipulate data
+-create shoppingCart.html and productDetail.html
+-fix second nav bar in header
+3. Need assistance / figure things out
+- testing products api
