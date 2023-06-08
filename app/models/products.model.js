@@ -48,8 +48,7 @@ Products.getAll = (category, searchFor, available, result) => {
         if (filterStr.length > 0) { filterStr += " and " };
         filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
     }
-    filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
-
+    
   if (filterStr.length > 0) {
     queryStr += ` where ${filterStr}`;
   }

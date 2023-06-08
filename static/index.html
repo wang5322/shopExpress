@@ -136,15 +136,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script>
         $("#formSearch").submit(function () {
-            var search = $('#formSearch :input').val();
-            $.ajax({
-                url: "/api/products/" + search,
-                method: "GET",
-            }).done(function (data, status, xhr) {
-                // todo - display the searched product
-
-            })
+            var searchFor = $('#formSearch :input').val();
+            window.open("product.html?searchFor=" + searchFor);
         });
+
+        // MOVE TO product.html
+        // $(document).ready(function () {
+        //     const urlParams = new URLSearchParams(window.location.search);
+        //     const searchFor = urlParams.get('searchFor');
+
+        //     $.ajax({
+        //         url: "/api/products/?searchFor=" + searchFor,
+        //         method: "GET",
+        //     }).done(function (data, status, xhr) {
+        //         // todo - display the searched product, build html
+        //         for (var item in data) {
+        //             $("#productcard").html(
+        //                 "<div class='card-body'>item.image"
+        //             )
+        //         }
+
+        //     });
+        // });
     </script>
 </body>
 
