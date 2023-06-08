@@ -24,8 +24,8 @@ Products.create = (newProduct, result) => {
   });
 };
 
-Products.getAll = (category, searchFor, available, result) => {
-  console.log(category, searchFor, available);
+Products.getAll = (category, searchFor, available, sellerId, result) => {
+  console.log(category, searchFor, available, sellerId);
 
   let queryStr = "select * from products";
   let filterStr = "";
@@ -53,6 +53,13 @@ Products.getAll = (category, searchFor, available, result) => {
     filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
   }
 
+  if (sellerId) {
+    if (filterStr.length > 0) {
+      filterStr += " and ";
+    }
+    filterStr += `sellerId = '${sellerId}'`;
+  }
+
   if (filterStr.length > 0) {
     queryStr += ` where ${filterStr}`;
   }
@@ -68,41 +75,41 @@ Products.getAll = (category, searchFor, available, result) => {
   });
 };
 
-Products.getBySeller = (available, sellerId, sortOrder, result) => {
-  console.log(sellerId, sortOrder, available);
+// Products.getBySeller = (available, sellerId, sortOrder, result) => {
+//   console.log(sellerId, sortOrder, available);
 
-  let queryStr = "SELECT * FROM products";
-  let filterStr = "";
-  switch (available) {
-    case "both":
-      break;
-    case "false": {
-      filterStr += "available=0";
-      break;
-    }
-    default:
-      filterStr += "available=1";
-  }
-  if (sellerId) {
-    if (filterStr.length > 0) {
-      filterStr += " and ";
-    }
-    filterStr += `sellerId='${sellerId}'`;
-  }
-  if (filterStr.length > 0) {
-    queryStr += ` WHERE ${filterStr}`;
-  }
-  queryStr += `ORDER BY ${sortOrder}`;
+//   let queryStr = "SELECT * FROM products";
+//   let filterStr = "";
+//   switch (available) {
+//     case "both":
+//       break;
+//     case "false": {
+//       filterStr += "available=0";
+//       break;
+//     }
+//     default:
+//       filterStr += "available=1";
+//   }
+//   if (sellerId) {
+//     if (filterStr.length > 0) {
+//       filterStr += " and ";
+//     }
+//     filterStr += `sellerId='${sellerId}'`;
+//   }
+//   if (filterStr.length > 0) {
+//     queryStr += ` WHERE ${filterStr}`;
+//   }
+//   queryStr += `ORDER BY ${sortOrder}`;
 
-  db.query(queryStr, (err, res) => {
-    if (err) {
-      console.log("error", err);
-      result(null, err);
-      return;
-    }
-    result(null, res);
-  });
-};
+//   db.query(queryStr, (err, res) => {
+//     if (err) {
+//       console.log("error", err);
+//       result(null, err);
+//       return;
+//     }
+//     result(null, res);
+//   });
+// };
 
 Products.getById = (id, result) => {
   let queryStr = `select * from products where id = ${id}`;
