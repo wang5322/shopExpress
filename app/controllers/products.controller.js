@@ -36,8 +36,9 @@ exports.findAll = (req, res) => {
   const category = req.query.category ? req.query.category : null;
   const searchFor = req.query.searchFor ? req.query.searchFor : null;
   const available = req.query.available ? req.query.available : null;
+  const sellerId = req.query.sellerId ? req.query.sellerId : null;
   //console.log(req.query);
-  Products.getAll(category, searchFor, available, (err, data) => {
+  Products.getAll(category, searchFor, available, sellerId, (err, data) => {
     if (err)
       res.status(500).send({
         message:
@@ -47,20 +48,20 @@ exports.findAll = (req, res) => {
   });
 };
 
-exports.findBySeller = (req, res) => {
-  const available = req.query.available ? req.query.available : null;
-  const sellerId = req.query.sellerId ? req.query.sellerId : null;
-  const sortOrder = req.query.sortOrder ? req.query.sortOrder : "id";
-  Products.getBySeller(available, sellerId, sortOrder, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message ||
-          `Some error occured while retrieving Products from sellerId=${sellerId}`,
-      });
-    else res.status(200).send(data);
-  });
-};
+// exports.findBySeller = (req, res) => {
+//   const available = req.query.available ? req.query.available : null;
+//   const sellerId = req.query.sellerId ? req.query.sellerId : null;
+//   const sortOrder = req.query.sortOrder ? req.query.sortOrder : "id";
+//   Products.getBySeller(available, sellerId, sortOrder, (err, data) => {
+//     if (err)
+//       res.status(500).send({
+//         message:
+//           err.message ||
+//           `Some error occured while retrieving Products from sellerId=${sellerId}`,
+//       });
+//     else res.status(200).send(data);
+//   });
+// };
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
