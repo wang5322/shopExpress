@@ -31,7 +31,7 @@ app.get('/api/test', (req, res) => {
 });
 
 
-//require("./app/routes/products.routes.js")(app);
+require("./app/routes/products.routes.js")(app);
 
 require("./app/routes/orders.routes.js")(app);
 app.use(express.static('static'));
