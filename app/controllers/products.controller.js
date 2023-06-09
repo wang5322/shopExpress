@@ -1,13 +1,13 @@
 const Products = require("../models/products.model");
+const Auth = require("../utils/auth");
 
 exports.create = (req, res) => {
-  if (!req.body) {
-    res.status.send({ message: "content can not be empty!" });
-  }
-
+  // if (!req.body) {
+  //   res.status.send({ message: "content can not be empty!" });
+  // }
   const product = new Products({
     category: req.body.category,
-    sellerId: req.body.sellerId,
+    sellerId: req.body.sellerId, //req.body.sellerId,
     productCode: req.body.productCode,
     productName: req.body.productName,
     productDesc: req.body.productDesc,
@@ -37,6 +37,7 @@ exports.findAll = (req, res) => {
   const searchFor = req.query.searchFor ? req.query.searchFor : null;
   const available = req.query.available ? req.query.available : null;
   const sellerId = req.query.sellerId ? req.query.sellerId : null;
+  //FIXME: validate sellerId
   //console.log(req.query);
   Products.getAll(category, searchFor, available, sellerId, (err, data) => {
     if (err)
@@ -49,8 +50,9 @@ exports.findAll = (req, res) => {
 };
 
 exports.findOne = (req, res) => {
+  // Auth.execIfAuthValid(req, res, null, (req, res, user) => {
   const id = req.params.id;
-  console.log(req.query);
+  // console.log(req.query);
   Products.getById(id, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -64,6 +66,7 @@ exports.findOne = (req, res) => {
         });
     } else res.status(200).send(data);
   });
+  // });
 };
 
 exports.update = (req, res) => {

@@ -27,7 +27,7 @@ Products.create = (newProduct, result) => {
 Products.getAll = (category, searchFor, available, sellerId, result) => {
   console.log(category, searchFor, available, sellerId);
 
-  let queryStr = "select * from products";
+  let queryStr = "SELECT * FROM products";
   let filterStr = "";
   switch (available) {
     case "both":
@@ -76,14 +76,19 @@ Products.getAll = (category, searchFor, available, sellerId, result) => {
 };
 
 Products.getById = (id, result) => {
-  let queryStr = `select * from products where id = ${id}`;
-  db.query(queryStr, (err, res) => {
+  let queryStr = `SELECT * FROM products WHERE id =? `;
+  db.query(queryStr, id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
       return;
     }
-    result(null, res);
+    if (res.length) {
+      console.log("found products: ", res[0]);
+      result(null, res[0]);
+      return;
+    }
+    result({ kind: "not_found" }, null);
   });
 };
 
@@ -124,7 +129,7 @@ Products.updateById = (id, products, result) => {
 };
 
 Products.updateStockById = (id, stockNum, available, result) => {
-  const queryStr = `UPDATE products SET stockNum = ?, available = ?, WHERE id = ?`;
+  const queryStr = `UPDATE products SET stockNum = ?, available = ? WHERE id = ?`;
   db.query(queryStr, [stockNum, available, id], (err, res) => {
     if (err) {
       console.log("error: ", err);

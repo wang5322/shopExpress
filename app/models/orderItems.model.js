@@ -23,7 +23,7 @@ OrderItem.create = (newOrderItem, result) => {
 };
 
 OrderItem.updateById = (id, orderItem, result) => {
-    db.query("UPDATE orderItems set orderId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amount = ? WHERE id = ?", [orderItem.orderId, orderItem.productId, orderItem.productCode, orderItem.productName, orderItem.price, orderItem.amout], (err, res) => {
+    db.query("UPDATE orderItems set orderId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amount = ? WHERE id = ?", [orderItem.orderId, orderItem.productId, orderItem.productCode, orderItem.productName, orderItem.price, orderItem.amount], (err, res) => {
         if (err) {
             console.log("error:", err);
             result(null, res);

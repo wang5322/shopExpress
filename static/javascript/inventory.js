@@ -1,10 +1,34 @@
 var available = 1;
-var sellerId = 10;
-var deletId;
-
+// var sellerId = "";
+// var deletId;
+var sessionUsername = sessionStorage.getItem("username");
+var sessionPassword = sessionStorage.getItem("password");
+var sellerId = sessionStorage.getItem("id");
 $(document).ready(function () {
-  console.log("page is fully loaded");
+  // $.ajax({
+  //   url: "/api/users/" + sessionUsername,
+  //   type: "GET",
+  //   headers: {
+  //     "x-auth-username": sessionUsername,
+  //     "x-auth-password": sessionPassword,
+  //   },
+  //   dataType: "json",
+  //   error: function (jqxhr, status, errorThrown) {
+  //     alert("AJAX error: " + jqxhr.responseText);
+  //   },
+  // }).done(function (user) {
+  //   sessionStorage.setItem("id", user.id);
+  //   var sellerId = sessionStorage.getItem("id");
+  //   console.log(user);
+  //   // sellerId = user.id;
+  //   console.log(sellerId);
+  //   refreshInventoryList();
+  // });
+
+  console.log(sellerId);
   refreshInventoryList();
+  console.log("page is fully loaded");
+
   // $("#alert").hide(); // error message alert
 
   $("#add").on("click", function () {
@@ -97,10 +121,15 @@ $(document).ready(function () {
 
 function refreshInventoryList() {
   $.ajax({
-    url: `/api/products/?sellerId=${sellerId}&available=1`,
+    url: `/api/products/?sellerId=${sellerId}`,
     type: "GET",
+    // headers: {
+    //   "x-auth-username": sessionUsername,
+    //   "x-auth-password": sessionPassword,
+    // },
     dataType: "json",
     success: function (response) {
+      console.log("sellerId is : " + sellerId);
       var result = "";
       console.log(response);
       for (let i = 0; i < response.length; i++) {
@@ -184,16 +213,16 @@ function selectItem(Id) {
       alert("AJAX error: " + jqxhr.responseText);
     },
   }).done(function (product) {
-    // console.log(Id);
-    // console.log(product);
-    $("#id").html(product[0].id);
-    $("input[name=productCode]").val(product[0].productCode);
-    $("input[name=productName]").val(product[0].productName);
-    $("textarea[name=productDesc]").val(product[0].productDesc);
-    $("input[name=category]").val(product[0].category);
-    $("input[name=stockNum]").val(product[0].stockNum);
-    $("input[name=price]").val(product[0].price);
-    $("input[name=imageUrl]").val(product[0].imageUrl);
+    console.log(Id);
+    console.log(product);
+    $("#id").html(product.id);
+    $("input[name=productCode]").val(product.productCode);
+    $("input[name=productName]").val(product.productName);
+    $("textarea[name=productDesc]").val(product.productDesc);
+    $("input[name=category]").val(product.category);
+    $("input[name=stockNum]").val(product.stockNum);
+    $("input[name=price]").val(product.price);
+    $("input[name=imageUrl]").val(product.imageUrl);
   });
 }
 

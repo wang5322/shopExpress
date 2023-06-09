@@ -122,3 +122,20 @@ Shiyu
 -create shoppingcart.html
 3. Need assistance / figure things out
 - having trouble patching products.available to 0
+
+2023/06/08
+
+Shiyuan
+1.  Done / not done since last scrum:
+-post, api/carts
+-post, api/orders
+
+2. To do until next Scrum:
+-get, api/carts
+-get, api/orders
+-delete, api/carts
+-delete, api/orders
+-patch, api/orders
+
+3. Need assistance / figure things out
+N/A

@@ -3,32 +3,32 @@ const Auth = require("../utils/auth");
 
 //Create and Save a new User
 exports.create = (req, res) => {
-    // Validate request
-    var isValidResult = isUserValid(req, res);
-    if (isValidResult === true) {
-        // Create a User
-        // TODO: encrypt the password SHA256
-        const user = new User({
-            userName: req.body.username,
-            password: req.body.password,
-            role: req.body.role,
-            address: req.body.address,
-            email: req.body.email
-        }); // FIXME: HASH PASSWORD
+  // Validate request
+  var isValidResult = isUserValid(req, res);
+  if (isValidResult === true) {
+    // Create a User
+    // TODO: encrypt the password SHA256
+    const user = new User({
+      userName: req.body.username,
+      password: req.body.password,
+      role: req.body.role,
+      address: req.body.address,
+      email: req.body.email,
+    }); // FIXME: HASH PASSWORD
 
-        // Save user in the database
-        User.create(user, (err, data) => {
-            if (err)
-                res.status(500).send({
-                    message:
-                        err.message || "Some error occurred while creating the user."
-                });
-            else {
-                delete data['password'];
-                res.status(201).send(data);
-            }
+    // Save user in the database
+    User.create(user, (err, data) => {
+      if (err)
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while creating the user.",
         });
-    }
+      else {
+        delete data["password"];
+        res.status(201).send(data);
+      }
+    });
+  }
 };
 //get user by username
 exports.findOne = (req, res) => {
@@ -110,28 +110,29 @@ exports.delete=(req, res)=>{
 
 // used by insert and update
 function isUserValid(req, res) {
-    //console.log("isValid: ",res);
-    if (req.body.id) {
-        res.status(400).send({
-            message: "id is provided by the system. User not saved",
-            result: false
-        });
-        //console.log("if cond: ",res.send.result);
-        return false;
-    }
-    // console.log(JSON.stringify(req.body));
-    if (req.body.username === undefined || req.body.password === undefined) {
-        res.status(400).send({ message: "username and password must be provided" });
-        return false;
-    }
-    // FIXME: verify quality of password (length 8+, at least one uppercase, lowercase, digit, and special character)
-    // FIXME: username must not exist yet, check database, may require you add a callback to this method instead of returning a value
-    let username = req.body.username;
-    if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
-        res.status(400).send({ message: "username must be 5-45 characters long made up of letters, digits and underscore" });
-        return false;
-    }
-    return true;
+  //console.log("isValid: ",res);
+  if (req.body.id) {
+    res.status(400).send({
+      message: "id is provided by the system. User not saved",
+      result: false,
+    });
+    //console.log("if cond: ",res.send.result);
+    return false;
+  }
+  // console.log(JSON.stringify(req.body));
+  if (req.body.username === undefined || req.body.password === undefined) {
+    res.status(400).send({ message: "username and password must be provided" });
+    return false;
+  }
+  // FIXME: verify quality of password (length 8+, at least one uppercase, lowercase, digit, and special character)
+  // FIXME: username must not exist yet, check database, may require you add a callback to this method instead of returning a value
+  let username = req.body.username;
+  if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
+    res.status(400).send({
+      message:
+        "username must be 5-45 characters long made up of letters, digits and underscore",
+    });
+    return false;
+  }
+  return true;
 }
-
-

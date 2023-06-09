@@ -1,27 +1,27 @@
-$(document).ready(function(){
-    const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('register');
+$(document).ready(function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const myParam = urlParams.get("register");
 
-    if (myParam === '1') {
-        $("#registerPanel").show();
-        $("#loginPanel").hide();
-    } else {
-        //hide register form
-        $("#registerPanel").hide();
-    }
-});
-
-$("#hrefRegisterHere").click(function(){
+  if (myParam === "1") {
     $("#registerPanel").show();
     $("#loginPanel").hide();
-})
+  } else {
+    //hide register form
+    $("#registerPanel").hide();
+  }
+});
 
-$("#btnLogin").on("click", function(){
-    // get username and password from input text fields, use jQuery
-    let username = $("input[name=username]").val();
-    let password = $("input[name=password]").val();
-    sessionStorage.setItem('username', username);
-    sessionStorage.setItem('password', password);
+$("#hrefRegisterHere").click(function () {
+  $("#registerPanel").show();
+  $("#loginPanel").hide();
+});
+
+$("#btnLogin").on("click", function () {
+  // get username and password from input text fields, use jQuery
+  let username = $("input[name=username]").val();
+  let password = $("input[name=password]").val();
+  sessionStorage.setItem("username", username);
+  sessionStorage.setItem("password", password);
 
     // open AJAX httpRequst, send username and password with AJAX req.header to authenticator
     $.ajax({
@@ -57,25 +57,25 @@ $("#btnLogin").on("click", function(){
     });
 });
 
-$("#btnRegister").on("click", function(){
-    // get username and password from input text fields, use jQuery
-    let username = $("input[name=newUsername]").val();
-    let password = $("input[name=newPassword]").val();
-    let address = $("input[name=newAddress]").val();
-    let email = $("input[name=newEmail]").val();
-    let role = $("select[name=newRole]").val();
-    
-    sessionStorage.setItem('username', username);
-    sessionStorage.setItem('password', password);
-    sessionStorage.setItem('role', role);
+$("#btnRegister").on("click", function () {
+  // get username and password from input text fields, use jQuery
+  let username = $("input[name=newUsername]").val();
+  let password = $("input[name=newPassword]").val();
+  let address = $("input[name=newAddress]").val();
+  let email = $("input[name=newEmail]").val();
+  let role = $("select[name=newRole]").val();
 
-    let newUserObj = {
-        "username": username,
-        "password": password,
-        "role": role,
-        "address": address,
-        "email": email 
-    };
+  sessionStorage.setItem("username", username);
+  sessionStorage.setItem("password", password);
+  sessionStorage.setItem("role", role);
+
+  let newUserObj = {
+    username: username,
+    password: password,
+    role: role,
+    address: address,
+    email: email,
+  };
 
         $.ajax({
             url: "/api/users/",
@@ -87,19 +87,19 @@ $("#btnRegister").on("click", function(){
         }).done(function(data){
             switch (role) {
                 case "seller":
-                    window.open("inventory.html");
+                    window.open("inventory.html", "_self");
                     break;
     
                 case "buyer":
-                    window.open("orderhistory.html");
+                    window.open("orderhistory.html", "_self");
                     break;
     
                 case "admin":
-                    window.open("admin.html");
+                    window.open("admin.html", "_self");
                     break;
     
                 default:
-                    window.open("loginregister.html")
+                    window.open("loginregister.html", "_self")
                     break;
             }
         });
