@@ -340,7 +340,26 @@
 
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+     // MOVE TO productlist.html
+         $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+             const searchFor = urlParams.get('searchFor');
 
+             $.ajax({
+                 url: "/api/products/?searchFor=" + searchFor,
+                 method: "GET",
+             }).done(function (data, status, xhr) {
+                 // todo - display the searched product, build html
+                 for (var item in data) {
+                     $("#productcard").html(
+                         "<div class='card-body'>item.image"
+                     )
+                 }
+
+             });
+         });
+</script>
 </body>
 
 </html>
