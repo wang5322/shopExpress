@@ -1,9 +1,11 @@
 const db = require("./db.js");
 // constructor
 const Users = function (user) {
-    this.username = user.username;
+    this.userName = user.userName;
     this.password = user.password;
     this.role = user.role;
+    this.address = user.address;
+    this.email = user.email;
   };
   
   //create a user

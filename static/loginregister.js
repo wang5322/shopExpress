@@ -55,8 +55,48 @@ $("#btnLogin").on("click", function(){
 
 $("#btnRegister").on("click", function(){
     // get username and password from input text fields, use jQuery
-    let username = $("input[name=username]").val();
-    let password = $("input[name=password]").val();
+    let username = $("input[name=newUsername]").val();
+    let password = $("input[name=newPassword]").val();
+    let address = $("input[name=newAddress]").val();
+    let email = $("input[name=newEmail]").val();
+    let role = $("select[name=newRole]").val();
+    
     sessionStorage.setItem('username', username);
     sessionStorage.setItem('password', password);
+    sessionStorage.setItem('role', role);
+
+    let newUserObj = {
+        "username": username,
+        "password": password,
+        "role": role,
+        "address": address,
+        "email": email 
+    };
+
+        $.ajax({
+            url: "/api/users/",
+            type:"POST",
+            dataType:"json",
+            data: newUserObj,
+            error: function (jqxhr, status, errorThrown){
+                alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);}        
+        }).done(function(data){
+            switch (role) {
+                case "seller":
+                    window.open("inventory.html");
+                    break;
+    
+                case "buyer":
+                    window.open("orderhistory.html");
+                    break;
+    
+                case "admin":
+                    window.open("admin.html");
+                    break;
+    
+                default:
+                    window.open("loginregister.html")
+                    break;
+            }
+        });
 })

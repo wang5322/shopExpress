@@ -9,22 +9,23 @@ exports.create = (req, res) => {
         // Create a User
         // TODO: encrypt the password SHA256
         const user = new User({
-            username: req.body.username,
-            password: Auth.hash(req.body.password),
-            // FIXME: only admin can create admins, anonymous registration only creates users
-            role: req.body.role || 'Buyer'
-        });
+            userName: req.body.username,
+            password: req.body.password,
+            role: req.body.role,
+            address: req.body.address,
+            email: req.body.email
+        }); // FIXME: HASH PASSWORD
 
         // Save user in the database
         User.create(user, (err, data) => {
             if (err)
                 res.status(500).send({
                     message:
-                        err.message || "Some error occurred while creating the ToDo."
+                        err.message || "Some error occurred while creating the user."
                 });
             else {
                 delete data['password'];
-                res.status(201).send(data); // better to send data.id only
+                res.status(201).send(data);
             }
         });
     }
@@ -109,12 +110,6 @@ function isUserValid(req, res) {
     if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
         res.status(400).send({ message: "username must be 5-45 characters long made up of letters, digits and underscore" });
         return false;
-    }
-    if (req.body.role !== undefined) {
-        if (req.body.role != "User" && req.body.isDone !== "Admin") {
-            res.status(400).send({ message: "Role must be User or Admin" });
-            return false;
-        }
     }
     return true;
 }
