@@ -27,16 +27,11 @@
                 </button>
 
                 <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
-                    <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
-
-                        <li class="nav-item">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1" href="loginregister.html?register=1">Hello,
-                                sign up</a>
-                        </li>
+                    <ul class="navbar-nav my-2 mb-lg-0 text-center">
 
                         <li class="nav-item ">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1 px-2"
-                                href="loginregister.html?register=0">Login</a>
+                            <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" href="loginregister.html?register=0"
+                                id="loginHere">Login</a>
                         </li>
                         <li class="nav-item ">
                             <a href="#" target="_blank"><i
@@ -54,42 +49,35 @@
             </button>
             <div class="col-md-8 justify-content-center">
                 <div class="d-flex form-inputs">
-                    <input class="form-control" type="text">
+                    <!-- <input class="form-control" type="text">
                     <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="submit">Search</button>
-                    <i class="bx bx-search"></i>
+                    <button id="createAdmin">Create Admin</button> 
+                    <i class="bx bx-search"></i> -->
+                    <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
+                        <input class="form-control mr-sm-2 " type="text" id="textUsername"placeholder="Please enter username">
+                        <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6"
+                            type="button" id="btnSearch">Search</button>
+                    </form>
                 </div>
             </div>
         </nav>
     </header>
     <section class="h-auto" style="background-color: #eee;">
+
         <div class="container py-5 h-100">
-            <h2>User Information</h2>
-        </div>
-        <div class="container py-5 h-100">
-            <div>
-                <table>
-                    <tr>
-                        <td>User ID</td>
-                        <td>User Name</td>
-                        <td>
-                            <output type="id" id="myid" name="myid"></output>
-                        </td>
-                        <td>Role
-                            <output type="role" id="role" name="role"></output>
-                            <a href="#!" style="color: #393f81;" id="btnRegister">Delete Account</a>
-                        </td>
-                    </tr>
-                    <tr>Email</tr>
-                    <tr>Address</tr>
+            <div id="userInfor">
+                <h2>User Information</h2>
+                <table id="tableUserinfo" class="table table-borderless">
+
                 </table>
             </div>
-            <div>
+            <div id="orders">
                 <h2>Orders</h2>
                 <table>
 
                 </table>
             </div>
-            <div>
+            <div id="productManage">
                 <h2>Product management</h2>
                 <table>
 
@@ -98,11 +86,58 @@
         </div>
 
     </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script>
-        $("#formSearch").submit(function () {
-            var searchFor = $('#formSearch :input').val();
-            window.open("product.html?searchFor=" + searchFor);
+        $(document).ready(function () {
         });
+
+        $("#loginHere").click(function () {
+            window.open("loginregister.html");
+        });
+
+        $("#btnSearch").on("click",function () {
+            console.log("search button is clicked");
+            let username = $("#textUsername").val();
+            console.log(username);
+            $.ajax({
+                url: "/api/users/" + username,
+                type: "GET",
+                headers: { 'x-auth-username': sessionStorage.getItem('username'), 
+                    'x-auth-password': sessionStorage.getItem('password'),
+                    'x-auth-role': sessionStorage.getItem('role') },
+                error: function (jqxhr, status, errorThrown) {
+                    alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                }
+            }).done(function (data, status, xhr) {
+                // todo - display the searched user infor
+                var result = "<tr><td>User Id: " + data.id + "</td>"
+                            + "<td>Username: " + data.userName + "</td>"
+                            + "<td>Role: " + data.role + "</td></tr>"
+                            + "<tr><td>Email: " + data.email + "</td>"
+                            + "<td></td>"
+                            + '<td><a href="#!" style="color: #393f81;" id="deleteAccount">Delete Account</a></td></tr>'
+                            + "<tr><td>Address: " + data.address + "</td></tr>";
+                
+                $("#tableUserinfo").html(result);
+            });
+
+            
+        });
+
+        // $("#delectAccount").on("click", function () {
+        //     let username = $("input[userName]").value();
+        //     $.ajax({
+        //         url: "/api/users",
+        //         type: "DELETE",
+        //         dataType: "json",
+        //         error: function (jqxhr, status, errorThrown) {
+        //             alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+        //         }
+        //     }).done(function (data) {
+        //         //after delete, return?
+        //     })
+        // })
+
     </script>
 </body>
 

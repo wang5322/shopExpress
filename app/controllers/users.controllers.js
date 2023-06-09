@@ -30,9 +30,9 @@ exports.create = (req, res) => {
         });
     }
 };
-//get user by id
+//get user by username
 exports.findOne = (req, res) => {
-    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    Auth.execIfAuthValid(req, res, 'admin', (req, res, user) => {
         User.findByUsername(req.params.username, (err, data) => {
             if (err) {
                 if (err.kind === "not_found") {
@@ -49,18 +49,18 @@ exports.findOne = (req, res) => {
     });
 };
 
-//update user by id
-exports.update = (req, res) => {
+// login
+exports.login = (req, res) => {
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-        User.updateByID(req.params.id, req.params.username, (err, data) => {
+        User.findByUsername(req.headers["x-auth-username"], (err, data) => {
             if (err) {
                 if (err.kind === "not_found") {
                     res.status(404).send({
-                        message: 'Not found the user with id ' + req.params.id
+                        message: 'Not found the user with username ' + req.params.username
                     });
                 } else {
                     res.status(500).send({
-                        message: 'Error updating user with id ' + req.params.id
+                        message: 'Error retrieving user with username ' + req.params.username
                     });
                 }
             } else res.status(200).send(data);
@@ -68,18 +68,38 @@ exports.update = (req, res) => {
     });
 };
 
-//delete user by id
+//update user by username
+exports.update = (req, res) => {
+    let role = req.headers['x-auth-role'];
+    Auth.execIfAuthValid(req, res, role, (req, res, user) => {
+        User.updateByID( req.params.username, (err, data) => {
+            if (err) {
+                if (err.kind === "not_found") {
+                    res.status(404).send({
+                        message: 'Not found the user with usename ' + req.params.username
+                    });
+                } else {
+                    res.status(500).send({
+                        message: 'Error updating user with username ' + req.params.username
+                    });
+                }
+            } else res.status(200).send(data);
+        });
+    });
+};
+
+//delete user by username
 exports.delete=(req, res)=>{
     Auth.execIfAuthValid(req, res, null, (req, res, user)=>{
-        User.removeById(req.params.id,(err, data)=>{
+        User.removeById(req.params.username,(err, data)=>{
             if (err) {
                 if (err.kind === "not_found") {
                   res.status(404).send({
-                    message: 'Not found user with id ' + req.params.id,
+                    message: 'Not found user with username ' + req.params.username,
                   });
                 } else {
                   res.status(500).send({
-                    message: 'Could not delete user with id ' + req.params.id,
+                    message: 'Could not delete user with username ' + req.params.username,
                   });
                 }
               } else
