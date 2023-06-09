@@ -76,3 +76,49 @@ Shiyu
 -fix second nav bar in header
 3. Need assistance / figure things out
 - testing products api
+
+2023/06/08
+
+Xuerun
+
+1.  Done / not done since last scrum:
+- index.html is functional but still need further testing with product.html
+- register/login html and DOM are created
+-started with admin html setup but not yet finished 
+
+2. To do until next Scrum:
+-work on user APIs 
+-add auth for user login, update, delete 
+-try to make register/login page fully functional
+
+3. Need assistance / figure things out
+N/A
+
+Shiyuan
+1.  Done / not done since last scrum:
+-order.mode
+-orderItem.model
+-logic flow for order
+-logic flow for cart
+
+2. To do until next Scrum:
+-post, api/carts
+-post, api/orders
+-get, api/carts
+-get, api/orders
+
+3. Need assistance / figure things out
+N/A
+
+Shiyu
+1.  Done / not done since last scrum:
+- implemented javascript to inventory.html to retrieve and modify products data
+- created productdetail.html
+- created productlist.html
+2. To do until next Scrum:
+- add auth to products API
+-fix second nav bar in header
+-add javascript to productdtail.html and productlist.html
+-create shoppingcart.html
+3. Need assistance / figure things out
+- having trouble patching products.available to 0

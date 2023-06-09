@@ -75,42 +75,6 @@ Products.getAll = (category, searchFor, available, sellerId, result) => {
   });
 };
 
-// Products.getBySeller = (available, sellerId, sortOrder, result) => {
-//   console.log(sellerId, sortOrder, available);
-
-//   let queryStr = "SELECT * FROM products";
-//   let filterStr = "";
-//   switch (available) {
-//     case "both":
-//       break;
-//     case "false": {
-//       filterStr += "available=0";
-//       break;
-//     }
-//     default:
-//       filterStr += "available=1";
-//   }
-//   if (sellerId) {
-//     if (filterStr.length > 0) {
-//       filterStr += " and ";
-//     }
-//     filterStr += `sellerId='${sellerId}'`;
-//   }
-//   if (filterStr.length > 0) {
-//     queryStr += ` WHERE ${filterStr}`;
-//   }
-//   queryStr += `ORDER BY ${sortOrder}`;
-
-//   db.query(queryStr, (err, res) => {
-//     if (err) {
-//       console.log("error", err);
-//       result(null, err);
-//       return;
-//     }
-//     result(null, res);
-//   });
-// };
-
 Products.getById = (id, result) => {
   let queryStr = `select * from products where id = ${id}`;
   db.query(queryStr, (err, res) => {
@@ -159,9 +123,9 @@ Products.updateById = (id, products, result) => {
   );
 };
 
-Products.updateStockById = (id, stockNum, result) => {
-  const queryStr = `UPDATE products SET stockNum = ? WHERE id = ?`;
-  db.query(queryStr, [stockNum, id], (err, res) => {
+Products.updateStockById = (id, stockNum, available, result) => {
+  const queryStr = `UPDATE products SET stockNum = ?, available = ?, WHERE id = ?`;
+  db.query(queryStr, [stockNum, available, id], (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

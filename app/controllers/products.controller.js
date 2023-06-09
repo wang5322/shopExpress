@@ -48,21 +48,6 @@ exports.findAll = (req, res) => {
   });
 };
 
-// exports.findBySeller = (req, res) => {
-//   const available = req.query.available ? req.query.available : null;
-//   const sellerId = req.query.sellerId ? req.query.sellerId : null;
-//   const sortOrder = req.query.sortOrder ? req.query.sortOrder : "id";
-//   Products.getBySeller(available, sellerId, sortOrder, (err, data) => {
-//     if (err)
-//       res.status(500).send({
-//         message:
-//           err.message ||
-//           `Some error occured while retrieving Products from sellerId=${sellerId}`,
-//       });
-//     else res.status(200).send(data);
-//   });
-// };
-
 exports.findOne = (req, res) => {
   const id = req.params.id;
   console.log(req.query);
@@ -109,8 +94,10 @@ exports.updateStock = (req, res) => {
       message: "Content can not be empty!",
     });
   }
+  const stockNum = req.body.stockNum;
+  const available = req.body.available;
   console.log(req.body);
-  Products.updateStockById(req.params.id, req.body.stockNum, (err, data) => {
+  Products.updateStockById(req.params.id, stockNum, available, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({

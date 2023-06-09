@@ -7,7 +7,7 @@ const OrderItem = function (orderItem) {
     this.productCode = orderItem.productCode;
     this.productName = orderItem.productName;
     this.price = orderItem.price;
-    this.amout = orderItem.amout;
+    this.amount = orderItem.amount;
 };
 
 OrderItem.create = (newOrderItem, result) => {
@@ -23,7 +23,7 @@ OrderItem.create = (newOrderItem, result) => {
 };
 
 OrderItem.updateById = (id, orderItem, result) => {
-    db.query("UPDATE orderItems set orderId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amout = ? WHERE id = ?", [orderItem.orderId, orderItem.productId, orderItem.productCode, orderItem.productName, orderItem.price, orderItem.amout], (err, res) => {
+    db.query("UPDATE orderItems set orderId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amount = ? WHERE id = ?", [orderItem.orderId, orderItem.productId, orderItem.productCode, orderItem.productName, orderItem.price, orderItem.amout], (err, res) => {
         if (err) {
             console.log("error:", err);
             result(null, res);

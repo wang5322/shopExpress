@@ -8,6 +8,10 @@ footer{
     font-size: small;
 }
 
+.cropped { width: 150px; overflow: hidden; } 
+
+.cropped img { margin: -150px 0px 0px -150px; }
+
 .icon-link{
     color:rgb(107, 106, 106);
 }
@@ -28,4 +32,14 @@ footer{
 
 .label-sm{
     width:300px;
+}
+
+.productImageCard{
+    width:300px;
+    height: 300px;
+    
+}
+
+.card-title{
+    cursor:pointer;
 }
