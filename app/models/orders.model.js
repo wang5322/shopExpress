@@ -23,7 +23,7 @@ Orders.create = (newOrder, result) => {
           result(err, null);
           return;
         }
-        console.log("created order: ", { id: res.insertId, ...newOrder });
+        //console.log("created order: ", { id: res.insertId, ...newOrder });
         result(null, { id: res.insertId, ...newOrder });
       });
 }

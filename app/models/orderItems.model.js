@@ -17,7 +17,7 @@ OrderItem.create = (newOrderItem, result) => {
             result(err, null);
             return;
         }
-        console.log("created orderItems: ", { id: res.insertId, ...newOrderItem });
+        //console.log("created orderItems: ", { id: res.insertId, ...newOrderItem });
         result(null, { id: res.insertId, ...newOrderItem });
     });
 };
