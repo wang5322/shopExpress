@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 </head>
 
 <body>
@@ -33,31 +32,29 @@
                             </div>
                             <div class="col-md-6 col-lg-7 d-flex align-items-center">
                                 <div class="card-body p-4 p-lg-5 text-black" id="loginPanel">
-
                                     <form>
-
                                         <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your
                                             account</h5>
 
                                         <div class="form-outline mb-2">
-                                            <input type="email" id="formLogin"
-                                                class="form-control form-control-lg" />
-                                            <label class="form-label" for="formLogin">Email address</label>
+                                            <label class="form-label" for="username">Username</label>
+                                            <input type="text" name="username" class="form-control form-control-lg" />                
                                         </div>
 
                                         <div class="form-outline mb-2">
-                                            <input type="password" id="formLogin"
-                                                class="form-control form-control-lg" />
-                                            <label class="form-label" for="formLogin">Password</label>
+                                            <label class="form-label" for="password">Password</label>
+                                            <input type="text" name="password" class="form-control form-control-lg" />
                                         </div>
 
                                         <div class="pt-1 mb-4">
-                                            <button class="btn btn-dark btn-lg btn-block" type="button">Login</button>
+                                            <button id="btnLogin" class="btn btn-dark btn-lg btn-block"
+                                            type="button">Login</button>
                                         </div>
 
                                         <a class="small text-muted" href="#!">Forgot password?</a>
                                         <p class="mb-3 pb-lg-2" style="color: #393f81;">Don't have an account? <a
-                                                href="#!" style="color: #393f81;" id="btnRegister">Register here</a></p>
+                                                href="#!" style="color: #393f81;" id="hrefRegisterHere">Register
+                                                here</a></p>
                                         <a href="#!" class="small text-muted">Terms of use.</a>
                                         <a href="#!" class="small text-muted">Privacy policy</a>
                                     </form>
@@ -70,29 +67,32 @@
                                         <h5 class="fw-normal mb-3 pb-2" style="letter-spacing: 1px;">Create account</h5>
 
                                         <div class="form-outline mb-2">
-                                            <input type="email" id="formRegister"
-                                                class="form-control form-control-sm" />
-                                            <label class="form-label" for="formRegister">Your name</label>
+                                            <label class="form-label" for="newEmail">Email</label>
+                                            <input type="text" name="newEmail" class="form-control form-control-sm" />                                            
                                         </div>
                                         <div class="form-outline mb-2">
-                                            <input type="email" id="formRegister"
-                                                class="form-control form-control-sm" />
-                                            <label class="form-label" for="formRegister">Email address</label>
+                                            <label class="form-label" for="newUsername">Username</label>
+                                            <input type="text" name="newUsername" class="form-control form-control-sm" />                                            
                                         </div>
 
                                         <div class="form-outline mb-2">
-                                            <input type="password" id="formRegister"
-                                                class="form-control form-control-sm" />
-                                            <label class="form-label" for="formRegister">Password</label>
+                                            <label class="form-label" for="newPassword">Password</label>
+                                            <input type="text" name="newPassword" class="form-control form-control-sm" />                                            
                                         </div>
                                         <div class="form-outline mb-2">
-                                            <input type="password" id="formRegister"
-                                                class="form-control form-control-sm" />
-                                            <label class="form-label" for="formRegister">Address</label>
+                                            <label class="form-label" for="newAddress">Address</label>
+                                            <input type="text" name="newAddress" class="form-control form-control-sm" />                                            
+                                        </div>
+                                        <div class="form-outline mb-2">
+                                            <label class="form-label" for="newRole">Role</label>
+                                            <select name="role" id="selectRole">
+                                                <option value="seller">Seller</option>
+                                                <option value="buyer">buyer</option>
+                                            </select>
                                         </div>
 
                                         <div class="pt-1 mb-2">
-                                            <button class="btn btn-dark btn-lg btn-block"
+                                            <button id="btnRegister" class="btn btn-dark btn-lg btn-block"
                                                 type="button">Register</button>
                                         </div>
                                         <a href="#!" class="small text-muted">Terms of use.</a>
@@ -107,6 +107,7 @@
             </div>
         </div>
     </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
     <script src="loginregister.js"></script>
 </body>
 
