@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!--bootstrap icon-->
 
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="main.css">
@@ -23,7 +25,12 @@
         <!-- main nav bar -->
         <nav class="navbar navbar-expand-sm bg-body-tertiary sticky-top">
             <div class="container-fluid">
+
                 <a class="navbar-brand mb-1" href="index.html">ShopExpress</a>
+                <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
+                    <input class="form-control mr-sm-2 " type="search" placeholder="Search any product">
+                    <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="submit">Search</button>
+                </form>
                 <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
                     aria-label="Toggle navigation">
@@ -33,22 +40,24 @@
                 <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
 
                     <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
-                        <li class="nav-item ">
+                        <!-- <li class="nav-item ">
                             <form class="form-inline my-2 my-lg-0 d-flex">
                                 <input class="form-control mr-sm-2 " type="search" placeholder="Search">
                                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6"
                                     type="submit">Search</button>
                             </form>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link" href="index.html">seller's center</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1" href="#" target="_blank">Hello,
+                            <a class="btn btn-warning btn-sm mt-1 mx-1" href="loginregister.html?register=0"
+                                target="_blank">Hello,
                                 sign in</a>
                         </li>
                         <li class="nav-item ">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" href="#" target="_blank">Register</a>
+                            <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" href="loginregister.html?register=1"
+                                target="_blank">Register</a>
                         </li>
                         <li class="nav-item ">
                             <a href="#" target="_blank"><i
@@ -97,34 +106,36 @@
     </header>
 
     <main class="container-fluid mt-5">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div id="alert" class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Holy guacamole!</strong> You should check in on some of those fields below.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <section class="row m-5">
+        <section class=" container-fluid row m-5">
             <div class="inventoryList editPane rounded col-md-7 mx-4 ">
                 <div class="ml-5">
                     <h1 class="mt-4">Inventory</h1>
                     <div class="row">
-                        <div class="deselectAll col-10">Deselect all items</div>
-                        <div class="ms-l col-2 ">Price</div>
+                        <div id="deselectAll" class=" col-10">Deselect all items</div>
+                        <!-- <div class="ms-l col-2 ">Price</div> -->
                         <hr class="solid">
-                        <div id="productList"></div>
+
                     </div>
+                    <div id="productList"></div>
                 </div>
             </div>
             <div class="editPane col-md-4 rounded ">
                 <h3 class="mt-5">Product info:</h3>
                 <hr class="solid">
                 <form class="mb-4 ">
+                    <label class="labelform">Product id:<span id="id"></span></label><br>
                     <label class="labelform">Product code:</label>
-                    <input type="text" name="itemCode" class="form-control">
+                    <input type="text" name="productCode" class="form-control">
                     <label class="labelform">Product name:</label>
-                    <input type="text" name="itemName" class="form-control">
+                    <input type="text" name="productName" class="form-control">
                     <label class="labelform">Product description:</label>
-                    <textarea type="text" name="itemDesc" class="form-control" rows="3"></textarea>
+                    <textarea type="text" name="productDesc" class="form-control" rows="3"></textarea>
                     <label class="labelform label-sm">Category:</label>
                     <input type="text" name="category" class="form-control form-sm">
                     <label class="labelform label-sm">In stock items:</label>
@@ -136,6 +147,7 @@
                     <button class="btn btn-warning mt-2" id="add">Add product</button>
                     <button class="btn btn-secondary mt-2" id="update">Update product</button>
                     <button class="btn btn-outline-secondary mt-2" id="archieve">Archieve product</button>
+                    <button class="btn btn-outline-secondary mt-2" id="clear">Clear panel</button>
 
                 </form>
             </div>
@@ -144,7 +156,7 @@
     </main>
     <footer>
         <div class="container navbar-dark">
-            <p>Copyright 2023 by ShopExpress. All Rights Reserved.</p>
+            <p>Copyright&copy; 2023 by ShopExpress. All Rights Reserved.</p>
         </div>
     </footer>
     <!-- JavaScript bootstrap-->
@@ -153,8 +165,7 @@
         crossorigin="anonymous"></script>
     <script src="javascript/inventory.js"></script>
 
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 
 </body>
 
