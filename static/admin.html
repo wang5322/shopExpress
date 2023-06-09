@@ -28,12 +28,12 @@
 
                 <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
                     <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
-                       
+
                         <li class="nav-item">
                             <a class="btn btn-warning btn-sm mt-1 mx-1" href="loginregister.html?register=1">Hello,
                                 sign up</a>
                         </li>
-                       
+
                         <li class="nav-item ">
                             <a class="btn btn-warning btn-sm mt-1 mx-1 px-2"
                                 href="loginregister.html?register=0">Login</a>
@@ -61,3 +61,49 @@
             </div>
         </nav>
     </header>
+    <section class="h-auto" style="background-color: #eee;">
+        <div class="container py-5 h-100">
+            <h2>User Information</h2>
+        </div>
+        <div class="container py-5 h-100">
+            <div>
+                <table>
+                    <tr>
+                        <td>User ID</td>
+                        <td>User Name</td>
+                        <td>
+                            <output type="id" id="myid" name="myid"></output>
+                        </td>
+                        <td>Role
+                            <output type="role" id="role" name="role"></output>
+                            <a href="#!" style="color: #393f81;" id="btnRegister">Delete Account</a>
+                        </td>
+                    </tr>
+                    <tr>Email</tr>
+                    <tr>Address</tr>
+                </table>
+            </div>
+            <div>
+                <h2>Orders</h2>
+                <table>
+
+                </table>
+            </div>
+            <div>
+                <h2>Product management</h2>
+                <table>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+    <script>
+        $("#formSearch").submit(function () {
+            var searchFor = $('#formSearch :input').val();
+            window.open("product.html?searchFor=" + searchFor);
+        });
+    </script>
+</body>
+
+</html>
