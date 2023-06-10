@@ -39,7 +39,11 @@ exports.getAll = (req, res) => {
     });//Auth.execIfAuthValid end
 };
 
-
+//add an orderitem into an order or create an order
+exports.create = (req, res) => {
+  
+}
+/*
 
 exports.create = (req, res) => {
 
@@ -171,42 +175,43 @@ exports.create = (req, res) => {
         };
     });//Products.getById end
     
-}
+                  }
+                  */
 
 exports.delete = (req, res) => {
-    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-        switch (user.role) {
-            case "seller": {
-                //seller not allowed to delete
-                return;
-            }
-            case "buyer": {
-                //buyer not allowed to delete other's order
-                if (!(req.body.buyerId == user.id)) {
-                    return;
-                }
-                break;
-            }
-            case "admin": {
-                break;
-            }
-            default:
-                return;
-        };
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    switch (user.role) {
+      case "seller": {
+        //seller not allowed to delete
+        return;
+      }
+      case "buyer": {
+        //buyer not allowed to delete other's order
+        if (!(req.body.buyerId == user.id)) {
+          return;
+        }
+        break;
+      }
+      case "admin": {
+        break;
+      }
+      default:
+        return;
+    };
 
-        Orders.remove(req.params.id, (err, data) => {
-            if (err) {
-                if (err.kind === "not_found") {
-                    res.status(404).send({
-                        message: `Not found order with id ${req.params.id}.`
-                    });
-                } else {
-                    res.status(500).send({
-                        message: "Could not delete order with id " + req.params.id
-                    });
-                }
-            } else res.status(200).send({ message: true });
-        });//Orders.remove end
+    Orders.remove(req.params.id, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: `Not found order with id ${req.params.id}.`
+          });
+        } else {
+          res.status(500).send({
+            message: "Could not delete order with id " + req.params.id
+          });
+        }
+      } else res.status(200).send({ message: true });
+    });//Orders.remove end
 
-    })//Auth.execIfAuthValid end
+  });//Auth.execIfAuthValid end
 };

@@ -36,6 +36,7 @@ require("./app/routes/images.routes.js")(app);
 
 require("./app/routes/orders.routes.js")(app);
 require("./app/routes/carts.routes.js")(app);
+require("./app/routes/cartItem.routes.js")(app);
 app.use(express.static("static"));
 
 // set port, listen for requests

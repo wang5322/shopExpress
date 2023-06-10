@@ -13,13 +13,15 @@ exports.getAll = (req, res) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can get carts." });
         }//only buyer can get carts
-        Carts.getAll(user.id, null, (err, data) => {
-            if (err) {
-                res.status(500).send({ message: err.message || "Some error occurred while retrieving carts." });
-            } else {
-                res.status(200).send(data);
-            }
-        });
+        else {
+            Carts.getAll(user.id, null, (err, data) => {
+                if (err) {
+                    res.status(500).send({ message: err.message || "Some error occurred while retrieving carts." });
+                } else {
+                    res.status(200).send(data);
+                }
+            });
+        };
     });//Auth.execIfAuthValid end
 };
 
@@ -111,7 +113,7 @@ exports.create = (req, res) => {
     
 }
 
-//delete all items in cartItems table with indicated cartId, then delete cart in carts table
+//delete carts by id, and delete all items with indicated cartId
 exports.delete = (req, res) => {
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) { return; }//only buyer can delete cart 
