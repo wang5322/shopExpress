@@ -77,8 +77,26 @@ exports.regIfInputValid = (req, res, callIfValid) => {
     res.status(400).send({ message: "username and password must be provided" });
     return false;
   }
-  // FIXME: verify quality of password (length 8+, at least one uppercase, lowercase, digit, and special character)
-  // FIXME: username must not exist yet, check database, may require you add a callback to this method instead of returning a value
+
+  let pwdFormat = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  let mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  if (!req.body.password.match(pwdFormat)){
+    res.status(400).send({
+      message:
+        "password must be length 8+, at least one uppercase, lowercase, digit, and special character",
+    });
+    return false;
+  }
+
+  if (!req.body.email.match(mailFormat)){
+    res.status(400).send({
+      message:
+        "invalid email address",
+    });
+    return false;
+  }
+
   let username = req.body.username;
   if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
     res.status(400).send({
