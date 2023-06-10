@@ -30,19 +30,19 @@ Orders.create = (newOrder, result) => {
 //get one order by id
 Orders.findById = (id, result) => {
 
-    db.query(`SELECT * FROM orders WHERE id = ${id}`, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
+    db.query("SELECT * FROM orders WHERE id = ?", [id], (err, res) => {
+        if (err) {
+            console.log("error: ", err);
+            result(err, null);
+            return;
+        }
   
-      if (res.length) {
-        console.log("found orders: ", res[0]);
-        result(null, res[0]);
-        return;
-      }
-      result({ kind: "not_found" }, null);
+        if (res.length) {
+            console.log("found orders: ", res[0]);
+            result(null, res[0]);
+            return;
+        }
+        result({ kind: "not_found" }, null);
     });
 };
   
@@ -52,7 +52,7 @@ Orders.getAll = (sellerName, buyerName, statusFilter, result) => {
     
     
 
-    let sql = "SELECT orders.* FROM orders join users as u1 on (orders.sellerId=u1.id and u1.role='seller') join users as u2 on (orders.buyerId=u2.id and u2.role='buyer')";
+    let sql = "SELECT orders.*, u1.userName as sellerName, u2.userName as buyerName FROM orders join users as u1 on (orders.sellerId=u1.id and u1.role='seller') join users as u2 on (orders.buyerId=u2.id and u2.role='buyer')";
     let inserts = [];
     let filterStr="";
     if (sellerName) {

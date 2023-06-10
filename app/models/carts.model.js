@@ -24,42 +24,35 @@ Carts.create = (newCart, result) => {
 //get one order by id
 Carts.findById = (id, result) => {
 
-    db.query(`SELECT * FROM carts WHERE id = ${id}`, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
+    db.query("SELECT * FROM carts WHERE id = ?", [id], (err, res) => {
+        if (err) {
+            console.log("error: ", err);
+            result(err, null);
+            return;
+        }
   
-      if (res.length) {
-        console.log("found orders: ", res[0]);
-        result(null, res[0]);
-        return;
-      }
-      result({ kind: "not_found" }, null);
+        if (res.length) {
+            console.log("found orders: ", res[0]);
+            result(null, res[0]);
+            return;
+        }
+        result({ kind: "not_found" }, null);
     });
 };
   
 
-//get carts with sellerId , buyerId
-Carts.getAll = (sellerId,buyerId, result) => {
+//get carts with  buyerId, and optional sellerId 
+Carts.getAll = (buyerId, sellerId, result) => {
 
-    let sql = "SELECT * FROM carts";
-    let inserts = [];
-    let filterStr;
+    let sql = "SELECT carts.*, u1.userName as sellerName, u2.userName as buyerName FROM carts join users as u1 on (carts.sellerId=u1.id and u1.role='seller') join users as u2 on (carts.buyerId=u2.id and u2.role='buyer') where buyerId=?";
+    let query;
     if (sellerId) {
-        filterStr += " WHERE sellerId = ??";
-        inserts.push(sellerId);
-
-    };
-    if (buyerId) {
-        if (filterStr.length == 0) { filterStr += " WHERE buyerId = ??"; }
-        else { filterStr += " AND buyerId = ??"; }
-        inserts.push(buyerId);
-    };
-    
-    sql += filterStr;
-    let query = db.format(sql, inserts);
+        sql += " and sellerId=?";
+        query = db.format(sql, [buyerId, sellerId]);
+    }
+    else {
+        query = db.format(sql, buyerId);
+    }
     db.query(query, (err, res) => {
         if (err) {
             console.log("error: ", err);
