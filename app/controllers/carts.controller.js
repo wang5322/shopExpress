@@ -7,35 +7,39 @@ const Products = require("../models/products.model");
 const Auth = require("../utils/auth");
 const { error } = require("npmlog");
 
+//get all carts from particular user
 exports.getAll = (req, res) => {
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-        if (!(user.role == "buyer")) { return; }//only buyer can get carts
-        Carts.getAll( user.id, (err, data) => {
+        if (!(user.role == "buyer")) {
+            return res.status(500).send({ message: "Only buyer can get carts." });
+        }//only buyer can get carts
+        Carts.getAll(user.id, null, (err, data) => {
             if (err) {
                 res.status(500).send({ message: err.message || "Some error occurred while retrieving carts." });
             } else {
                 res.status(200).send(data);
             }
-        })
+        });
     });//Auth.execIfAuthValid end
 };
 
-
-
+//insert posted product into cartItems table, using cart in carts table if existing, else create a new cart  
 exports.create = (req, res) => {
     let sellerId;
     let buyerId;
     
-    Products.getById(req.body.productId , (err, data) => {
+    
+    Products.getById(req.body.id , (err, data) => {
         //get product record from products table
         if (err) {
             return res.status(500).send({ message: err.message || "errors when demanding products" });
         } else {
-            if (data.length == 0) {
+            if (!(data.id)) {
                 res.status(500).send({ message: "Cannot find products!" });
                 return;
             } else {
-                sellerId = data[0].sellerId;
+                
+                sellerId = data.sellerId;
                 Auth.execIfAuthValid(req, res, null, (req, res, user) => {
                     
                     if (!(user.role == "buyer")) {
@@ -43,10 +47,10 @@ exports.create = (req, res) => {
                     } else {let newCarts;
                         //write product information into a new orderitem object
                         let newCartItem = new CartItem({
-                            productId: data[0].id,
-                            productCode: data[0].productCode,
-                            productName: data[0].productName,
-                            price: Number(data[0].price),
+                            productId: data.id,
+                            productCode: data.productCode,
+                            productName: data.productName,
+                            price: Number(data.price),
                             amount: req.body.amount
                 
                         });
@@ -58,7 +62,7 @@ exports.create = (req, res) => {
                                 return;
                             } else {
                                 if (data.length == 0) {
-                                    //create a new record to orders table
+                                    //no existing cart, insert a new cart into carts table
                                     newCarts = {
                                         sellerId: sellerId,
                                         buyerId: buyerId
@@ -67,10 +71,10 @@ exports.create = (req, res) => {
                                         if (err) {
                                             return res.status(500).send({ message: err.message || "Create failed!" });
                                         } else {
-                                            cartId = data.id;
-                                            newCarts = data;
-                                            newCartItem.cartId = newCarts.id;
+                                            newCarts = data[0];
+                                            newCartItem.cartId = data.id;
                                             CartItem.create(newCartItem, (err, data) => {
+                                                //insert cartItem into cartItems table
                                                 if (err) {
                                                     return res.status(500).send({ message: err.message || ("Create cart item failed!") });
                                                 } else {
@@ -81,16 +85,17 @@ exports.create = (req, res) => {
                                         }
                                     });//Carts.create end
                                 } else {
-                                    //use the existing cart record in carts table
+                                    //use the existing cart in carts table
                                     newCarts = data[0];
                                     newCartItem.cartId = newCarts.id;
                                     CartItem.create(newCartItem, (err, data) => {
+                                        //insert cartItem into cartItems table
                                         if (err) {
                                             return res.status(500).send({ message: err.message || ("Create cart item failed!") });
                                         } else {
                                             return res.status(200).send({ cart: newCarts, cartItem: data });
                                         };
-                                    });
+                                    });//CartItem.create end
                                 
                                 };
                             }
@@ -106,23 +111,45 @@ exports.create = (req, res) => {
     
 }
 
+//delete all items in cartItems table with indicated cartId, then delete cart in carts table
 exports.delete = (req, res) => {
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) { return; }//only buyer can delete cart 
-
-        Carts.remove(req.params.id, (err, data) => {
+        Carts.findById(req.params.id,(err, data) => {
+            //get indicated cart
             if (err) {
-                if (err.kind === "not_found") {
-                    res.status(404).send({
-                        message: `Not found order with id ${req.params.id}.`
-                    });
-                } else {
-                    res.status(500).send({
-                        message: "Could not delete cart with id " + req.params.id
-                    });
-                }
-            } else res.status(200).send({ message: true });
-        });//Orders.remove end
-
+                res.status(500).send({
+                    message: "Could not delete cart with id " + req.params.id
+                });
+            } else if (!(data.id)) {
+                //no cart record returned
+                res.status(404).send({
+                    message: `Not found cart with id ${req.params.id}.`
+                });
+            } else if (!(data.buyerId == user.id)) {
+                //buyer can only delete his own cart
+                res.status(500).send({
+                    message: "Permission denied on deleting cart with id " + req.params.id
+                });
+            } else {
+                CartItem.removeAll(req.params.id, (err, data) => {
+                    //delete all cartItems from cartItems table with indicated cartId
+                    if (err) {
+                        res.status(500).send({
+                            message: "Could not delete cartItems with cartId " + req.params.id
+                        });
+                    } else {
+                        Carts.remove(req.params.id, (err, data) => {
+                            //delete cart from carts table
+                            if (err) {
+                                res.status(500).send({
+                                        message: "Could not delete cart with id " + req.params.id
+                                });
+                            } else res.status(200).send({ message: true });
+                        });//Carts.remove end
+                    }
+                })//CartItem.removeAll end
+            }
+        })//Carts.getById end
     })//Auth.execIfAuthValid end
 };

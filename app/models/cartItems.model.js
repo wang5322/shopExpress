@@ -54,6 +54,22 @@ CartItem.remove = (id, result) => {
     });
 };
 
+CartItem.removeAll = (cartId, result) => {
+    db.query("delete from cartItems where cartId = ?", cartId, (err, res) => {
+        if (err) {
+            console.log("error: ", err);
+            result(null, err);
+            return;
+        }
+        if (res.affectedRows == 0) {
+            result({ kind: "not_found" }, null);
+            return;
+        };
+        console.log("deleted cartItems with cartId: ", cartId);
+        result(null, res);
+    })
+}
+
 CartItem.getByCartId = (cartId, result) => {
     db.query("SELECT * FROM cartItems WHERE cartId=?", cartId, (err, res) => {
         if (err) {

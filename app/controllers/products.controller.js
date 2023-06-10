@@ -37,16 +37,24 @@ exports.findAll = (req, res) => {
   const searchFor = req.query.searchFor ? req.query.searchFor : null;
   const available = req.query.available ? req.query.available : null;
   const sellerId = req.query.sellerId ? req.query.sellerId : null;
+  const userName = req.query.userName ? req.query.userName : null;
   //FIXME: validate sellerId
   //console.log(req.query);
-  Products.getAll(category, searchFor, available, sellerId, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Products.",
-      });
-    else res.status(200).send(data);
-  });
+  Products.getAll(
+    category,
+    searchFor,
+    available,
+    sellerId,
+    userName,
+    (err, data) => {
+      if (err)
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving Products.",
+        });
+      else res.status(200).send(data);
+    }
+  );
 };
 
 exports.findOne = (req, res) => {

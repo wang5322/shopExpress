@@ -154,3 +154,15 @@ Xuerun
 -work on admin page
 3. Need assistance / figure things out
 N/A
+
+Shiyu
+1.  Done / not done since last scrum:
+- added auth to products API
+- used sessionStorage to retrieve data from the logined seller
+- display logined in seller's product list
+2. To do until next Scrum:
+-add javascript to productdtail.html and productlist.html
+-create shoppingcart.html
+-add 
+3. Need assistance / figure things out
+-N/A
