@@ -14,6 +14,7 @@ exports.getAll = (req, res) => {
             return res.status(500).send({ message: "Only buyer can get carts." });
         }//only buyer can get carts
         else {
+            //get user's all carts
             Carts.getAll(user.id, null, (err, data) => {
                 if (err) {
                     res.status(500).send({ message: err.message || "Some error occurred while retrieving carts." });

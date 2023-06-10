@@ -23,17 +23,18 @@ CartItem.create = (newCartItem, result) => {
 };
 
 CartItem.updateById = (id, cartItem, result) => {
-    db.query("UPDATE cartItems set cartId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amount = ? WHERE id = ?", [cartItem.cartId, cartItem.productId, cartItem.productCode, cartItem.productName, cartItem.price, cartItem.amount], (err, res) => {
+    db.query("UPDATE cartItems set cartId = ?, productId = ?, productCode = ?, productName = ?, price = ?, amount = ? WHERE id = ?", [cartItem.cartId, cartItem.productId, cartItem.productCode, cartItem.productName, cartItem.price, cartItem.amount,id], (err, res) => {
         if (err) {
             console.log("error:", err);
-            result(null, res);
+            result(null, err);
             return;
         }
         if (res.affectedRows == 0) {
             result({ kind: "not_found" }, null);
             return;
         }
-        console.log("updated orderItems: ", { id: id, ...cartItem });
+        console.log("updated cartItems: ", { id: id, ...cartItem });
+        result(null, { id: id, ...cartItem });
         return;
     })
 }
