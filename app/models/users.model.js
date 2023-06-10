@@ -42,7 +42,7 @@ Users.findByUsername = (username, result) => {
     });
   };
 //update user by username
-  Users.updateByID = (username, result)=>{
+  Users.updateByUsername = (username, result)=>{
     let queryStr = 'UPDATE users SET userName =?, passwords =?, role =?, address =?, email =? WHERE username =?'
     db.query(querystr, [users.userName, users.passwords, users.role, users.address, users.email, username], (err, res)=>{
         if (err) {

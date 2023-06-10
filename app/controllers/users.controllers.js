@@ -3,8 +3,8 @@ const Auth = require("../utils/auth");
 
 //Create and Save a new User
 exports.create = (req, res) => {
-  // Validate request
-  var isValidResult = isUserValid(req, res);
+  let isValidResult = isUserValid(req, res);
+
   if (isValidResult === true) {
     // Create a User
     // TODO: encrypt the password SHA256
@@ -32,94 +32,93 @@ exports.create = (req, res) => {
 };
 //get user by username
 exports.findOne = (req, res) => {
-    Auth.execIfAuthValid(req, res, 'admin', (req, res, user) => {
-        User.findByUsername(req.params.username, (err, data) => {
-            if (err) {
-                if (err.kind === "not_found") {
-                    res.status(404).send({
-                        message: 'Not found the user with username ' + req.params.username
-                    });
-                } else {
-                    res.status(500).send({
-                        message: 'Error retrieving user with username ' + req.params.username
-                    });
-                }
-            } else res.status(200).send(data);
-        });
+  Auth.execIfAuthValid(req, res, 'admin', (req, res, user) => {
+    User.findByUsername(req.params.username, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: 'Not found the user with username ' + req.params.username
+          });
+        } else {
+          res.status(500).send({
+            message: 'Error retrieving user with username ' + req.params.username
+          });
+        }
+      } else res.status(200).send(data);
     });
+  });
 };
 
 // login
 exports.login = (req, res) => {
-    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-        User.findByUsername(req.headers["x-auth-username"], (err, data) => {
-            if (err) {
-                if (err.kind === "not_found") {
-                    res.status(404).send({
-                        message: 'Not found the user with username ' + req.params.username
-                    });
-                } else {
-                    res.status(500).send({
-                        message: 'Error retrieving user with username ' + req.params.username
-                    });
-                }
-            } else res.status(200).send(data);
-        });
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    User.findByUsername(req.headers["x-auth-username"], (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: 'Not found the user with username ' + req.params.username
+          });
+        } else {
+          res.status(500).send({
+            message: 'Error retrieving user with username ' + req.params.username
+          });
+        }
+      } else res.status(200).send(data);
     });
+  });
 };
 
 //update user by username
 exports.update = (req, res) => {
-    let role = req.headers['x-auth-role'];
-    Auth.execIfAuthValid(req, res, role, (req, res, user) => {
-        User.updateByID( req.params.username, (err, data) => {
-            if (err) {
-                if (err.kind === "not_found") {
-                    res.status(404).send({
-                        message: 'Not found the user with usename ' + req.params.username
-                    });
-                } else {
-                    res.status(500).send({
-                        message: 'Error updating user with username ' + req.params.username
-                    });
-                }
-            } else res.status(200).send(data);
-        });
+  let role = req.headers['x-auth-role'];
+  Auth.execIfAuthValid(req, res, role, (req, res, user) => {
+    User.updateByUsername(req.params.username, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: 'Not found the user with usename ' + req.params.username
+          });
+        } else {
+          res.status(500).send({
+            message: 'Error updating user with username ' + req.params.username
+          });
+        }
+      } else res.status(200).send(data);
     });
+  });
 };
 
 //delete user by username
-exports.delete=(req, res)=>{
-    Auth.execIfAuthValid(req, res, null, (req, res, user)=>{
-        User.removeById(req.params.username,(err, data)=>{
-            if (err) {
-                if (err.kind === "not_found") {
-                  res.status(404).send({
-                    message: 'Not found user with username ' + req.params.username,
-                  });
-                } else {
-                  res.status(500).send({
-                    message: 'Could not delete user with username ' + req.params.username,
-                  });
-                }
-              } else
-                res.status(200).send({ message: `User was deleted successfully!` });
-        })
+exports.delete = (req, res) => {
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    User.removeById(req.params.username, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: 'Not found user with username ' + req.params.username,
+          });
+        } else {
+          res.status(500).send({
+            message: 'Could not delete user with username ' + req.params.username,
+          });
+        }
+      } else
+        res.status(200).send({ message: `User was deleted successfully!` });
     })
+  })
 }
 
 // used by insert and update
-function isUserValid(req, res) {
-  //console.log("isValid: ",res);
+async function isUserValid(req, res) {
   if (req.body.id) {
     res.status(400).send({
       message: "id is provided by the system. User not saved",
       result: false,
     });
-    //console.log("if cond: ",res.send.result);
+
     return false;
   }
-  // console.log(JSON.stringify(req.body));
+
   if (req.body.username === undefined || req.body.password === undefined) {
     res.status(400).send({ message: "username and password must be provided" });
     return false;
@@ -134,5 +133,30 @@ function isUserValid(req, res) {
     });
     return false;
   }
-  return true;
+
+  let promise = new Promise((resolve, reject)=>{
+    User.findByUsername(username, (err, data) => {
+      let ifExist;
+      if (err) {
+        if (err.kind === "not_found") {
+          ifExist = true;
+        } else {
+          res.status(500).send({
+            message: 'Error retrieving user with username ' + username + 'during input validation'
+          });
+          ifExist = false;
+        }
+      } else {
+        res.status(400).send({
+          message:
+            "username already exists! Please register with another username.",
+        });
+        ifExist = false;
+      }
+
+      resolve(ifExist);
+    });
+  })
+
+  return await promise;
 }

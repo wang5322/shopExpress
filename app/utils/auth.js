@@ -44,7 +44,7 @@ exports.execIfAuthValid = (req, res, role, callIfAuth) => {
       if (user.password == passwordHash) {
         delete user.password;
         if (role !== undefined && role !== null) {
-          if (user.role == role) {
+          if (user.role == role || role.includes(user.role)) {
             callIfAuth(req, res, user);
           } else {
             res.status(403).send({
