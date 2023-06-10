@@ -21,7 +21,7 @@ const Users = function (user) {
       result(null, { id: res.insertId, ...newUser });
     });
   };
-  //get one user by id
+  //get one user by username
 Users.findByUsername = (username, result) => {
     // prevent SQL injection
     db.query('SELECT * FROM users WHERE username = ?', [username], (err, res) => {
@@ -41,10 +41,10 @@ Users.findByUsername = (username, result) => {
       result({ kind: "not_found" }, null);
     });
   };
-//update user by id
-  Users.updateByID = (id, username, result)=>{
-    let queryStr = 'UPDATE users SET userName =?, passwords =?, role =?, address =?, email =? WHERE id=?'
-    db.query(querystr, [users.userName, users.passwords, users.role, users.address, users.email, id], (err, res)=>{
+//update user by username
+  Users.updateByID = (username, result)=>{
+    let queryStr = 'UPDATE users SET userName =?, passwords =?, role =?, address =?, email =? WHERE username =?'
+    db.query(querystr, [users.userName, users.passwords, users.role, users.address, users.email, username], (err, res)=>{
         if (err) {
             console.log("error: ", err);
             result(null, err);
@@ -56,14 +56,15 @@ Users.findByUsername = (username, result) => {
             return;
           }
     
-          console.log("updated user: ", { id: id, ...users });
-          result(null, { id: id, ...users }); 
+          console.log("updated user: ", { ...users });
+          result(null, { ...users }); 
     });
   };
+
 //delete user by id
-  Users.removeById = (id, result) => {
-    let queryStr = `DELETE FROM users WHERE id=?`;
-    db.query(queryStr, id, (err, res) => {
+  Users.removeById = (username, result) => {
+    let queryStr = `DELETE FROM users WHERE username =?`;
+    db.query(queryStr, username, (err, res) => {
       if (err) {
         console.log("error: ", err);
         result(null, err);
@@ -75,7 +76,7 @@ Users.findByUsername = (username, result) => {
         return;
       }
   
-      console.log("deleted user with id: ", id);
+      console.log("deleted user ", username);
       result(null, res);
     });
   };
