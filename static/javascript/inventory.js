@@ -28,6 +28,7 @@ $(document).ready(function () {
   // console.log(sellerId);
   refreshInventoryList();
   console.log("page is fully loaded");
+  console.log(sellerId);
 
   // $("#alert").hide(); // error message alert
 
@@ -41,8 +42,9 @@ $(document).ready(function () {
       error: function (jqxhr, status, errorThrown) {
         alert("AJAX error: " + jqxhr.responseText);
       },
-    }).done(function () {
+    }).done(function (data) {
       console.log(productObj);
+      console.log(data);
       alert("Products added successfully");
       refreshInventoryList();
     });
