@@ -143,10 +143,9 @@
                     alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
                 }
             }).done(function (data, status, xhr) {
-                var orders = "<tr><th>orderI</th><th>sellerID</th><th>status</th><th>order time</th><th>total price</th><th>taxes</th><th>shipping fee</th><th>total payment</th></tr>";
+                var orders = "<tr><th>orderID</th><th>sellerID</th><th>status</th><th>order time</th><th>total price</th><th>taxes</th><th>shipping fee</th><th>total payment</th></tr>"+"<tr><td></td>"
 
                     $("#tableOrders").html(orders);
-
             });
 
 
