@@ -81,73 +81,85 @@ exports.create = (req, res) => {
                 
                         });
 
+              if (from == "carts") {
+                if (
+                  !(
+                    req.body.productCode == data[0].productCode &&
+                    req.body.productName == data[0].productName &&
+                    req.body.price == data[0].price
+                  )
+                ) {
+                  return res.status(500).send({
+                    message:
+                      "Cart items does not match the product information!",
+                  });
+                }
+              }
+
+              //select existing unSubmitted order
+              Orders.getAll(sellerId, buyerId, "unSubmitted", (err, data) => {
+                if (err) {
+                  res
+                    .status(500)
+                    .send({ message: err.message || "Create failed!" });
+                  return;
+                } else {
+                  if (data.length == 0) {
+                    //create a new record to orders table
+                    newOrder = {
+                      sellerId: sellerId,
+                      buyerId: buyerId,
+                    };
+                    Orders.create(newOrder, (err, data) => {
+                      if (err) {
+                        return res
+                          .status(500)
+                          .send({ message: err.message || "Create failed!" });
+                      } else {
+                        orderId = data.id;
+                        newOrder = data;
+                        newOrderItem.orderId = newOrder.id;
+                        OrderItem.create(newOrderItem, (err, data) => {
+                          if (err) {
+                            return res.status(500).send({
+                              message:
+                                err.message || "Create order item failed!",
+                            });
+                          } else {
+                            if (from == "carts") {
+                              //delete cart item when transfered to order
+                              CartItem.remove(req.body.id, (err, data) => {
+                                if (err) {
+                                  return res.status(500).send({
+                                    message:
+                                      err.message || "delete from cart failed!",
+                                  });
+                                }
+                              });
+                            }
+                          }
+                        }); //OrderItem.create end
+                      }
+                    }); //Orders.create end
+                  } else {
+                    //use the existing order record in orders table
+                    //orderId = data[0].id;
+                    newOrder = data[0];
+                    newOrderItem.orderId = newOrder.id;
+                    OrderItem.create(newOrderItem, (err, data) => {
+                      if (err) {
+                        return res.status(500).send({
+                          message: err.message || "Create order item failed!",
+                        });
+                      } else {
                         if (from == "carts") {
-                            if (!(req.body.productCode == data[0].productCode && req.body.productName == data[0].productName && req.body.price == data[0].price)) {
-                                return res.status(500).send({ message: "Cart items does not match the product information!" });
-                            };
-                        }
-
-                        //select existing unSubmitted order 
-                        Orders.getAll(sellerId, buyerId, "unSubmitted", (err, data) => {
+                          //delete cart item when transfered to order
+                          CartItem.remove(req.body.id, (err, data) => {
                             if (err) {
-                                res.status(500).send({ message: err.message || "Create failed!" });
-                                return;
-                            } else {
-                                if (data.length == 0) {
-                                    //create a new record to orders table
-                                    newOrder = {
-                                        sellerId: sellerId,
-                                        buyerId: buyerId
-                                    }
-                                    Orders.create(newOrder, (err, data) => {
-                                        if (err) {
-                                            return res.status(500).send({ message: err.message || "Create failed!" });
-                                        } else {
-                                            orderId = data.id;
-                                            newOrder = data;
-                                            newOrderItem.orderId = newOrder.id;
-                                            OrderItem.create(newOrderItem, (err, data) => {
-                                                if (err) {
-                                                    return res.status(500).send({ message: err.message || ("Create order item failed!") });
-                                                } else {
-                                                    if (from == "carts") {
-                                                        //delete cart item when transfered to order
-                                                        CartItem.remove(req.body.id, (err, data) => {
-                                                            if (err) {
-                                                                return res.status(500).send({ message: err.message || "delete from cart failed!" });
-                                                            };
-                                                        });
-                                                    } 
-                                                };
-                                            });//OrderItem.create end
-
-                                        }
-                                    });//Orders.create end
-                                } else {
-                                    //use the existing order record in orders table
-                                    //orderId = data[0].id;
-                                    newOrder = data[0];
-                                    newOrderItem.orderId = newOrder.id;
-                                    OrderItem.create(newOrderItem, (err, data) => {
-                                        if (err) {
-                                            return res.status(500).send({ message: err.message || ("Create order item failed!") });
-                                        } else {
-                                            if (from == "carts") {
-                                                //delete cart item when transfered to order
-                                                CartItem.remove(req.body.id, (err, data) => {
-                                                    if (err) {
-                                                        return res.status(500).send({ message: err.message || "delete from cart failed!" });
-                                                    };
-                                                });
-                                            } else {
-                                                return res.status(200).send({ order: newOrder, orderItem: data });
-                                            };
-                                    
-                                    
-                                        };
-                                    });
-                                
-                                };
+                              return res.status(500).send({
+                                message:
+                                  err.message || "delete from cart failed!",
+                              });
                             }
                         });//Orders.getAll end
 

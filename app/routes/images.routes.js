@@ -6,11 +6,14 @@ module.exports = (app) => {
   // Create a new document
   router.post("/", images.create);
 
-  // Retrieve a single document with id
+  // Retrieve a single image with id
   router.get("/:id([0-9]+)", images.findOne);
 
-  // Retrieve all docs
+  // Retrieve all images
   router.get("/", images.findAll);
+
+  //delete image by id
+  router.delete("/:id([0-9]+)", images.delete);
 
   app.use("/api/images", router);
 };

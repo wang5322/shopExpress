@@ -135,22 +135,82 @@
                     <label class="labelform">Product name:</label>
                     <input type="text" name="productName" class="form-control">
                     <label class="labelform">Product description:</label>
-                    <textarea type="text" name="productDesc" class="form-control" rows="3"></textarea>
+                    <textarea type="text" name="productDesc" class="form-control" rows="3"
+                        placeholder="Write your description here"></textarea>
                     <label class="labelform label-sm">Category:</label>
                     <input type="text" name="category" class="form-control form-sm">
                     <label class="labelform label-sm">In stock items:</label>
                     <input type="text" name="stockNum" class="form-control form-sm">
                     <label class="labelform label-sm">Price:</label>
                     <input type="text" name="price" class="form-control form-sm">
-                    <label class="labelform label-sm">Add image url:</label>
-                    <input type="text" name="imageUrl" class="form-control">
-                    <button class="btn btn-warning mt-2" id="add">Add product</button>
-                    <button class="btn btn-secondary mt-2" id="update">Update product</button>
-                    <button class="btn btn-outline-secondary mt-2" id="archieve">Archieve product</button>
-                    <button class="btn btn-outline-secondary mt-2" id="clear">Clear panel</button>
+
+                    <!-- <label class="labelform label-sm">Add image url:</label>
+                    <input type="text" name="imageUrl" class="form-control"> -->
+
+
+
+                    <button class="btn btn-warning my-2 " id="add">Add product</button>
+                    <button class="btn btn-secondary my-2" id="update">Update product</button>
+                    <button class="btn btn-outline-secondary my-2" id="archieve">Archieve product</button>
+                    <button class="btn btn-outline-secondary my-2" id="clear">Clear panel</button>
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+                        data-whatever="@getbootstrap">Open modal for @getbootstrap</button>
+
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="recipient-name" class="col-form-label">Recipient:</label>
+                                            <input type="text" class="form-control" id="recipient-name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="message-text" class="col-form-label">Message:</label>
+                                            <textarea class="form-control" id="message-text"></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Send message</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
 
                 </form>
+                <!-- image upload panel -->
+
+
             </div>
+
+            <!-- <form>
+                <div class="form-row ">
+                    <div class=" col-md-4 offset-md-8 imageForm my-2 rounded p-4 ">
+
+                        <p>Please upload your image to this product:</p>
+                        <label class="labelform">Image id:<span id="id"></span></label><br>
+                        <input type="text" name="imageTile" class="form-control my-1" placeholder="Image title">
+                        <input type="text" name="imageType" class="form-control my-1" placeholder="Image type">
+                        <label class="labelform">Upload image:</label>
+                        <input type="file" name="uploadImage" class="form-control my-1">
+                    </div>
+                </div>
+            </form>
+ -->
+
+
         </section>
 
     </main>

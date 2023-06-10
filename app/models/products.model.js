@@ -24,48 +24,121 @@ Products.create = (newProduct, result) => {
   });
 };
 
-Products.getAll = (category, searchFor, available, sellerId, result) => {
-  console.log(category, searchFor, available, sellerId);
+// Products.getAll = (category, searchFor, available, sellerId, result) => {
+//   console.log(category, searchFor, available, sellerId);
 
-  let queryStr = "SELECT * FROM products";
+//   let queryStr = "SELECT * FROM products";
+//   let filterStr = "";
+//   switch (available) {
+//     case "both":
+//       break;
+//     case "false": {
+//       filterStr += "available=0";
+//       break;
+//     }
+//     default:
+//       filterStr += "available=1";
+//   }
+
+//   if (category) {
+//     if (filterStr.length > 0) {
+//       filterStr += " and ";
+//     }
+//     filterStr += `category='${category}'`;
+//   }
+//   if (searchFor) {
+//     if (filterStr.length > 0) {
+//       filterStr += " and ";
+//     }
+//     filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
+//   }
+
+//   if (sellerId) {
+//     if (filterStr.length > 0) {
+//       filterStr += " and ";
+//     }
+//     filterStr += `sellerId = '${sellerId}'`;
+//   }
+
+//   if (filterStr.length > 0) {
+//     queryStr += ` where ${filterStr}`;
+//   }
+
+//   //console.log(filterStr);
+//   db.query(queryStr, (err, res) => {
+//     if (err) {
+//       console.log("error: ", err);
+//       result(null, err);
+//       return;
+//     }
+//     result(null, res);
+//   });
+// };
+
+Products.getAll = (
+  category,
+  searchFor,
+  available,
+  sellerId,
+  userName,
+  result
+) => {
+  console.log(category, searchFor, available, sellerId, userName);
+
+  let sql =
+    "SELECT products.* FROM products JOIN users on (products.sellerId=users.id and users.role='seller')";
+  let inserts = [];
   let filterStr = "";
-  switch (available) {
-    case "both":
-      break;
-    case "false": {
-      filterStr += "available=0";
-      break;
-    }
-    default:
-      filterStr += "available=1";
+
+  if (available !== "both") {
+    filterStr = " WHERE available = ?";
+    inserts.push(available === "false" ? 0 : 1);
   }
 
   if (category) {
-    if (filterStr.length > 0) {
-      filterStr += " and ";
+    if (filterStr.length == 0) {
+      filterStr = " WHERE category = ?";
+    } else {
+      filterStr += " AND category = ?";
     }
-    filterStr += `category='${category}'`;
+    inserts.push(category);
   }
+
   if (searchFor) {
-    if (filterStr.length > 0) {
-      filterStr += " and ";
+    if (filterStr.length == 0) {
+      filterStr =
+        " WHERE (productCode like ? or productName like ? or productDesc like ?)";
+    } else {
+      filterStr +=
+        " AND (productCode like ? or productName like ? or productDesc like ?)";
     }
-    filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
+    let searchPattern = "%" + searchFor + "%";
+    inserts.push(searchPattern, searchPattern, searchPattern);
   }
 
   if (sellerId) {
-    if (filterStr.length > 0) {
-      filterStr += " and ";
+    if (filterStr.length == 0) {
+      filterStr = " WHERE sellerId = ?";
+    } else {
+      filterStr += " AND sellerId = ?";
     }
-    filterStr += `sellerId = '${sellerId}'`;
+    inserts.push(sellerId);
   }
 
-  if (filterStr.length > 0) {
-    queryStr += ` where ${filterStr}`;
+  if (userName) {
+    if (filterStr.length == 0) {
+      filterStr = " WHERE users.userName = ?";
+    } else {
+      filterStr += " AND users.userName = ?";
+    }
+    inserts.push(userName);
   }
 
-  //console.log(filterStr);
-  db.query(queryStr, (err, res) => {
+  sql += filterStr;
+  let query = db.format(sql, inserts);
+  console.log(query);
+
+  db.query(query, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

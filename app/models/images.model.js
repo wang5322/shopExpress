@@ -1,16 +1,19 @@
 const db = require("./db.js");
 
 // constructor
-const imagesClass = function (document) {
-  this.title = document.title;
-  this.data = document.data;
+const ImageClass = function (image) {
+  this.title = image.title;
+  this.data = image.data;
   // OPTION: you could also hava column 'filename' to remember the original file name
-  this.mimeType = document.mimeType;
+  this.mimeType = image.mimeType;
+  this.productId = image.productId;
 };
 
 //create
-imagesClass.create = (newDocument, result) => {
-  db.query("INSERT INTO images SET ?", newDocument, (err, res) => {
+ImageClass.create = (newImage, result) => {
+  db.query("INSERT INTO images SET ?", newImage, (err, res) => {
+    //TODO: check if productId exists
+
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -22,7 +25,7 @@ imagesClass.create = (newDocument, result) => {
 };
 
 //return one by id
-imagesClass.findById = (id, result) => {
+ImageClass.findById = (id, result) => {
   // FIXME: prevent SQL injection
   db.query("SELECT * FROM images WHERE id = ?", [id], (err, res) => {
     if (err) {
@@ -42,10 +45,11 @@ imagesClass.findById = (id, result) => {
 
 // return all todo[serach by task and return all if any]
 // WARNING: when a table has BLOBs do *NOT* fetch blobs when fetching multiple records! Only all other fields
-imagesClass.getAll = (sortOrder, result) => {
-  var query = db.format("SELECT id, title, mimeType FROM images ORDER BY ??", [
-    sortOrder,
-  ]);
+ImageClass.getAll = (sortOrder, result) => {
+  var query = db.format(
+    "SELECT id, title, mimeType, productId FROM images ORDER BY ??",
+    [sortOrder]
+  );
   // console.log(query);
   db.query(query, (err, res) => {
     if (err) {
@@ -57,4 +61,24 @@ imagesClass.getAll = (sortOrder, result) => {
   });
 };
 
-module.exports = imagesClass;
+ImageClass.removeById = (id, result) => {
+  let queryStr = `DELETE FROM images WHERE id=?`;
+  db.query(queryStr, id, (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(null, err);
+      return;
+    }
+
+    if (res.affectedRows == 0) {
+      // not found Todos with the product
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    console.log("deleted image with id: ", id);
+    result(null, res);
+  });
+};
+
+module.exports = ImageClass;
