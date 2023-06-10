@@ -5,8 +5,45 @@ const Products = require("../models/products.model");
 const Carts = require("../models/carts.model");
 const Auth = require("../utils/auth");
 
-//return true if cartitem matched product information, false if not matched
+//get all cartItems with indicated carts' id in req.body
+exports.getAll = (req, res) => {
+    //validate id existing in req.body
+    if (!(req.body.id)) return res.status(500).send({ message: "id not indicated!" });
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        if (!(user.role == "buyer")) {
+            return res.status(500).send({ message: "Only buyer can use carts." });
+        }//only buyer can use carts
+        else {
+            Carts.findById(req.body.id, (err, data) => {
+                if (err) {
+                    return res.status(404).send({ message: err.message || "Can not find cart record" });
+                } else {
+                    if (!data.id) {
+                        return res.status(404).send({ message: "Can not find cart record" });
+                    } else {
+                        if (!(user.id == data.buyerId)) {
+                            //buyer can only delete his own cartitem
+                            return res.status(500).send({ message:"buyer can only delete your own cartitem" });
+                        } else {
+                            CartItems.getByCartId(req.body.id, (err, data) => {
+                                if (err) {
+                                    return res.status(500).send({ message: err.message || "query failed!" });
+                                } else {
+                                    return res.status(200).send(data);
+                                }
+                            })
+                        }
+                    }
+                }
+            })//Carts.findById end
+            
+        };
+    });//Auth.execIfAuthValid end
+}
+
+//return true if cartitem in req.body matched product information, false if not matched
 exports.matchProduct = (req, res) => {
+    if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
@@ -49,7 +86,8 @@ exports.matchProduct = (req, res) => {
 }
 
 //refresh cartitem by original product information
-exports.refreshFromProduct = (req, res)=>{
+exports.refreshFromProduct = (req, res) => {
+    if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
@@ -97,8 +135,9 @@ exports.refreshFromProduct = (req, res)=>{
     });//Auth.execIfAuthValid end
 }
 
-//update cartitem amount
+//update cartitem attached in req.body
 exports.updata = (req, res) => {
+    if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
@@ -146,7 +185,7 @@ exports.updata = (req, res) => {
     });//Auth.execIfAuthValid end
 }
 
-//delete cartitem by id
+//delete cartitem attached in req.body
 exports.delete = (req, res) => {
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
@@ -185,3 +224,11 @@ exports.delete = (req, res) => {
     });//Auth.execIfAuthValid end
 }
 
+
+
+
+function isValidateCartItem(cartItem) {
+    if (cartItem.cartId && cartItem.productId && cartItem.productCode && cartItem.productName && cartItem.price && cartItem.amount) {
+        return true;
+    } else { return false };
+}
