@@ -2,12 +2,13 @@ $(document).ready(() => {
 
     let cartOrOrder = window.location.search.substring(1).split("=")[1];
     refresh(cartOrOrder);
-$("#showCarts").on("click", function ()  {
-    refresh("carts");
-});
-$("#showOrders").on("click", function () {
-    refresh("orders");
-});
+    $("#showCarts").on("click", function () {
+        refresh("carts");
+    });
+    $("#showOrders").on("click", function () {
+        refresh("orders");
+    });
+
 })
 
 
@@ -28,8 +29,6 @@ function refresh(pane) {
             $("#ordersPane").hide();
             $("#cartsPane").hide();
         };
-            
-        
     }
-    alert(pane);
+    
 }

@@ -7,16 +7,41 @@ const CartItem = require("../models/cartItems.model");
 const Auth = require("../utils/auth");
 const { error } = require("npmlog");
 
-exports.getTest = (req, res) => {
-    for (let i = 0; i < 40; i++){
-        getProductById(i)
-            .then(
-                (data) => { console.log(data); },
-                (err) => { console.log(err); }
-            
-            );
-            
+exports.getOrders = (req, res) => {
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        let sellerName;
+        let buyerName;
+        let statusFilter=false;
+        switch (user.role) {
+            case "seller": {
+                sellerName = user.userName;
+                statusFilter = true;
+                break;
+            }
+            case "buyer": {
+                buyerName = user.userName;
+                break;
+            }
+            case "admin": {
+                sellerName = req.body.sellerName;
+                buyerName = req.body.buyerName;
+                break;
+            }
+            default: return;
         }
+        Orders.getAll(sellerName, buyerName, statusFilter, (err, data) => {
+            if (err) {
+                res.status(500).send({ message: err.message || "Some error occurred while retrieving orders." });
+            } else {
+                res.status(200).send(data);
+            }
+        })
+
+
+
+
+    });//Auth.execIfAuthValid end
+    
     
     
     
