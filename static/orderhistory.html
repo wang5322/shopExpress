@@ -99,38 +99,49 @@
             <div class="col">
               <div class="card card-stepper" style="border-radius: 10px;">
                 <div class="card-body p-4">
-      
+
                   <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
-                      <span class="lead fw-normal">Your order has been delivered</span>
-                      <span class="text-muted small">by DHFL on 21 Jan, 2020</span>
+                        <span class="text-muted small">order #</span>
+                        
+                      <span class="lead fw-normal" id="status">status</span>     
+                      <span class=" fw-normal" id="productName">product name</span>                
+                      
+                    </div>
+                    <div class="d-flex flex-column justify-content-between">
+                        <span class="fw-normal pt-5" id="Order summary">Order summary</span> 
+                        <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: </span> 
+                        <span class="fw-normal small" id="Order summary">Shipping Fee: </span> 
+                        <span class="fw-normal small" id="Order summary">Taxes: </span> 
+                        <span class="fw-normal small" id="Order summary">Grand Total: </span> 
                     </div>
                     <div>
-                      <button class="btn btn-outline-primary" type="button">Track order details</button>
+                    
+                      <button class="btn btn-outline-primary" type="button">Cancel order</button>
                     </div>
                   </div>
-                  <hr class="my-4">
+                  <!-- <hr class="my-4"> -->
       
                   <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                    <span class="dot"></span>
+                    <!-- <span class="dot"></span>
                     <hr class="flex-fill track-line"><span class="dot"></span>
                     <hr class="flex-fill track-line"><span class="dot"></span>
                     <hr class="flex-fill track-line"><span class="dot"></span>
                     <hr class="flex-fill track-line"><span
                       class="d-flex justify-content-center align-items-center big-dot dot">
-                      <i class="fa fa-check text-white"></i></span>
+                      <i class="fa fa-check text-white"></i></span> -->
                   </div>
       
                   <div class="d-flex flex-row justify-content-between align-items-center">
-                    <div class="d-flex flex-column align-items-start"><span>15 Mar</span><span>Order placed</span>
+                    <div class="d-flex flex-column align-items-start" id="order time"><span>15 Mar</span><span>Order placed</span>
                     </div>
-                    <div class="d-flex flex-column justify-content-center"><span>15 Mar</span><span>Order
+                    <!-- <div class="d-flex flex-column justify-content-center"><span>15 Mar</span><span>Order
                         placed</span></div>
                     <div class="d-flex flex-column justify-content-center align-items-center"><span>15
                         Mar</span><span>Order Dispatched</span></div>
                     <div class="d-flex flex-column align-items-center"><span>15 Mar</span><span>Out for
                         delivery</span></div>
-                    <div class="d-flex flex-column align-items-end"><span>15 Mar</span><span>Delivered</span></div>
+                    <div class="d-flex flex-column align-items-end"><span>15 Mar</span><span>Delivered</span></div> -->
                   </div>
       
                 </div>

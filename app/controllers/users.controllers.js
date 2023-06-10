@@ -3,9 +3,7 @@ const Auth = require("../utils/auth");
 
 //Create and Save a new User
 exports.create = (req, res) => {
-  let isValidResult = isUserValid(req, res);
-
-  if (isValidResult === true) {
+  Auth.regIfInputValid(req, res, (req, res)=>{
     // Create a User
     // TODO: encrypt the password SHA256
     const user = new User({
@@ -28,7 +26,8 @@ exports.create = (req, res) => {
         res.status(201).send(data);
       }
     });
-  }
+  });
+  
 };
 //get user by username
 exports.findOne = (req, res) => {
@@ -106,57 +105,4 @@ exports.delete = (req, res) => {
         res.status(200).send({ message: `User was deleted successfully!` });
     })
   })
-}
-
-// used by insert and update
-async function isUserValid(req, res) {
-  if (req.body.id) {
-    res.status(400).send({
-      message: "id is provided by the system. User not saved",
-      result: false,
-    });
-
-    return false;
-  }
-
-  if (req.body.username === undefined || req.body.password === undefined) {
-    res.status(400).send({ message: "username and password must be provided" });
-    return false;
-  }
-  // FIXME: verify quality of password (length 8+, at least one uppercase, lowercase, digit, and special character)
-  // FIXME: username must not exist yet, check database, may require you add a callback to this method instead of returning a value
-  let username = req.body.username;
-  if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
-    res.status(400).send({
-      message:
-        "username must be 5-45 characters long made up of letters, digits and underscore",
-    });
-    return false;
-  }
-
-  let promise = new Promise((resolve, reject)=>{
-    User.findByUsername(username, (err, data) => {
-      let ifExist;
-      if (err) {
-        if (err.kind === "not_found") {
-          ifExist = true;
-        } else {
-          res.status(500).send({
-            message: 'Error retrieving user with username ' + username + 'during input validation'
-          });
-          ifExist = false;
-        }
-      } else {
-        res.status(400).send({
-          message:
-            "username already exists! Please register with another username.",
-        });
-        ifExist = false;
-      }
-
-      resolve(ifExist);
-    });
-  })
-
-  return await promise;
 }

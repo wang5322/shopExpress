@@ -54,9 +54,10 @@
                     <button id="createAdmin">Create Admin</button> 
                     <i class="bx bx-search"></i> -->
                     <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
-                        <input class="form-control mr-sm-2 " type="text" id="textUsername"placeholder="Please enter username">
-                        <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6"
-                            type="button" id="btnSearch">Search</button>
+                        <input class="form-control mr-sm-2 " type="text" id="textUsername"
+                            placeholder="Please enter username">
+                        <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="button"
+                            id="btnSearch">Search</button>
                     </form>
                 </div>
             </div>
@@ -73,13 +74,13 @@
             </div>
             <div id="orders">
                 <h2>Orders</h2>
-                <table>
+                <table id="tableOrders">
 
                 </table>
             </div>
             <div id="productManage">
                 <h2>Product management</h2>
-                <table>
+                <table id="tableProducts">
 
                 </table>
             </div>
@@ -95,34 +96,60 @@
             window.open("loginregister.html");
         });
 
-        $("#btnSearch").on("click",function () {
+        $("#btnSearch").on("click", function () {
             console.log("search button is clicked");
             let username = $("#textUsername").val();
             console.log(username);
             $.ajax({
                 url: "/api/users/" + username,
                 type: "GET",
-                headers: { 'x-auth-username': sessionStorage.getItem('username'), 
+                headers: {
+                    'x-auth-username': sessionStorage.getItem('username'),
                     'x-auth-password': sessionStorage.getItem('password'),
-                    'x-auth-role': sessionStorage.getItem('role') },
+                    'x-auth-role': sessionStorage.getItem('role')
+                },
                 error: function (jqxhr, status, errorThrown) {
                     alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
                 }
             }).done(function (data, status, xhr) {
-                // todo - display the searched user infor
+                // display the searched user infor
                 var result = "<tr><td>User Id: " + data.id + "</td>"
-                            + "<td>Username: " + data.userName + "</td>"
-                            + "<td>Role: " + data.role + "</td></tr>"
-                            + "<tr><td>Email: " + data.email + "</td>"
-                            + "<td></td>"
-                            + '<td><a href="#!" style="color: #393f81;" id="deleteAccount">Delete Account</a></td></tr>'
-                            + "<tr><td>Address: " + data.address + "</td></tr>";
-                
+                    + "<td>Username: " + data.userName + "</td>"
+                    + "<td>Role: " + data.role + "</td></tr>"
+                    + "<tr><td>Email: " + data.email + "</td>"
+                    + "<td></td>"
+                    + '<td><a href="#!" style="color: #393f81;" id="deleteAccount">Delete Account</a></td></tr>'
+                    + "<tr><td>Address: " + data.address + "</td></tr>";
+
                 $("#tableUserinfo").html(result);
-                var 
             });
 
-            
+            // FIXME
+            // if (user.role == 'buyer') {
+            //     $("#orders").show();
+            //     $("#productManage").hide();
+            // }
+            // if (user.role == 'seller') {
+            //     $("#orders").hide();
+            //     $("#productManage").show();
+            // }
+
+            $.ajax({
+                url: "/api/orders",
+                type: "GET",
+                dataType: "JSON",
+                data: {buyerName: username, sellerName: null},
+                error: function (jqxhr, status, errorThrown) {
+                    alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                }
+            }).done(function (data, status, xhr) {
+                var orders = "<tr><th>orderI</th><th>sellerID</th><th>status</th><th>order time</th><th>total price</th><th>taxes</th><th>shipping fee</th><th>total payment</th></tr>";
+
+                    $("#tableOrders").html(orders);
+
+            });
+
+
         });
 
         // $("#delectAccount").on("click", function () {

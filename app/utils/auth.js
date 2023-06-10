@@ -62,3 +62,49 @@ exports.execIfAuthValid = (req, res, role, callIfAuth) => {
     }
   });
 };
+
+exports.regIfInputValid = (req, res, callIfValid) => {
+  if (req.body.id) {
+    res.status(400).send({
+      message: "id is provided by the system. User not saved",
+      result: false,
+    });
+
+    return false;
+  }
+
+  if (req.body.username === undefined || req.body.password === undefined) {
+    res.status(400).send({ message: "username and password must be provided" });
+    return false;
+  }
+  // FIXME: verify quality of password (length 8+, at least one uppercase, lowercase, digit, and special character)
+  // FIXME: username must not exist yet, check database, may require you add a callback to this method instead of returning a value
+  let username = req.body.username;
+  if (!username.match(/^[a-zA-Z0-9_]{5,45}$/)) {
+    res.status(400).send({
+      message:
+        "username must be 5-45 characters long made up of letters, digits and underscore",
+    });
+    return false;
+  }
+
+  User.findByUsername(username, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        callIfValid(req, res);
+      } else {
+        res.status(500).send({
+          message: err.message || 'Error retrieving user with username ' + username + 'during input validation'
+        });
+        return false;
+      }
+    } else {
+      res.status(400).send({
+        message:
+          "username already exists! Please register with another username.",
+      });
+      return false;
+    }
+  });
+}
+
