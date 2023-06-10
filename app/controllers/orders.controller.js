@@ -7,28 +7,42 @@ const CartItem = require("../models/cartItems.model");
 const Auth = require("../utils/auth");
 const { error } = require("npmlog");
 
-exports.getTest = (req, res) => {
-    for (let i = 0; i < 40; i++){
-        getProductById(i)
-            .then(
-                (data) => { console.log(data); },
-                (err) => { console.log(err); }
-            
-            );
-            
+exports.getAll = (req, res) => {
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        let sellerName;
+        let buyerName;
+        let statusFilter = false;
+        switch (user.role) {
+            case "seller": {
+                sellerName = user.userName;
+                statusFilter = true;
+                break;
+            }
+            case "buyer": {
+                buyerName = user.userName;
+                break;
+            }
+            case "admin": {
+                sellerName = req.body.sellerName;
+                buyerName = req.body.buyerName;
+                break;
+            }
+            default: return;
         }
-    
-    
-    
-}
+        Orders.getAll(sellerName, buyerName, statusFilter, (err, data) => {
+            if (err) {
+                res.status(500).send({ message: err.message || "Some error occurred while retrieving orders." });
+            } else {
+                res.status(200).send(data);
+            }
+        })
+    });//Auth.execIfAuthValid end
+};
 
 
 
 exports.create = (req, res) => {
-    /*if (isAuthorized(req, res) === false) {
-        res.status(500).send({ message: "Authentication error!" });
-        return;
-    }*/
+
     let from;
     let cartIdForDel;
     let sellerId;
@@ -147,3 +161,40 @@ exports.create = (req, res) => {
     
 }
 
+exports.delete = (req, res) => {
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        switch (user.role) {
+            case "seller": {
+                //seller not allowed to delete
+                return;
+            }
+            case "buyer": {
+                //buyer not allowed to delete other's order
+                if (!(req.body.buyerId == user.id)) {
+                    return;
+                }
+                break;
+            }
+            case "admin": {
+                break;
+            }
+            default:
+                return;
+        };
+
+        Orders.remove(req.params.id, (err, data) => {
+            if (err) {
+                if (err.kind === "not_found") {
+                    res.status(404).send({
+                        message: `Not found order with id ${req.params.id}.`
+                    });
+                } else {
+                    res.status(500).send({
+                        message: "Could not delete order with id " + req.params.id
+                    });
+                }
+            } else res.status(200).send({ message: true });
+        });//Orders.remove end
+
+    })//Auth.execIfAuthValid end
+};
