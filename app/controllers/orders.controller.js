@@ -8,41 +8,45 @@ const Auth = require("../utils/auth");
 const { error } = require("npmlog");
 
 exports.getAll = (req, res) => {
-    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-        let sellerName;
-        let buyerName;
-        let statusFilter = false;
-        switch (user.role) {
-            case "seller": {
-                sellerName = user.userName;
-                statusFilter = true;
-                break;
-            }
-            case "buyer": {
-                buyerName = user.userName;
-                break;
-            }
-            case "admin": {
-                sellerName = req.body.sellerName;
-                buyerName = req.body.buyerName;
-                break;
-            }
-            default: return;
-        }
-        Orders.getAll(sellerName, buyerName, statusFilter, (err, data) => {
-            if (err) {
-                res.status(500).send({ message: err.message || "Some error occurred while retrieving orders." });
-            } else {
-                res.status(200).send(data);
-            }
-        })
-    });//Auth.execIfAuthValid end
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    let sellerName;
+    let buyerName;
+    let statusFilter = false;
+    switch (user.role) {
+      case "seller": {
+        sellerName = user.userName;
+        statusFilter = true;
+        break;
+      }
+      case "buyer": {
+        buyerName = user.userName;
+        break;
+      }
+      case "admin": {
+        sellerName = req.body.sellerName;
+        buyerName = req.body.buyerName;
+        break;
+      }
+      default:
+        return;
+    }
+    Orders.getAll(sellerName, buyerName, statusFilter, (err, data) => {
+      if (err) {
+        res
+          .status(500)
+          .send({
+            message:
+              err.message || "Some error occurred while retrieving orders.",
+          });
+      } else {
+        res.status(200).send(data);
+      }
+    });
+  }); //Auth.execIfAuthValid end
 };
 
 //add an orderitem into an order or create an order
-exports.create = (req, res) => {
-  
-}
+exports.create = (req, res) => {};
 /*
 
 exports.create = (req, res) => {
@@ -197,21 +201,20 @@ exports.delete = (req, res) => {
       }
       default:
         return;
-    };
+    }
 
     Orders.remove(req.params.id, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
           res.status(404).send({
-            message: `Not found order with id ${req.params.id}.`
+            message: `Not found order with id ${req.params.id}.`,
           });
         } else {
           res.status(500).send({
-            message: "Could not delete order with id " + req.params.id
+            message: "Could not delete order with id " + req.params.id,
           });
         }
       } else res.status(200).send({ message: true });
-    });//Orders.remove end
-
-  });//Auth.execIfAuthValid end
+    }); //Orders.remove end
+  }); //Auth.execIfAuthValid end
 };

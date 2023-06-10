@@ -143,11 +143,37 @@
                     <input type="text" name="stockNum" class="form-control form-sm">
                     <label class="labelform label-sm">Price:</label>
                     <input type="text" name="price" class="form-control form-sm">
+                    <!-- <label class="labelform label-sm">Add image url:</label>
+                    <input type="text" name="imageUrl" class="form-control"> -->
+                    <button class="btn btn-warning mt-2" id="add">Add product</button>
+                    <button class="btn btn-secondary mt-2" id="update">Update product</button>
+                    <button class="btn btn-outline-secondary mt-2" id="archieve">Archieve product</button>
+                    <button class="btn btn-outline-secondary mt-2" id="clear">Clear panel</button>
 
                     <!-- <label class="labelform label-sm">Add image url:</label>
                     <input type="text" name="imageUrl" class="form-control"> -->
 
+                    <form>
+                        <div class="form-row ">
+                            <div class=" imageForm my-2 rounded p-4 ">
 
+                                <p>Please upload your image to this product:</p>
+                                <label class="labelform">Image id:<span id="imageId"></span></label><br>
+                                <input type="text" name="imageTitle" class="form-control my-1"
+                                    placeholder="Image title">
+                                <input type="text" name="imageType" class="form-control my-1" placeholder="Image type">
+                                <input type="text" name="productId" class="form-control my-1"
+                                    placeholder="ProductId of this image">
+                                <label class="labelform">Upload image:</label>
+                                <input type="file" name="uploadImage" class="form-control my-1">
+                                <button class="btn btn-warning mt-2" id="addImage">Add image</button>
+                                <button class="btn btn-outline-secondary mt-2" id="deleteImage">Delete image</button>
+                                <button class="btn btn-outline-secondary mt-2" id="clearImagePane">Clear image
+                                    panel</button>
+
+                            </div>
+                        </div>
+                    </form>
 
 
                 </form>
@@ -156,22 +182,9 @@
 
             </div>
 
-            <form>
-                <div class="form-row ">
-                    <div class=" col-md-4 offset-md-8 imageForm my-2 rounded p-4 ">
 
-                        <p>Please upload your image to this product:</p>
-                        <label class="labelform">Image id:<span id="id"></span></label><br>
-                        <input type="text" name="imageTitle" class="form-control my-1" placeholder="Image title">
-                        <input type="text" name="imageType" class="form-control my-1" placeholder="Image type">
-                        <input type="text" name="imageType" class="form-control my-1" placeholder="ProductId of this image">
-                        <label class="labelform">Upload image:</label>
-                        <input type="file" name="uploadImage" class="form-control my-1">
-                    </div>
-                </div>
-            </form>
 
-<em>ProductId:""</em>
+
 
         </section>
 

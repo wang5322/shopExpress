@@ -8,6 +8,10 @@ footer{
     font-size: small;
 }
 
+em{
+    font-weight: bold;
+}
+
 .cropped { width: 150px; overflow: hidden; } 
 
 .cropped img { margin: -150px 0px 0px -150px; }
