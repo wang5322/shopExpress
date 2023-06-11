@@ -1,13 +1,21 @@
-$(document).ready(function () {
-  const urlParams = new URLSearchParams(window.location.search);
-  const myParam = urlParams.get("register");
+let ifLoggedIn;
 
-  if (myParam === "1") {
-    $("#registerPanel").show();
-    $("#loginPanel").hide();
+$(document).ready(function () {
+  ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+  if (ifLoggedIn === "true") {
+    alert("Access Forbidden: you are already logged in!");
+    window.location.href = "index.html";
   } else {
-    //hide register form
-    $("#registerPanel").hide();
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get("register");
+
+    if (myParam === "1") {
+      $("#registerPanel").show();
+      $("#loginPanel").hide();
+    } else {
+      //hide register form
+      $("#registerPanel").hide();
+    }
   }
 });
 
@@ -35,17 +43,18 @@ $("#btnLogin").on("click", function () {
     error: function (jqxhr, status, errorThrown) {
       alert(
         "AJAX error: " +
-          errorThrown +
-          "/" +
-          jqxhr.responseText +
-          ", status: " +
-          jqxhr.status
+        errorThrown +
+        "/" +
+        jqxhr.responseText +
+        ", status: " +
+        jqxhr.status
       );
       loginFailedHandler();
     },
   }).done(function (data) {
     sessionStorage.setItem("id", data.id);
     sessionStorage.setItem("role", data.role);
+    sessionStorage.setItem("ifLoggedIn", "true");
     switch (data.role) {
       case "seller":
         window.open("inventory.html", "_self");
@@ -95,6 +104,7 @@ $("#btnRegister").on("click", function () {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     },
   }).done(function (data) {
+    sessionStorage.setItem("ifLoggedIn", "true");
     switch (role) {
       case "seller":
         window.open("inventory.html", "_self");
@@ -119,6 +129,5 @@ function loginFailedHandler() {
   alert("Authentication failed");
   $("input[name=username]").val("");
   $("input[name=password]").val("");
-  sessionStorage.setItem("username", "");
-  sessionStorage.setItem("password", "");
+  sessionStorage.clear();
 }

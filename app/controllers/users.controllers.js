@@ -31,7 +31,17 @@ exports.create = (req, res) => {
 };
 //get user by username
 exports.findOne = (req, res) => {
-  Auth.execIfAuthValid(req, res, 'admin', (req, res, user) => {
+  // if the accessing user is not an admin, he/she can only find his/her own info
+  if (req.headers['x-auth-role'] !== "admin" && req.headers['x-auth-username'] != req.params.username){
+    res.status(403).send({
+      message: "Access Forbidden! You can only pull your own user info"
+    });
+
+    return;
+  }
+  
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    
     User.findByUsername(req.params.username, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {

@@ -4,132 +4,146 @@ var available = 1;
 var sessionUsername = sessionStorage.getItem("username");
 var sessionPassword = sessionStorage.getItem("password");
 var sellerId = sessionStorage.getItem("id");
+let ifLoggedIn;
 
 $(document).ready(function () {
-  refreshInventoryList();
-  console.log("page is fully loaded");
-  console.log(sellerId);
+  ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+  if (ifLoggedIn !== "true") {
+    alert("Access Forbidden: you are not logged in!");
+    window.location.href = "index.html";
+  } else {
 
-  // $("#alert").hide(); // error message alert
+    refreshInventoryList();
+    console.log("page is fully loaded");
+    console.log(sellerId);
 
-  $("#add").on("click", function () {
-    var productObj = creatObject();
+    // $("#alert").hide(); // error message alert
 
-    $.ajax({
-      url: "/api/products",
-      type: "POST",
-      dataType: "json",
-      data: productObj,
-      error: function (jqxhr, status, errorThrown) {
-        alert("AJAX error: " + jqxhr.responseText);
-      },
-    }).done(function (data) {
-      console.log(productObj);
-      console.log(data);
-      alert("Products added successfully");
-      refreshInventoryList();
-    });
-    // $(".close").alert("close");
-  });
+    $("#add").on("click", function () {
+      var productObj = creatObject();
 
-  // $('input[type="checkbox"]').on("change", function () {
-  //   $('input[name="' + this.name + '"]')
-  //     .not(this)
-  //     .prop("checked", false);
-  // });
-
-  $("#deselectAll").on("click", function () {
-    $(".form-check-input").prop("checked", false);
-  });
-
-  $("#clear").on("click", function () {
-    $("#id").html("");
-    $("input[name=productCode]").val("");
-    $("input[name=productName]").val("");
-    $("textarea[name=productDesc]").val("");
-    $("input[name=category]").val("");
-    $("input[name=stockNum]").val("");
-    $("input[name=price]").val("");
-    $("input[name=imageUrl]").val("");
-  });
-
-  $("#update").on("click", function () {
-    var id = $("#id").html();
-    console.log(id);
-    var product = creatObject();
-    $.ajax({
-      url: "/api/products/" + id,
-      type: "PUT",
-      dataType: "json",
-      data: product,
-      error: function (jqxhr, status, errorThrown) {
-        alert("AJAX error: " + jqxhr.responseText);
-      },
-    }).done(function () {
-      alert("Product updated succesfully");
-      refreshInventoryList();
-    });
-  });
-
-  $("#archieve").on("click", function () {
-    var id = $("#id").html();
-    console.log(id);
-    $.ajax({
-      url: "/api/products/" + id,
-      type: "PATCH",
-      data: { stockNum: 0, available: 0 },
-      error: function (jqxhr, status, errorThrown) {
-        alert("AJAX error: " + jqxhr.responseText);
-      },
-    }).done(function () {
-      alert("Products archieved successfully");
-      refreshInventoryList();
-    });
-  });
-
-  // add image
-  $("#addImage").click(function () {
-    // add or update
-    let titleVal = $("input[name=imageTitle]").val();
-    console.log($("input[name=uploadImage]").prop("files"));
-    let file = $("input[name=uploadImage]").prop("files")[0];
-    //let filenameVal = file.name; // not used by me, but you can use it if you like, add 'filename' column to database
-    let mimeTypeVal = file.type;
-    let productIdVal = $("input[name=productId]").val();
-    // https://javascript.info/file  (about FileReader, see readAsDataURL )
-    let reader = new FileReader();
-    reader.onload = function () {
-      // console.log(reader.result); // careful, may print out hundreds of lines of binary
-      // magically "reader.result" hold the contents of the selected file, btoa() encodes it to base64
-      docObj = {
-        title: titleVal,
-        mimeType: mimeTypeVal,
-        data: btoa(reader.result),
-        productId: productIdVal,
-      };
       $.ajax({
-        // FIXME: escape special characters using urlencode
-        url: "/api/images",
+        url: "/api/products",
         type: "POST",
         dataType: "json",
-        data: docObj,
+        data: productObj,
+        error: function (jqxhr, status, errorThrown) {
+          alert("AJAX error: " + jqxhr.responseText);
+        },
+      }).done(function (data) {
+        console.log(productObj);
+        console.log(data);
+        alert("Products added successfully");
+        refreshInventoryList();
+      });
+      // $(".close").alert("close");
+    });
+
+    // $('input[type="checkbox"]').on("change", function () {
+    //   $('input[name="' + this.name + '"]')
+    //     .not(this)
+    //     .prop("checked", false);
+    // });
+
+    $("#deselectAll").on("click", function () {
+      $(".form-check-input").prop("checked", false);
+    });
+
+    $("#clear").on("click", function () {
+      $("#id").html("");
+      $("input[name=productCode]").val("");
+      $("input[name=productName]").val("");
+      $("textarea[name=productDesc]").val("");
+      $("input[name=category]").val("");
+      $("input[name=stockNum]").val("");
+      $("input[name=price]").val("");
+      $("input[name=imageUrl]").val("");
+    });
+
+    $("#update").on("click", function () {
+      var id = $("#id").html();
+      console.log(id);
+      var product = creatObject();
+      $.ajax({
+        url: "/api/products/" + id,
+        type: "PUT",
+        dataType: "json",
+        data: product,
         error: function (jqxhr, status, errorThrown) {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        alert("upload successful");
-        // refreshList();
+        alert("Product updated succesfully");
+        refreshInventoryList();
       });
-    };
-    reader.onerror = function () {
-      console.log(reader.error);
-      alert(reader.error);
-    };
-    //reader.readAsDataURL(file); // read file and trigger one of the above handlers
-    reader.readAsBinaryString(file);
+    });
 
-    return;
-  });
+    $("#archieve").on("click", function () {
+      var id = $("#id").html();
+      console.log(id);
+      $.ajax({
+        url: "/api/products/" + id,
+        type: "PATCH",
+        data: { stockNum: 0, available: 0 },
+        error: function (jqxhr, status, errorThrown) {
+          alert("AJAX error: " + jqxhr.responseText);
+        },
+      }).done(function () {
+        alert("Products archieved successfully");
+        refreshInventoryList();
+      });
+    });
+
+    $("#signout").click(function () {
+      ifLoggedIn = "false";
+      sessionStorage.clear();
+      window.open("index.html");
+    });
+
+    // add image
+    $("#addImage").click(function () {
+      // add or update
+      let titleVal = $("input[name=imageTitle]").val();
+      console.log($("input[name=uploadImage]").prop("files"));
+      let file = $("input[name=uploadImage]").prop("files")[0];
+      //let filenameVal = file.name; // not used by me, but you can use it if you like, add 'filename' column to database
+      let mimeTypeVal = file.type;
+      let productIdVal = $("input[name=productId]").val();
+      // https://javascript.info/file  (about FileReader, see readAsDataURL )
+      let reader = new FileReader();
+      reader.onload = function () {
+        // console.log(reader.result); // careful, may print out hundreds of lines of binary
+        // magically "reader.result" hold the contents of the selected file, btoa() encodes it to base64
+        docObj = {
+          title: titleVal,
+          mimeType: mimeTypeVal,
+          data: btoa(reader.result),
+          productId: productIdVal,
+        };
+        $.ajax({
+          // FIXME: escape special characters using urlencode
+          url: "/api/images",
+          type: "POST",
+          dataType: "json",
+          data: docObj,
+          error: function (jqxhr, status, errorThrown) {
+            alert("AJAX error: " + jqxhr.responseText);
+          },
+        }).done(function () {
+          alert("upload successful");
+          // refreshList();
+        });
+      };
+      reader.onerror = function () {
+        console.log(reader.error);
+        alert(reader.error);
+      };
+      //reader.readAsDataURL(file); // read file and trigger one of the above handlers
+      reader.readAsBinaryString(file);
+
+      return;
+    });
+  }
 });
 
 function refreshInventoryList() {
