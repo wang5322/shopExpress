@@ -24,57 +24,6 @@ Products.create = (newProduct, result) => {
   });
 };
 
-// Products.getAll = (category, searchFor, available, sellerId, result) => {
-//   console.log(category, searchFor, available, sellerId);
-
-//   let queryStr = "SELECT * FROM products";
-//   let filterStr = "";
-//   switch (available) {
-//     case "both":
-//       break;
-//     case "false": {
-//       filterStr += "available=0";
-//       break;
-//     }
-//     default:
-//       filterStr += "available=1";
-//   }
-
-//   if (category) {
-//     if (filterStr.length > 0) {
-//       filterStr += " and ";
-//     }
-//     filterStr += `category='${category}'`;
-//   }
-//   if (searchFor) {
-//     if (filterStr.length > 0) {
-//       filterStr += " and ";
-//     }
-//     filterStr += `(productCode like '%${searchFor}%' or productName like '%${searchFor}%' or productDesc like '%${searchFor}%')`;
-//   }
-
-//   if (sellerId) {
-//     if (filterStr.length > 0) {
-//       filterStr += " and ";
-//     }
-//     filterStr += `sellerId = '${sellerId}'`;
-//   }
-
-//   if (filterStr.length > 0) {
-//     queryStr += ` where ${filterStr}`;
-//   }
-
-//   //console.log(filterStr);
-//   db.query(queryStr, (err, res) => {
-//     if (err) {
-//       console.log("error: ", err);
-//       result(null, err);
-//       return;
-//     }
-//     result(null, res);
-//   });
-// };
-
 Products.getAll = (
   category,
   searchFor,
