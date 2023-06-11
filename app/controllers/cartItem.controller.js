@@ -43,93 +43,63 @@ exports.getAll = (req, res) => {
 
 //return true if cartitem in req.body matched product information, false if not matched
 exports.matchProduct = (req, res) => {
-    if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
+    //if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
+    id = req.params.id;
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
         }//only buyer can use carts
         else {
-            Carts.findById(req.body.cartId, (err, data) => {
+            CartItems.userPermitted(id, user.id, (err, data) => {
                 if (err) {
-                    return res.status(404).send({ message: err.message || "Can not find cart record" });
+                    return res.status(500).send({ message: err.message||"can not check permission" });
                 } else {
-                    if (!data.id) {
-                        return res.status(404).send({ message: "Can not find cart record" });
+                    if (data.permitted) {
+                        CartItems.matchById(id, (err, data) => {
+                            if (err) {
+                                return res.status(500).send({ message: err.message||"can not get matched" });
+                            } else {
+                                return res.status(200).send(data);
+                            }
+                        })
                     } else {
-                        if (!(user.id == data.buyerId)) {
-                            //buyer can only match his own cartitem
-                            return res.status(500).send({ message:"buyer can only match your own cartitem" });
-                        } else {
-                            Products.getById(req.body.productId, (err, data) => {
-                                if (err) {
-                                    return res.status(404).send({ message: err.message || "Can not find product record" });
-                                } else {
-                                    if (!data.id) {
-                                        return res.status(404).send({ message: "Can not find product record" });
-                                    } else {
-                                        if (data.productCode == req.body.productCode && data.productName == req.body.productName && data.price == req.body.price) {
-                                            return res.status(200).send({ matched: true });
-                                        } else {
-                                            return res.status(200).send({ matched: false });
-                                        }
-                                    }
-                                }
-                                
-                            })//Products.findById end
-                        }
+                        return res.status(500).send({ message: "not permitted" });
                     }
                 }
-            })//Carts.findById end
-            
+            })//CartItems.userPermitted
         };
     });//Auth.execIfAuthValid end
 }
 
 //refresh cartitem by original product information
 exports.refreshFromProduct = (req, res) => {
-    if (!isValidateCartItem(req.body)) {return res.status(500).send({ message: "invalidate cartItem" });}
+    id = req.params.id;
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
         }//only buyer can use carts
         else {
-            Carts.findById(req.body.cartId, (err, data) => {
+            CartItems.userPermitted(id, user.id, (err, data) => {
                 if (err) {
-                    return res.status(404).send({ message: err.message || "Can not find cart record" });
+                    return res.status(500).send({ message: err.message||"can not check permission" });
                 } else {
-                    if (!data.id) {
-                        return res.status(404).send({ message: "Can not find cart record" });
-                    } else {
-                        if (!(user.id == data.buyerId)) {
-                            //buyer can only match his own cartitem
-                            return res.status(500).send({ message:"buyer can only refresh your own cartitem" });
-                        } else {
-                            Products.getById(req.body.productId, (err, data) => {
-                                if (err) {
-                                    return res.status(404).send({ message: err.message || "Can not find product record" });
+                    if (data.permitted) {
+                        CartItems.refreshFromProduct(id, (err, data) => {
+                            if (err) {
+                                return res.status(500).send({ message: err.message||"refresh failed" });
+                            } else {
+                                if (data.affectedRows == 0) {
+                                    return res.status(500).send({ message:"refresh failed" });
                                 } else {
-                                    if (!data.id) {
-                                        return res.status(404).send({ message: "Can not find product record" });
-                                    } else {
-                                        //write product information into cartitem
-                                        req.body.productCode = data.productCode;
-                                        req.body.productName = data.productName;
-                                        req.body.price = data.price; 
-                                        CartItems.updateById(req.body.id, req.body, (err, data) => {
-                                            if (err) {
-                                                return res.status(500).send({ message: err.message || "refresh failed!" });
-                                            } else {
-                                                return res.status(200).send(data);
-                                            }
-                                        })//CartItems.updateById end
-                                    }
+                                    return res.status(200).send({ message:"refresh successfully" });
                                 }
-                                
-                            })//Products.findById end
-                        }
+                            }
+                        })
+                    } else {
+                        return res.status(500).send({ message: "not permitted" });
                     }
                 }
-            })//Carts.findById end
+            })//CartItems.userPermitted
             
         };
     });//Auth.execIfAuthValid end

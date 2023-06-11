@@ -4,8 +4,14 @@ module.exports = (app) => {
 
     router.post("/", orders.create);
     router.get("/", orders.getAll);
+    router.get("/:id([0-9]+)", orders.getOne);
+    router.put("/:id([0-9]+)", orders.confirmOrder);
     router.delete("/:id([0-9]+)", orders.delete);
-    
+
+    router.patch("/pay/:id([0-9]+)", orders.payOrder);
+
+    router.patch("/:id([0-9]+)", orders.modifyStatus);
+
     app.use('/api/orders', router);
 
 }

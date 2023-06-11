@@ -65,8 +65,8 @@ Orders.getAll = (sellerName, buyerName, statusFilter, result) => {
         inserts.push(buyerName);
     };
     if (statusFilter) {
-        if (filterStr.length == 0) { filterStr = " WHERE status<>'unSubmitted'"; }
-        else { filterStr += " AND status<>'unSubmitted'"; }
+        if (filterStr.length == 0) { filterStr = " WHERE status<>'unSubmitted' and status<>'Submitted'"; }
+        else { filterStr += " AND status<>'unSubmitted' and status<>'Submitted'"; }
     }
     sql += filterStr;
     sql +=" order by u1.userName, u2.userName,status"
