@@ -191,7 +191,7 @@ function refreshInventoryList() {
         var imageId = product.image_id;
         if (imageId) {
           imagepath = `api/images/${imageId}`;
-          existProductId.push(product.id);
+          // existProductId.push(product.id);
         } else {
           // Handle case when no images are returned
           imagepath = "api/images/38";
