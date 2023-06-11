@@ -120,7 +120,7 @@ OrderItem.refreshFromProduct = (id, result) => {
 
 //return if user has permission to view the orderItem
 OrderItem.userPermitted = (id, userId, userRole, result) => {
-    let queryStr = "select * from orderItems as oi join orders as o on oi.cartId=o.id where oi.id = ?";
+    let queryStr = "select * from orderItems as oi join orders as o on oi.orderId=o.id where oi.id = ?";
     let args = [id];
     switch (userRole) {
         case "buyer": {
