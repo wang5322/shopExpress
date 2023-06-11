@@ -1,25 +1,33 @@
 let searchedUsername;
+let ifLoggedIn;
 
 $(document).ready(function () {
-  if (sessionStorage.getItem('role') !== 'admin') {
-    $("body").hide();
-    alert("Access Forbidden: you are not an admin!");
+  ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+  if (ifLoggedIn !== "true") {
+    alert("Access Forbidden: you are not logged in!");
+    window.location.href = "index.html";
   } else {
-    // hide or show tables
-    if (sessionStorage.role === 'buyer') {
-      $("#orders").show();
-      $("#productManage").hide();
-    }
-    if (sessionStorage.role === 'seller') {
-      $("#orders").hide();
-      $("#productManage").show();
+    if (sessionStorage.getItem('role') !== 'admin') {
+      $("body").hide();
+      alert("Access Forbidden: you are not an admin!");
+    } else {
+      // hide or show tables
+      if (sessionStorage.role === 'buyer') {
+        $("#orders").show();
+        $("#productManage").hide();
+      }
+      if (sessionStorage.role === 'seller') {
+        $("#orders").hide();
+        $("#productManage").show();
+      }
     }
   }
-
 });
 
-$("#loginHere").click(function () {
-  window.open("loginregister.html");
+$("#signout").click(function () {
+  ifLoggedIn = "false";
+  sessionStorage.clear();
+  window.open("index.html");
 });
 
 $("#btnSearch").on("click", function () {
@@ -57,16 +65,18 @@ function refreshDisplay(username) {
     switch (searchedUserObj.role) {
       case "buyer":
         $("#productManage").hide();
+        $("#orders").show();
         //if input user is a buyer, show his orders
         refreshOrderList(searchedUsername);
         break;
-  
+
       case "seller":
         //if input user is a seller, show his product list
         $("#orders").hide();
-        refreshProductList(searchedUsername);
+        $("#productManage").show();
+        refreshProductList(searchedUserObj);
         break;
-  
+
       default:
         $("#orders").hide();
         $("#productManage").hide();
@@ -122,7 +132,7 @@ $("#tableUserinfo").on("click", "#deleteAccount", function () {
   })
 });
 
-$("#tableOrders").on("click", "#deleteOrder" ,function () {
+$("#tableOrders").on("click", "#deleteOrder", function () {
   console.log("test: delete order button is clicked!");
   let checkedboxes = $(".delete-order:checked");
   for (box of checkedboxes) {
@@ -144,7 +154,7 @@ $("#tableOrders").on("click", "#deleteOrder" ,function () {
   }
 });
 
-function refreshProductList(username) {
+function refreshProductList(searchedUser) {
   $.ajax({
     url: "/api/products?sellerId=" + searchedUser.id,
     type: "GET",
@@ -154,7 +164,7 @@ function refreshProductList(username) {
       'x-auth-role': sessionStorage.getItem('role')
     },
     dataType: "JSON",
-    data: { buyerName: null, sellerName: username },
+    data: { buyerName: null, sellerName: searchedUser.username },
     error: function (jqxhr, status, errorThrown) {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     }

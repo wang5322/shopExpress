@@ -2,132 +2,213 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <!--bootstrap icon-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- CSS -->
-    <link rel="stylesheet" href="main.css">
-    <script src="javascript/cartOrder.js"></script>
-    <title>ShopExpress</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <!--bootstrap icon-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="main.css">
+  <script src="javascript/cartOrder.js"></script>
+  <title>ShopExpress</title>
 </head>
 
 <body>
 
-    <header>
-        <!-- main nav bar -->
-        <nav class="navbar navbar-expand-sm bg-body-tertiary sticky-top">
-            <div class="container-fluid">
+  <header>
+    <!-- main nav bar -->
+    <nav class="navbar navbar-expand-sm bg-body-tertiary sticky-top">
+      <div class="container-fluid">
 
-                <a class="navbar-brand mb-1" href="index.html">ShopExpress</a>
-                <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
-                    <input class="form-control mr-sm-2 " type="search" placeholder="Search any product">
-                    <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="submit">Search</button>
-                </form>
-                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <a class="navbar-brand mb-1" href="index.html">ShopExpress</a>
+        <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
+          <input class="form-control mr-sm-2 " type="search" placeholder="Search any product">
+          <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="submit">Search</button>
+        </form>
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-                <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
 
-                    <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
-                        <!-- <li class="nav-item ">
+          <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
+            <!-- <li class="nav-item ">
                             <form class="form-inline my-2 my-lg-0 d-flex">
                                 <input class="form-control mr-sm-2 " type="search" placeholder="Search">
                                 <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6"
                                     type="submit">Search</button>
                             </form>
                         </li> -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">seller's center</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1" href="loginregister.html?register=0"
-                                target="_blank">Hello,
-                                sign in</a>
-                        </li>
-                        <li class="nav-item ">
-                            <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" href="loginregister.html?register=1"
-                                target="_blank">Register</a>
-                        </li>
-                        <li class="nav-item ">
-                            <a href="#" target="_blank"><i
-                                    class="bi bi-cart-check-fill display-6 icon-link mx-2"></i></a>
-                        </li>
-                    </ul>
-                </div>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">seller's center</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" id="signout">Sign out</a>
+            </li>
+            <li class="nav-item ">
+              <a href="#" target="_blank"><i class="bi bi-cart-check-fill display-6 icon-link mx-2"></i></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- nav bar -2 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Best deals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Fashion</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Books</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Electronic</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              More categories
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="#">Baby</a>
+              <a class="dropdown-item" href="#">Home</a>
+              <a class="dropdown-item" href="#">Beauty</a>
             </div>
-        </nav>
-        <!-- nav bar -2 -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Best deals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Fashion</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Books</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Electronic</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            More categories
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="#">Baby</a>
-                            <a class="dropdown-item" href="#">Home</a>
-                            <a class="dropdown-item" href="#">Beauty</a>
-                        </div>
-                    </li>
-                </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+
+  </header>
+
+  <section class="container-fluid row m-5">
+    <div class="editPane rounded col-md-7 mx-4 ">
+      <h1>Shopping Cart</h1>
+      <div class="card mb-3" style="max-width: 800px; max-height:300px;">
+        <div class="form-check">
+          <input class="form-check-input " type="checkbox" value="" name="group1[]" />
+        </div>
+        <div class="row g-0">
+          <div class="col-md-4 ">
+            <img id="imageCursor" onclick="selectImage(
+                imageId )" src="" class="img-fluid rounded-start cropped" alt=""
+              style="height: 100%; object-fit: cover;">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title" onclick="selectItem(product.id)">
+                product.productName </h5>
+              <h4>Price:+ product.price +</h4>
+              <p class="card-text">` +
+                product.productDesc +
+                `</p><em class="card-text">ProductId:` +
+                product.id +
+                ` </em>
+              <select class="form-select" id="quantitySelect">
+                <option selected value="1">1</option>
+                <option selected value="2">2</option>
+                <option selected value="3">3</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-sm">Delect</button>
+
             </div>
-        </nav>
-
-
-    </header>
-
-    <main class="container-fluid mt-5">
-        <button id="showCarts">Carts</button>
-        <button id="showOrders">Orders</button>
-        <div id="cartsPane">cartsPane
-
+          </div>
         </div>
-        <div id="ordersPane">ordersPane
+      </div>
 
-        </div>
+    </div>
 
 
-    </main>
-    <footer>
-        <div class="container navbar-dark">
-            <p>Copyright &copy; 2023 by ShopExpress. All Rights Reserved.</p>
-        </div>
-    </footer>
-    <!-- JavaScript bootstrap-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
-    <script src="javascript/inventory.js"></script>
+    <div class="editPane col-md-4 rounded ">
+      <h5 class="mt-5">subttotal</h5>
+    </div>
 
-    
+
+
+  </section>
+  <footer>
+    <div class="container navbar-dark">
+      <p>Copyright &copy; 2023 by ShopExpress. All Rights Reserved.</p>
+    </div>
+  </footer>
+  <!-- JavaScript bootstrap-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+  <script>
+    ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+    $(document).ready(function () {
+      ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+      if (ifLoggedIn !== "true") {
+        alert("Access Forbidden: you are not logged in!");
+        window.location.href = "index.html";
+      } else {
+        // $ajax({
+        //   url: "/api/cartItem/",
+        //   type: "PUT",
+        //   dataType: "json",
+        //   data: xxx,
+        //   error: function (jqxhr, status, errorThrown) {
+        //     alert("AJAX error: " + jqxhr.responseText);
+        //   },
+        // }).done(function (data) {
+        //   refreshCartList();
+        // });
+      }
+    });
+
+    $("#signout").click(function () {
+      ifLoggedIn = "false";
+      sessionStorage.clear();
+      window.open("index.html");
+    });
+
+    function refreshCartList() {
+      $ajax({
+        url: "/api/cartItem/",
+        type: "GET",
+        dataType: "json",
+        data: xxx,
+        error: function (jqxhr, status, errorThrown) {
+          alert("AJAX error: " + jqxhr.responseText);
+        },
+
+      }).done(function (response) {
+        // loop the info of products
+        for (let i = 0; i < response.length; i++) {
+          var product = response[i];
+          console.log(product);
+          var imagepath;
+          var imageId = product.image_id;
+          if (imageId) {
+            imagepath = `api/images/${imageId}`;
+          } else {
+            // Handle case when no images are returned
+            imagepath = "api/images/38";
+          }
+        }
+      });
+    }
+
+  </script>
+
+
 
 </body>
 
