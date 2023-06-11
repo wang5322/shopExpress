@@ -9,6 +9,7 @@ const Orders = require("../models/orders.model");
 
 const db = require("../models/db");
 const Auth = require("../utils/auth");
+const orderItemRoutes = require("../routes/orderItem.routes");
 
 //add an product or cartitem into an order with an orderId
 //json include {id,productId}(from cartItems)/{id}(from products) and {amount,orderId}
@@ -142,7 +143,6 @@ exports.addToOrder = (req, res) => {
 
 //delete an orderItem from an order
 exports.delete = (req, res) => {
-    
     //validate user
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         //only a buyer or admin can delete orderItem
@@ -150,7 +150,7 @@ exports.delete = (req, res) => {
             //admin delete an orderItem
             OrderItems.remove(req.params.id, (err, data) => {
                 if (err) {
-                    return res.status(500).send({ message:err.message|| "delete orderItem failed" })
+                    return res.status(500).send({ message: err.message || "delete orderItem failed" })
                 } else {
                     if (data.affectedRows == 0) {
                         return res.status(500).send({ message: "delete orderItem failed" })
@@ -162,31 +162,44 @@ exports.delete = (req, res) => {
             //buyer delete an orderItem
         } else if (user.role == "buyer") {
             //validata buyer match the order
-            OrderItems.userPermitted(req.params.id, user.id, (err, data) => {
+            OrderItems.userPermitted(req.params.id, user.id,user.role, (err, data) => {
                 if (err) {
-                    return res.status(500).send({ message:err.message|| "no permission to delete other user's orderitem" })
+                    return res.status(500).send({ message: err.message || "no permission to delete orderitem" })
                 } else {
                     if (data.permitted == false) {
-                        
-                    }
-                    //only unSubmitted orderItem can be deleted --BuyerConfirmed can be delete in orders controller
-                    Orders.findByOrderItemId(req.params.id, (err, data) => {
-                        if (err) {
-                            return res.status(500).send({ message: err.message || "order not found" })
-                        } else {
-                            if (data.length == 0) {
-                                return res.status(500).send({ message:  "order not found" })
+                        return res.status(500).send({ message: "no permission to delete orderitem" })
+                    } else {
+                        //only unSubmitted orderItem can be deleted --BuyerConfirmed can be delete in orders controller
+                        Orders.findByOrderItemId(req.params.id, (err, data) => {
+                            if (err) {
+                                return res.status(500).send({ message: err.message || "order not found" })
                             } else {
-                                if (!(data[0].status == "unSubmitted")) {
-                                    return res.status(500).send({ message:  "not permitted to delete orderitem in status: "+data[0].status })
+                                if (data.length == 0) {
+                                    return res.status(500).send({ message: "order not found" })
                                 } else {
-                                    //buyer delete an orderItem
+                                    if (!(data[0].status == "unSubmitted")) {
+                                        return res.status(500).send({ message: "not permitted to delete orderitem in status: " + data[0].status })
+                                    } else {
+                                        //buyer delete an orderItem
+                                        OrderItems.remove(req.params.id, (err, data) => {
+                                            if (err) {
+                                                return res.status(500).send({ message: err.message || "delete orderItem failed" })
+                                            } else {
+                                                if (data.affectedRows == 0) {
+                                                    return res.status(500).send({ message: "delete orderItem failed" })
+                                                } else {
+                                                    return res.status(200).send(data)
+                                                }
+                                            }
+                                        })//OrderItems.remove end
+                                    }
                                 }
                             }
-                        }
                             
                         
-                    })//Orders.findByOrderItemId
+                        })//Orders.findByOrderItemId
+                    }
+
                 }
             })//OrderItems.userPermitted
         } else {
@@ -195,32 +208,176 @@ exports.delete = (req, res) => {
 
     })//Auth.execIfAuthValid
 }
-
-//get all orderItems in an order
-exports.getAll = (req, res) => {
     
+//get all orderItems in an order --maybe not needed
+exports.getAllByOrderId = (req, res) => {
+    //validate id existing in req.body
+    if (!(req.body.id)) return res.status(500).send({ message: "id not indicated!" });
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        //user permitted
+        Orders.userPermitted(req.body.id, user.id, user.role, (err, data) => {
+            if (err) {
+                return res.status(500).send({ message:err.message|| "get permission failed" })
+            } else {
+                if (!(data.permitted)) {
+                    return res.status(500).send({ message: "no permission to get orderitems" })
+                } else {
+                    //get orderItems by order id
+                    OrderItems.getByOrderId(req.body.id, (err, data) => {
+                        if (err) {
+                            return res.status(500).send({ message: err.message||"get orderitems failed" })
+                        } else {
+                            return res.status(200).send(data);
+                        }
+                    })//OrderItems.getByOrderId
+                }
+            }
+    
+        })//Orders.userPermitted
+
+
+
+
+            
+  
+
+
+
+
+    });//Auth.execIfAuthValid end
 }
+
 
 //get one orderItem with id
 exports.getOne = (req, res) => {
-    
+    //validate user
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        //buyer or seller can only get their own orderItem
+        OrderItems.userPermitted(req.params.id, user.id, user.role, (err, data) => {
+            if (err) {
+                return res.status(500).send({ message: err.message || "get permission failed" })
+            } else {
+                if (data.permitted == false) {
+                    return res.status(500).send({ message: "not permitted" })
+                } else {
+                    OrderItems.getById(req.params.id, (err, data)=>{
+                        if (err) {
+                            return res.status(500).send({ message: err.message || "get orderItem failed" })
+                        } else {
+                            return res.status(200).send(data);
+                        }
+                    })//OrderItems.getById end
+                }
+            }
+        })//OrderItems.userPermitted
+
+    })//Auth.execIfAuthValid
 }
 
 //modify amount of an orderItem
-exports.modifyAmount= (req, res) => {
-    
+exports.modifyAmount = (req, res) => {
+    //validata req
+    if (!(req.body.amount)) {
+        return res.status(500).send({ message: "no amount" })
+    } else {
+        //validate user
+        Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+            //get Order
+            Orders.findByOrderItemId(req.params.id, (err, data) => {
+                if (err) {
+                    return res.status(500).send({ message: err.message || "get order failed" })
+                } else {
+                    if (data.length == 0) {
+                        return res.status(500).send({ message: "get order failed" })
+                    } else {
+                        if (!(data[0].buyerId == user.id && data[0].status == "unSubmitted")) {
+                            return res.status(500).send({ message: "modify not permitted" })
+                        } else {
+                            OrderItems.getById(req.params.id, (err, data) => {
+                                if(err) {
+                                    return res.status(500).send({ message:err.message|| "get order item failed" })
+                                } else {
+                                    if (data.length == 0) {
+                                        return res.status(500).send({ message: "get order item failed" })
+                                    } else {
+                                        let orderItem = data[0];
+                                        orderItem.amount = req.data.amount;
+                                        //modify amount
+                                        OrderItems.updateById(req.params.id, orderItem, (err, data) => {
+                                            if (err) {
+                                                return res.status(500).send({ message:err.message|| "updated failed" })
+                                            } else {
+                                                return res.status(200).send(data);
+                                            }
+                                        })//OrderItems.updateById
+                                    }
+                                }
+                            })//OrderItems.getById
+                        
+                        }
+                    }
+                }
+
+            })//Orders.findByOrderItemId
+        })//Auth.execIfAuthValid
+    }
 }
 
 
 
 //if orderItem with id match the product 
 exports.matchProduct = (req, res) => {
-    
+    //validate user
+    Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        //user permitted
+        OrderItems.userPermitted(req.params.id, user.id, user.role, (err, data) => {
+            if (err) {
+                return res.status(500).send({ message: err.message || "get permission failed" })
+            } else {
+                if (!(data.permitted)) {
+                    return res.status(500).send({ message:  "not permitted" })
+                } else {
+                    OrderItems.matchById(req.params.id, (err, data) => {
+                        if (err) {
+                            return res.status(500).send({ message: err.message || "get permission failed" })
+                        } else {
+                            return res.status(200).send(data)
+                        }
+                    })//OrderItems.matchById
+                }
+            }
+        })//OrderItems.userPermitted
+        
+    })//Auth.execIfAuthValid
     
 }
 
 //refresh orderItem with id from product
 exports.refreshFromProduct= (req, res) => {
-    
+        //validate user
+        Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+            Orders.findByOrderItemId(req.params.id, (err, data) => {
+                if (err) {
+                    return res.status(500).send({ message: err.message || "get order error" })
+                } else {
+                    if (data.length == 0) {
+                        return res.status(500).send({ message:  "order not found" })
+                    } else {
+                        if (!(data[0].buyerId == user.id && data[0].status == "unSubmitted")) {
+                            return res.status(500).send({ message:  "refresh not permitted" })
+                        } else {
+                            OrderItems.refreshFromProduct(req.params.id, (err, data) => {
+                                if (err) {
+                                    return res.status(500).send({ message: err.message || "refresh error" })
+                                } else {
+                                    return res.status(200).send(data)
+                                }
+                            })//OrderItems.refreshFromProduct
+                        }
+                    }
+                }
+            })//Orders.findByOrderItemId
+            
+        })//Auth.execIfAuthValid
 }
 

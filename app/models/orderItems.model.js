@@ -16,9 +16,11 @@ OrderItem.create = (newOrderItem, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
+        } else {
+            //console.log("created orderItems: ", { id: res.insertId, ...newOrderItem });
+            result(null, { id: res.insertId, ...newOrderItem });
         }
-        //console.log("created orderItems: ", { id: res.insertId, ...newOrderItem });
-        result(null, { id: res.insertId, ...newOrderItem });
+        
     });
 };
 
@@ -28,10 +30,7 @@ OrderItem.updateById = (id, orderItem, result) => {
             console.log("error:", err);
             result(err, null);
             return;
-        } else if (res.affectedRows == 0) {
-            result({ kind: "not_found" }, null);
-            return;
-        } else {
+        }else {
             console.log("updated orderItems: ", { id: id, ...orderItem });
             result(null, { id: id, ...orderItem });
         }
@@ -45,11 +44,7 @@ OrderItem.remove = (id, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
-        }
-        if (res.affectedRows == 0) {
-            result({ kind: "not_found" }, null);
-            return;
-        } else {
+        }else {
             console.log("deleted orderItems with id: ", id);
             result(null, res);
         }
@@ -63,11 +58,7 @@ OrderItem.removeAll = (OrderId, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
-        }
-        if (res.affectedRows == 0) {
-            result({ kind: "not_found" }, null);
-            return;
-        } else {
+        }else {
             console.log("deleted orderItems with orderId: ", OrderId);
             result(null, res);
         }
@@ -81,8 +72,10 @@ OrderItem.getByOrderId = (orderId, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
-        };
-        result(null, res);
+        } else {
+            result(null, res);
+        }
+        
     })
 };
 
@@ -92,8 +85,10 @@ OrderItem.getById = (id, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
-        };
-        result(null, res);
+        } else {
+            result(null, res);
+        }
+        
     })
 }
 
@@ -116,18 +111,37 @@ OrderItem.refreshFromProduct = (id, result) => {
             console.log("error: ", err);
             result(err, null);
             return;
-        } else if (res.affectedRows == 0) {
-            result({ kind: "not_found" }, null);
-            return;
         } else {
-            console.log("refreshed orderItem from products");
+            //console.log("refreshed orderItem from products");
             result(null, res);
         }
     })
 }
 
-OrderItem.userPermitted = (id, userId,result) => {
-    db.query("select * from orderItems as oi join orders as o on oi.cartId=o.id where oi.id = ? and buyerId = ?", [id,userId], (err, res) => {
+//return if user has permission to view the orderItem
+OrderItem.userPermitted = (id, userId, userRole, result) => {
+    let queryStr = "select * from orderItems as oi join orders as o on oi.cartId=o.id where oi.id = ?";
+    let args = [id];
+    switch (userRole) {
+        case "buyer": {
+            queryStr += " and o.buyerId = ?";
+            args.push(userId);
+            break;
+        }
+        case "seller": {
+            queryStr += " and o.sellerId = ? and o.status <> 'unSubmitted' and o.status <> 'BuyerConfirmed'";
+            args.push(userId);
+            break;
+        }
+        case "admin": {
+            queryStr += " and o.status <> 'unSubmitted' and o.status <> 'BuyerConfirmed'";
+            break;
+        }
+        default: {
+            result(new Error("user role error"), null);
+        };
+    }
+    db.query(queryStr, args, (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);
