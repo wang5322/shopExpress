@@ -12,6 +12,7 @@ const Products = function (product) {
   this.imageUrl = product.imageUrl;
   this.available = product.available;
 };
+
 Products.create = (newProduct, result) => {
   db.query("INSERT INTO products SET ?", newProduct, (err, res) => {
     if (err) {
@@ -150,22 +151,48 @@ Products.updateById = (id, products, result) => {
   );
 };
 
-Products.updateStockById = (id, stockNum, available, result) => {
-  const queryStr = `UPDATE products SET stockNum = ?, available = ? WHERE id = ?`;
-  db.query(queryStr, [stockNum, available, id], (err, res) => {
+Products.updateStockById = (id, stockNum, available, user, result) => {
+  // Get current stock number
+  const getStockQuery = "SELECT stockNum FROM products WHERE id = ?";
+  db.query(getStockQuery, id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
       return;
     }
-    if (res.affectedRows == 0) {
-      // not found Todos with the product
+    if (!res[0]) {
       result({ kind: "not_found" }, null);
       return;
     }
 
-    console.log("updated product with id: ", id);
-    result(null, res);
+    const currentStockNum = res[0].stockNum;
+
+    // Check if the new stock number is smaller than the current one
+    // If the user is a buyer, then it must be smaller
+    // If the user is a seller, then it can be either smaller or larger
+    if (user.role === "buyer" && stockNum > currentStockNum) {
+      result({ kind: "invalid_stockNum" }, null);
+      return;
+    }
+
+    // Update the stock number and availability
+    const updateQuery =
+      "UPDATE products SET stockNum = ?, available = ? WHERE id = ?";
+    db.query(updateQuery, [stockNum, available, id], (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+      if (res.affectedRows == 0) {
+        // not found product with the id
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log("updated product with id: ", id);
+      result(null, { id: id, stockNum: stockNum, available: available });
+    });
   });
 };
 

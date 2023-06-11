@@ -9,9 +9,6 @@ module.exports = (app) => {
   // Retrieve all products(including search for)
   router.get("/", products.findAll);
 
-  //Retrive all products by sellerId
-  // router.get("/", products.findBySeller);
-
   //Retrive a product by productId
   router.get("/:id([0-9]+)", products.findOne);
 

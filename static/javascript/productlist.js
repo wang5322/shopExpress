@@ -1,8 +1,10 @@
 var myParam = "";
+// var myParam2 = "";
 
 $(document).ready(function () {
   var urlParams = new URLSearchParams(window.location.search);
   myParam = urlParams.get("category");
+  // myParam2 = urlParams.get("searchFor");
   console.log(myParam);
   refreshProductList();
 });
