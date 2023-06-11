@@ -3,7 +3,7 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
-  // Create a new document
+  // Create a new image
   router.post("/", images.create);
 
   // Retrieve a single image with id

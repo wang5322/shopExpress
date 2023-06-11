@@ -150,6 +150,42 @@
           </div>
         </div>
       </section>
-      
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+      <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: "/api/users/" + username,
+                type: "GET",
+                headers: {
+                    'x-auth-username': sessionStorage.getItem('username'),
+                    'x-auth-password': sessionStorage.getItem('password'),
+                    'x-auth-role': sessionStorage.getItem('role')
+                },
+                error: function (jqxhr, status, errorThrown) {
+                    alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                }
+            }).done(function (user, status, xhr) {
+                $.ajax({
+                    url: "/api/orders",
+                    type: "GET",
+                    headers: {
+                        'x-auth-username': sessionStorage.getItem('username'),
+                        'x-auth-password': sessionStorage.getItem('password'),
+                        'x-auth-role': sessionStorage.getItem('role')
+                    },
+                    dataType: "JSON",
+                    data: { buyerName: username, sellerName: null },
+                    error: function (jqxhr, status, errorThrown) {
+                        alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                    }
+                }).done(function(orders, status, xhr){
+                    for (order of orders) {
+                        // FIXME: await orderitems api in backend
+                    }
+                })
+            });
+
+        })
+      </script>
 </body>
 </html>
