@@ -45,12 +45,23 @@ ImageClass.findById = (id, result) => {
 
 // return all todo[serach by task and return all if any]
 // WARNING: when a table has BLOBs do *NOT* fetch blobs when fetching multiple records! Only all other fields
-ImageClass.getAll = (sortOrder, result) => {
-  var query = db.format(
-    "SELECT id, title, mimeType, productId FROM images ORDER BY ??",
-    [sortOrder]
-  );
-  // console.log(query);
+ImageClass.getAll = (productId, sortOrder, result) => {
+  let sql = "SELECT id, title, mimeType, productId FROM images";
+  let inserts = [];
+  let filterStr = "";
+
+  if (productId) {
+    filterStr = " WHERE productId = ?";
+    inserts.push(productId);
+  }
+
+  if (sortOrder) {
+    filterStr += " ORDER BY ?";
+    inserts.push(sortOrder);
+  }
+  sql += filterStr;
+  var query = db.format(sql, inserts);
+  console.log(query);
   db.query(query, (err, res) => {
     if (err) {
       console.log("error: ", err);

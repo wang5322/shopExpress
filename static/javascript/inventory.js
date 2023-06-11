@@ -4,28 +4,8 @@ var available = 1;
 var sessionUsername = sessionStorage.getItem("username");
 var sessionPassword = sessionStorage.getItem("password");
 var sellerId = sessionStorage.getItem("id");
-$(document).ready(function () {
-  // $.ajax({
-  //   url: "/api/users/" + sessionUsername,
-  //   type: "GET",
-  //   headers: {
-  //     "x-auth-username": sessionUsername,
-  //     "x-auth-password": sessionPassword,
-  //   },
-  //   dataType: "json",
-  //   error: function (jqxhr, status, errorThrown) {
-  //     alert("AJAX error: " + jqxhr.responseText);
-  //   },
-  // }).done(function (user) {
-  //   sessionStorage.setItem("id", user.id);
-  //   var sellerId = sessionStorage.getItem("id");
-  //   console.log(user);
-  //   // sellerId = user.id;
-  //   console.log(sellerId);
-  //   refreshInventoryList();
-  // });
 
-  // console.log(sellerId);
+$(document).ready(function () {
   refreshInventoryList();
   console.log("page is fully loaded");
   console.log(sellerId);
@@ -34,6 +14,7 @@ $(document).ready(function () {
 
   $("#add").on("click", function () {
     var productObj = creatObject();
+
     $.ajax({
       url: "/api/products",
       type: "POST",
@@ -106,35 +87,56 @@ $(document).ready(function () {
     });
   });
 
-  // $("#exampleModal").on("show.bs.modal", function (event) {
-  //   var button = $(event.relatedTarget); // Button that triggered the modal
-  //   var recipient = button.data("whatever"); // Extract info from data-* attributes
-  //   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-  //   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-  //   var modal = $(this);
-  //   modal.find(".modal-title").text("New message to " + recipient);
-  //   modal.find(".modal-body input").val(recipient);
-  // });
+  // add image
+  $("#addImage").click(function () {
+    // add or update
+    let titleVal = $("input[name=imageTitle]").val();
+    console.log($("input[name=uploadImage]").prop("files"));
+    let file = $("input[name=uploadImage]").prop("files")[0];
+    //let filenameVal = file.name; // not used by me, but you can use it if you like, add 'filename' column to database
+    let mimeTypeVal = file.type;
+    let productIdVal = $("input[name=productId]").val();
+    // https://javascript.info/file  (about FileReader, see readAsDataURL )
+    let reader = new FileReader();
+    reader.onload = function () {
+      // console.log(reader.result); // careful, may print out hundreds of lines of binary
+      // magically "reader.result" hold the contents of the selected file, btoa() encodes it to base64
+      docObj = {
+        title: titleVal,
+        mimeType: mimeTypeVal,
+        data: btoa(reader.result),
+        productId: productIdVal,
+      };
+      $.ajax({
+        // FIXME: escape special characters using urlencode
+        url: "/api/images",
+        type: "POST",
+        dataType: "json",
+        data: docObj,
+        error: function (jqxhr, status, errorThrown) {
+          alert("AJAX error: " + jqxhr.responseText);
+        },
+      }).done(function () {
+        alert("upload successful");
+        // refreshList();
+      });
+    };
+    reader.onerror = function () {
+      console.log(reader.error);
+      alert(reader.error);
+    };
+    //reader.readAsDataURL(file); // read file and trigger one of the above handlers
+    reader.readAsBinaryString(file);
 
-  // $("#delete").on("click", function () {
-  //   var id = $("#id").html();
-  //   $.ajax({
-  //     url: "api/products/" + id,
-  //     type: "DELETE",
-  //     error: function (jqxhr, status, errorThrown) {
-  //       alert("AJAX error: " + jqxhr.responseText);
-  //     },
-  //   }).done(function () {
-  //     alert("Product archieved succesfully");
-  //     refreshInventoryList();
-  //   });
-  // });
+    return;
+  });
 });
 
 function refreshInventoryList() {
   $.ajax({
     url: `/api/products/?userName=${sessionUsername}`,
     type: "GET",
+    async: false,
     // headers: {
     //   "x-auth-username": sessionUsername,
     //   "x-auth-password": sessionPassword,
@@ -144,9 +146,36 @@ function refreshInventoryList() {
       console.log("userName is : " + sessionUsername);
       var result = "";
       console.log(response);
+
+      // loop the info of products
       for (let i = 0; i < response.length; i++) {
         var product = response[i];
         console.log(product);
+        var imagepath;
+        var imageId;
+
+        $.ajax({
+          // future: headers for authentication, url parameters for sorting, etc.
+          url: `/api/images/?productId=${product.id}`,
+          type: "GET",
+          dataType: "json",
+          async: false,
+          error: function (jqxhr, status, errorThrown) {
+            alert("AJAX error: " + jqxhr.responseText);
+          },
+        }).done(function (image) {
+          if (image.length > 0) {
+            imagepath = `api/images/${image[0].id}`;
+            imageId = image[0].id;
+            console.log(imagepath);
+            console.log(image);
+          } else {
+            // Handle case when no images are returned
+            imagepath = "api/images/38";
+          }
+        });
+
+        // insert to the DOM
         result +=
           `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
           <div class="form-check">
@@ -157,8 +186,10 @@ function refreshInventoryList() {
 </div>
 <div class="row g-0">
   <div class="col-md-4 ">
-    <img src="` +
-          product.imageUrl +
+    <img id="imageCursor" onclick="selectImage('` +
+          imageId +
+          `')" src="` +
+          imagepath +
           `" class="img-fluid rounded-start cropped" alt="` +
           product.productName +
           `" style="height: 100%; object-fit: cover;" >
@@ -174,7 +205,9 @@ function refreshInventoryList() {
           `</h4>
       <p class="card-text">` +
           product.productDesc +
-          `</p>
+          `</p><em class="card-text">ProductId:` +
+          product.id +
+          ` </em>
           
       <p class="card-text"><small class="text-body-secondary">Stock: ` +
           product.stockNum +
@@ -183,8 +216,10 @@ function refreshInventoryList() {
   </div>
 </div>
 </div>`;
+
+        $("#productList").html(result);
       }
-      $("#productList").html(result);
+      // $("#productList").html(result);
 
       $('input[type="checkbox"]').on("change", function () {
         $('input[name="' + this.name + '"]')
@@ -197,25 +232,6 @@ function refreshInventoryList() {
     },
   });
 }
-
-// `<div class="card mb-3" style="max-width: 540px;">
-//   <div class="row g-0">
-//     <div class="col-md-4">
-//       <img src=` +
-//   product.imageUrl +
-//   ` class="img-fluid rounded-start" alt="...">
-//     </div>
-//     <div class="col-md-8">
-//       <div class="card-body">
-//         <h5 class="card-title">` +
-//   product.productName +
-//   `</h5>
-//         <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-//         <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-//       </div>
-//     </div>
-//   </div>
-// </div>`;
 
 function selectItem(Id) {
   $.ajax({
@@ -236,6 +252,23 @@ function selectItem(Id) {
     $("input[name=stockNum]").val(product.stockNum);
     $("input[name=price]").val(product.price);
     $("input[name=imageUrl]").val(product.imageUrl);
+  });
+}
+
+function selectImage(id) {
+  $.ajax({
+    url: "/api/images/" + id,
+    type: "GET",
+    dataType: "json",
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText);
+    },
+  }).done(function (image) {
+    // console.log(image);
+    $("#imageId").html(image.id);
+    $("input[name=imageTitle]").val(image.title);
+    $("input[name=imageType]").val(image.mimeType);
+    $("input[name=productId]").val(image.productId);
   });
 }
 

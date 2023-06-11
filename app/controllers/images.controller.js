@@ -33,13 +33,14 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   const validSortOrders = ["id", "title", "mimeType"];
   const sortOrder = req.query.sortOrder ? req.query.sortOrder : "id"; // sort by id if no sortOrder provided
+  const productId = req.query.productId ? req.query.productId : null;
   if (!validSortOrders.includes(sortOrder)) {
     res.status(400).send({
       message: "invalid sort order value",
     });
     return;
   }
-  ImageClass.getAll(sortOrder, (err, list) => {
+  ImageClass.getAll(productId, sortOrder, (err, list) => {
     if (err)
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving Images.",
