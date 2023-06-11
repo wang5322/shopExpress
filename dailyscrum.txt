@@ -166,3 +166,54 @@ Shiyu
 -add 
 3. Need assistance / figure things out
 -N/A
+
+2023/6/11
+
+Xuerun
+
+1.  Done / not done since last scrum:
+-login/register page is fully functional,
+-didn't fix the hash problem because it will bring difficulty for testing, will do it at the last step
+-added restriction of who can access admin page
+-finished the restriction of who can view user infor (admin can't view each)
+ 2. To do until next Scrum:
+-login/sign out button
+-work on order history page front end
+-work on order page front end
+-work on cart front end
+-change the delete user account button to reset password (admin page)
+-when the back end finished by group member, continue work on delete order or product button on admin page
+3. Need assistance / figure things out
+N/A
+
+Shiyuan
+1.  Done / not done since last scrum:
+ - orderItem model
+ - orders model
+ - cartItem model
+ - carts model
+ - api/carts, api/cartItem, api/orders, api/orderItem -- route definition
+2. To do until next Scrum:
+ - orderItem controller
+ - orders controller
+ - cartItem controller
+ - carts controller
+ 3. Need assistance / figure things out
+N/A
+
+Shiyu
+1.  Done / not done since last scrum:
+- finished productdetail.js (can retrieve products info and images)
+- finished productlist.js (can retrieve products info and images)
+- created images tables
+-created images API to add, update, delete images
+-modified the product getAll API (Joined images and users table)
+2. To do until next Scrum:
+- add validation to products API
+- add validation to images API
+- modify products API to handle images.productId FK constraint.
+- fix images table can't add FK issue
+- add orders panel in inventory.html
+-try add cart (use carts API)
+3. Need assistance / figure things out
+-N/A
