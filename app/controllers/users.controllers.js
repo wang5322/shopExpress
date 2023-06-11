@@ -3,7 +3,7 @@ const Auth = require("../utils/auth");
 
 //Create and Save a new User
 exports.create = (req, res) => {
-  Auth.regIfInputValid(req, res, (req, res)=>{
+  Auth.regIfInputValid(req, res, (req, res) => {
     // Create a User
     // TODO: encrypt the password SHA256
     const user = new User({
@@ -27,7 +27,7 @@ exports.create = (req, res) => {
       }
     });
   });
-  
+
 };
 //get user by username
 exports.findOne = (req, res) => {
@@ -43,7 +43,15 @@ exports.findOne = (req, res) => {
             message: 'Error retrieving user with username ' + req.params.username
           });
         }
-      } else res.status(200).send(data);
+      } else {
+        if (data.role === 'admin' && req.params.username != req.headers["x-auth-username"]) {
+          res.status(403).send({
+            message: "Access Forbidden! Admin cannot view another admin's information"
+          });
+        } else {
+          res.status(200).send(data)
+        }
+      };
     });
   });
 };
@@ -89,20 +97,32 @@ exports.update = (req, res) => {
 
 //delete user by username
 exports.delete = (req, res) => {
-  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
-    User.removeById(req.params.username, (err, data) => {
+  Auth.execIfAuthValid(req, res, 'admin', (req, res, user) => {
+    User.findByUsername(req.params.username, (err, data) => {
       if (err) {
-        if (err.kind === "not_found") {
-          res.status(404).send({
-            message: 'Not found user with username ' + req.params.username,
+        res.send({ message: err.message })
+      } else {
+        if (data.role === 'admin') {
+          res.status(403).send({
+            message: 'Access Forbidden: Only root can delete an admin!',
           });
         } else {
-          res.status(500).send({
-            message: 'Could not delete user with username ' + req.params.username,
-          });
+          User.removeById(req.params.username, (err, data) => {
+            if (err) {
+              if (err.kind === "not_found") {
+                res.status(404).send({
+                  message: 'Not found user with username ' + req.params.username,
+                });
+              } else {
+                res.status(500).send({
+                  message: 'Could not delete user with username ' + req.params.username,
+                });
+              }
+            } else
+              res.status(200).send({ message: `User was deleted successfully!` });
+          })
         }
-      } else
-        res.status(200).send({ message: `User was deleted successfully!` });
+      }
     })
   })
 }

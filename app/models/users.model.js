@@ -47,7 +47,7 @@ Users.updateByUsername = (username, result) => {
   db.query(querystr, [users.userName, users.passwords, users.role, users.address, users.email, username], (err, res) => {
     if (err) {
       console.log("error: ", err);
-      result(null, err);
+      result(err, null);
       return;
     }
 
@@ -67,7 +67,7 @@ Users.removeById = (username, result) => {
   db.query(queryStr, username, (err, res) => {
     if (err) {
       console.log("error: ", err);
-      result(null, err);
+      result(err, null);
       return;
     }
 
