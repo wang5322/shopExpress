@@ -36,7 +36,7 @@
               <a class="nav-link" href="inventory.html">seller's center</a>
             </li>
             <li class="nav-item" id="anchorLogin">
-              <a class="btn btn-warning btn-sm mt-1 mx-1" href="loginregister.html?register=0">Hello, Sign In</a>
+              <a class="btn btn-warning btn-sm mt-1 mx-1">Hello, Sign In</a>
             </li>
             <li class="nav-item" id="anchorRegister">
               <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" href="loginregister.html?register=1">Register</a>
@@ -130,7 +130,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
   <script>
     let ifLoggedIn;
-    $(document).ready(function(){
+    $(document).ready(function () {
       ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
       if (ifLoggedIn === "true") {
         $("#anchorLogin a").text("Sign Out");
@@ -141,10 +141,21 @@
         $("#anchorRegister").show();
       }
     })
+
     $("#formSearch").submit(function () {
       var searchFor = $('#formSearch :input').val();
       window.open("productlist.html?searchFor=" + searchFor);
     });
+
+    $("#anchorLogin a").click(function () {
+      if (ifLoggedIn === "true") {
+        ifLoggedIn = "false";
+        sessionStorage.clear();
+        window.open("index.html");
+      } else {
+        window.location.replace("loginregister.html?register=0");
+      }
+    })
   </script>
 </body>
 
