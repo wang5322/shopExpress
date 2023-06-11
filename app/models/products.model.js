@@ -35,7 +35,7 @@ Products.getAll = (
   console.log(category, searchFor, available, sellerId, userName);
 
   let sql =
-    "SELECT products.* FROM products JOIN users on (products.sellerId=users.id and users.role='seller')";
+    "SELECT products.*, images.id AS image_id FROM products JOIN users ON (products.sellerId = users.id AND users.role='seller') LEFT JOIN images ON products.id = images.productId";
   let inserts = [];
   let filterStr = "";
 
@@ -98,7 +98,7 @@ Products.getAll = (
 };
 
 Products.getById = (id, result) => {
-  let queryStr = `SELECT * FROM products WHERE id =? `;
+  let queryStr = `SELECT products.*, images.id AS image_id FROM products LEFT JOIN images ON (products.id = images.productId) WHERE products.id = ? `;
   db.query(queryStr, id, (err, res) => {
     if (err) {
       console.log("error: ", err);

@@ -20,32 +20,43 @@ function refreshProducDetail() {
       console.log("productId is : " + myParam);
       var result = "";
       console.log(response);
-      // loop the info of products
-
       var product = response;
-      var imagepath;
-      var imageId;
 
-      $.ajax({
-        // future: headers for authentication, url parameters for sorting, etc.
-        url: `/api/images/?productId=${myParam}`,
-        type: "GET",
-        async: false,
-        dataType: "json",
-        error: function (jqxhr, status, errorThrown) {
-          alert("AJAX error: " + jqxhr.responseText);
-        },
-      }).done(function (image) {
-        if (image.length > 0) {
-          imagepath = `api/images/${image[0].id}`;
-          imageId = image[0].id;
-          console.log(imagepath);
-          console.log(image);
-        } else {
-          // Handle case when no images are returned
-          imagepath = "api/images/38";
-        }
-      });
+      var imagepath;
+      var imageId = product.image_id;
+      if (imageId) {
+        imagepath = `api/images/${imageId}`;
+      } else {
+        // Handle case when no images are returned
+        imagepath = "api/images/38";
+      }
+
+      // // loop the info of products
+
+      // var product = response;
+      // var imagepath;
+      // var imageId;
+
+      // $.ajax({
+      //   // future: headers for authentication, url parameters for sorting, etc.
+      //   url: `/api/images/?productId=${myParam}`,
+      //   type: "GET",
+      //   async: false,
+      //   dataType: "json",
+      //   error: function (jqxhr, status, errorThrown) {
+      //     alert("AJAX error: " + jqxhr.responseText);
+      //   },
+      // }).done(function (image) {
+      //   if (image.length > 0) {
+      //     imagepath = `api/images/${image[0].id}`;
+      //     imageId = image[0].id;
+      //     console.log(imagepath);
+      //     console.log(image);
+      //   } else {
+      //     // Handle case when no images are returned
+      //     imagepath = "api/images/38";
+      //   }
+      // });
 
       // insert to the DOM
       result +=

@@ -8,11 +8,9 @@ $(document).ready(function () {
 });
 
 function refreshProductList() {
-  console.log("refStart");
   $.ajax({
     url: `/api/products/?category=${myParam}`,
     type: "GET",
-    async: false,
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
       alert("AJAX error: " + jqxhr.responseText);
@@ -26,28 +24,13 @@ function refreshProductList() {
         var product = response[i];
         console.log(product);
         var imagepath;
-        var imageId;
-
-        $.ajax({
-          // future: headers for authentication, url parameters for sorting, etc.
-          url: `/api/images/?productId=${product.id}`,
-          type: "GET",
-          async: false,
-          dataType: "json",
-          error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText);
-          },
-        }).done(function (image) {
-          if (image.length > 0) {
-            imagepath = `api/images/${image[0].id}`;
-            imageId = image[0].id;
-            console.log(imagepath);
-            console.log(image);
-          } else {
-            // Handle case when no images are returned
-            imagepath = "api/images/38";
-          }
-        });
+        var imageId = product.image_id;
+        if (imageId) {
+          imagepath = `api/images/${imageId}`;
+        } else {
+          // Handle case when no images are returned
+          imagepath = "api/images/38";
+        }
 
         // insert to the DOM
         result +=
