@@ -1,4 +1,5 @@
 let searchedUsername;
+let searchedRole;
 let ifLoggedIn;
 
 $(document).ready(function () {
@@ -11,15 +12,8 @@ $(document).ready(function () {
             $("body").hide();
             alert("Access Forbidden: you are not an admin!");
         } else {
-            // hide or show tables
-            if (sessionStorage.role === 'buyer') {
-                $("#orders").show();
-                $("#productManage").hide();
-            }
-            if (sessionStorage.role === 'seller') {
-                $("#orders").hide();
-                $("#productManage").show();
-            }
+            $("#orders").show();
+            $("#productManage").hide();
         }
     }
 });
@@ -52,6 +46,7 @@ function refreshDisplay(username) {
         }
     }).done(function (data, status, xhr) {
         searchedUserObj = data;
+        searchedRole = searchedUserObj.role;
         // display the searched user infor
         var result = "<tr><td>User Id: " + searchedUserObj.id + "</td>"
             + "<td>Username: " + searchedUserObj.userName + "</td>"
@@ -63,39 +58,31 @@ function refreshDisplay(username) {
         $("#tableUserinfo").html(result);
 
         switch (searchedUserObj.role) {
-            case "buyer":
-                $("#productManage").hide();
-                $("#orders").show();
-                //if input user is a buyer, show his orders
-                refreshOrderList(searchedUsername);
-                break;
-
-            case "seller":
-                //if input user is a seller, show his product list
+            case "admin":
                 $("#orders").hide();
-                $("#productManage").show();
-                refreshProductList(searchedUserObj);
+                $("#productManage").hide();
                 break;
 
             default:
-                $("#orders").hide();
                 $("#productManage").hide();
+                $("#orders").show();
+                refreshOrderList(searchedUsername, searchedUserObj.role);
                 break;
         }
     });
 }
 
-function refreshOrderList(username) {
+function refreshOrderList(username, role) {
+    let buyerName = (role === 'buyer') ? username : "";
+    let sellerName = (role === 'seller') ? username : "";
     $.ajax({
-        url: "/api/orders",
+        url: `/api/orders/${buyerName}/buyfrom/${sellerName}`,
         type: "GET",
         headers: {
             'x-auth-username': sessionStorage.getItem('username'),
             'x-auth-password': sessionStorage.getItem('password'),
             'x-auth-role': sessionStorage.getItem('role')
         },
-        dataType: "JSON",
-        data: {buyerName: username, sellerName: null},
         error: function (jqxhr, status, errorThrown) {
             alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
         }
@@ -151,9 +138,10 @@ $("#tableUserinfo").on("click", "#deleteAccount", function () {
 });
 
 $("#tableOrders").on("click", "#deleteOrder", function () {
+    console.log("delete order is clicked")
     let checkedboxes = $(".delete-order:checked");
-    for (box of checkedboxes) {
-        let orderid = parseInt(box.parent().parent().children().eq(1).text());
+    checkedboxes.each(function(index){
+        let orderid = parseInt($(this).parent().parent().children().eq(1).text());
         $.ajax({
             url: "/api/orders/" + orderid,
             type: "DELETE",
@@ -166,44 +154,8 @@ $("#tableOrders").on("click", "#deleteOrder", function () {
                 alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
             }
         }).done(function () {
-            refreshOrderList(searchedUsername);
+            refreshOrderList(searchedUsername, searchedRole);
         })
-    }
+    })
+        
 });
-
-function refreshProductList(searchedUser) {
-    $.ajax({
-        url: "/api/products?sellerId=" + searchedUser.id,
-        type: "GET",
-        headers: {
-            'x-auth-username': sessionStorage.getItem('username'),
-            'x-auth-password': sessionStorage.getItem('password'),
-            'x-auth-role': sessionStorage.getItem('role')
-        },
-        dataType: "JSON",
-        data: {buyerName: null, sellerName: searchedUser.username},
-        error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
-        }
-    }).done(function (data, status, xhr) {
-        var products = "<tr class='table-primary'><th>Product ID</th><th>Category</th><th>Seller ID</th><th>Product Code</th><th>Product Name</th><th>Product Desc</th><th>Price</th><th>Stock Num</th><th>Available</th></tr>\n";
-        for (row of data) {
-            products += `<tr><td>${row.id}</td><td>${row.category}</td><td>${row.sellerId}</td><td>${row.productCode}</td><td>${row.productName}</td><td>${row.productDesc}</td><td>${row.price}</td><td>${row.stockNum}</td><td>${row.available}</td></tr>\n`;
-        }
-        $("#tableProducts").html(products);
-    });
-}
-
-// $("#delectAccount").on("click", function () {
-//     let username = $("textUsername").val();
-//     $.ajax({
-//         url: "/api/users"+ username,
-//         type: "DELETE",
-//         dataType: "json",
-//         error: function (jqxhr, status, errorThrown) {
-//             alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
-//         }
-//     }).done(function (data) {
-//         //after delete, return?
-//     })
-// })
