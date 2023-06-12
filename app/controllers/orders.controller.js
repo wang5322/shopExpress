@@ -142,7 +142,7 @@ exports.delete = (req, res) => {
               if (data.length == 0) {
                 return res.status(500).send({message: "order not found"})
               } else {
-                if (!(data[0].buyerId==user.id &&(data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed"))) {
+                if (!(data[0].buyerId==user.id &&(data[0].status == "unSubmitted" || data[0].status == "BuyerConfirmed"))) {
                   return res.status(500).send({message:"delete not permitted"})
                 } else {
                   OrderItem.removeAll(req.params.id, (err, data) => {

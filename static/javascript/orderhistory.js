@@ -13,6 +13,21 @@ $(document).ready(function () {
     refreshProductList();
   }
 
+  //add button functions here
+
+
+
+
+
+
+  //button functions end
+
+
+
+
+
+
+
   // confirm button
   $(document).on("click", '[id^="confirm-button-"]', function () {
     const orderId = this.id.split("-")[2];
@@ -50,8 +65,6 @@ function refreshProductList() {
     },
   }).done(function (orders, status, xhr) {
 
-
-    console.log(orders)
     //dom version
     let orderCards = $("#newordercards");
     for (let order of orders) {
@@ -89,9 +102,9 @@ function refreshProductList() {
             <span class="fw-normal" id="item-productName-${item.id}">Product: ${item.productName}</span>
             <span class="fw-normal" id="item-price-${item.id}">Price: ${item.price}</span>
             <span class="fw-normal" id="item-amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
-            <input type="number" id="item-amount-${item.id}" value=${item.amount}>
+            <input type="number" style="width:60px" id="item-amount-${item.id}" value=${item.amount}>
             <button id="item-modify-amount-${item.id}" class="btn btn-outline-primary" type="button">Modify</button>
-            <button id="item-delete-${item.id}" class="btn btn-outline-primary" type="button">delete</button>
+            <button id="item-delete-${item.id}" onclick="itemDelete(${item.id})" class="btn btn-outline-primary" type="button">delete</button>
             </div>
             `)
 
@@ -158,7 +171,10 @@ function refreshProductList() {
       ) {
         $(`#card-div5-${order.id}`).append(`<div><button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete</button></div>`);
       }
+      $(`#delete-button-${order.id}`).click(() => { deleteOrder(order.id) })
       //delete order button end
+      
+      
 
 
       //changable button
@@ -181,8 +197,24 @@ function refreshProductList() {
           buttonId = `received-button-${order.id}`;
           break;
       }
+      //add button
       $(`#card-div5-${order.id}`).append(`<div><button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button></div>`)
-      if (buttonType=="unshown"){$(`#${buttonId}`).hide()}
+      //add functions
+      if (buttonType == "unshown") { $(`#${buttonId}`).hide() }
+      switch (buttonType) {
+        case "Confirm": {
+          $(`#${buttonId}`).click(() => { confirmOrder(order.id) })
+          break;
+        }
+        case "Pay": {
+          $(`#${buttonId}`).click(() => { payOrder(order.id) })
+          break;
+        }
+        case "Received": {
+          $(`#${buttonId}`).click(() => { receiveOrder(order.id) })
+          break;
+        }
+      }
       //changable button end
 
 
@@ -358,9 +390,9 @@ function refreshProductList() {
         $("#ordercards").html(orderCard);
       })
     }
+   
+    //string version code end
     $("#ordercards").hide();
-    //string version code end 
-
 
   });
 }
@@ -370,3 +402,72 @@ $("#signout").click(function () {
   sessionStorage.clear();
   window.open("index.html");
 })
+
+function deleteOrder(orderId) {
+  $.ajax({
+    url: `/api/orders/${orderId}`,
+    // url: `/api/orders/?username=${username}`,
+    type: "DELETE",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done((data, status, xhr) => {
+      refreshProductList();
+   })
+}
+
+function confirmOrder(orderId) {
+  $.ajax({
+    url: `/api/orders/${orderId}`,
+    // url: `/api/orders/?username=${username}`,
+    type: "PUT",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done((data, status, xhr) => {
+      refreshProductList();
+   })
+}
+
+function payOrder(orderId) {
+  
+}
+
+function receiveOrder(orderId) {
+  $.ajax({
+    url: `/api/orders/${orderId}`,
+    // url: `/api/orders/?username=${username}`,
+    type: "PATCH",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    data: { status:"Received" },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done((data, status, xhr) => {
+      refreshProductList();
+   })
+}
+
+//item functions
+function itemDelete(itemId) {
+  alert(itemId)
+}
