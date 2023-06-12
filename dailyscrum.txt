@@ -217,3 +217,43 @@ Shiyu
 -try add cart (use carts API)
 3. Need assistance / figure things out
 -N/A
+
+2023/06/12
+Shiyu
+1.  Done / not done since last scrum:
+- added validation and auth to products API
+- added validation and auth to images API
+- fixed images FK issue
+- modified the orderhistory.js to retrieve orders and display the necessary dynamic buttons and info on the orderhistory.html
+2. To do until next Scrum:
+- create a orderpanel in inventory.html & inventory.js
+- implement image update and delete function
+- add href to categories hyperlink
+- download images and upload to corresponding products to database 
+3. Need assistance / figure things out
+-N/A
+
+Shiyuan
+1.  Done / not done since last scrum:
+ - orderItem controller --orderItem api finished
+ - orders controller --orders api finished
+ - cartItem controller --cartItem api finished
+ - carts controller --carts api finished
+2. To do until next Scrum:
+ - orders frontend
+ - cart frontend if order frontend finished
+3. Need assistance / figure things out
+-N/A
+
+Xuerun
+1.  Done / not done since last scrum:
+-login/sign out button 
+-finished order-history basic function, still need to add buttons
+-finished shopping cart design and front end
+ 2. To do until next Scrum:
+-change the delete user account button to reset password (admin page)
+-when the back end finished by group member, continue work on delete order or product button on admin page
+-continue with shopping cart front-end
+-set up heroku
+3. Need assistance / figure things out
+N/A
