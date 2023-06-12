@@ -22,7 +22,7 @@ $(document).ready(function () {
       url: `api/orders/${orderId}`,
       type: "PATCH",
       data: {
-        status: "BuyerConfirmed",
+        status: "BuyerConfirmed", // TODO: finish the ajax , now the patch controller not finished
       },
     });
   });
