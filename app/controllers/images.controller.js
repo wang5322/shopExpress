@@ -24,7 +24,6 @@ exports.create = (req, res) => {
       });
     }
 
-    // TODO: validate, e.g. check max size, mime-type, title content
     // console.log("REQ BODY: " + JSON.stringify(req.body)); // careful, you'll print out the whole uploaded file, can be hundreds of lines of text
     const item = new ImageClass({
       title: req.body.title,
@@ -33,7 +32,7 @@ exports.create = (req, res) => {
       productId: req.body.productId || null,
     });
 
-    // Save ToDo in the database
+    // Save image in the database
     ImageClass.create(item, (err, item) => {
       if (err) {
         if (err.code === "ER_NO_REFERENCED_ROW_2") {
