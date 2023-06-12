@@ -102,9 +102,9 @@ Orders.getAll = (sellerName, buyerName, statusFilter, result) => {
 
 //update an order
 Orders.updateById = (id, order, result) => {
-    db.query(
-        "UPDATE orders SET sellerId=?, buyerId=?, status=?, orderTime=?, paymentInfo=?, totalPrice=?, taxes=?, shippingFee=?, finalTotalPay=?, deliveryInfo = ? WHERE id = ?", [order.sellerId, order.buyerId, order.status, order.orderTime, order.paymentInfo, order.totalPrice, order.taxes, order.shippingFee, order.finalTotalPay,order.deliveryInfo, id],
-        (err, res) => {
+    let query = db.format(
+        "UPDATE orders SET sellerId=?, buyerId=?, status=?, orderTime=?, paymentInfo=?, totalPrice=?, taxes=?, shippingFee=?, finalTotalPay=?, deliveryInfo = ? WHERE id = ?", [order.sellerId, order.buyerId, order.status, order.orderTime, order.paymentInfo, order.totalPrice, order.taxes, order.shippingFee, order.finalTotalPay, order.deliveryInfo, id]);
+    db.query(query,(err, res) => {
             if (err) {
                 console.log("error: ", err);
                 result(err, null);
