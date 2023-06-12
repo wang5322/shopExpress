@@ -9,7 +9,9 @@ ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
 $(document).ready(function () {
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
   if (ifLoggedIn !== "true") {
-    alert("Access Forbidden: you are not logged in!");
+    $("#myModalBody").html("Access Forbidden: you are not logged in!");
+    $("#myModal").modal("show");
+    // alert("Access Forbidden: you are not logged in!");
     window.location.href = "index.html";
   } else {
     refreshInventoryList();
@@ -20,7 +22,8 @@ $(document).ready(function () {
     // $("#alert").hide(); // error message alert
 
     $("#add").on("click", function () {
-      var productObj = creatObject();
+      var productObj = createObject();
+      isValidProduct(product);
 
       $.ajax({
         url: "/api/products",
@@ -37,7 +40,9 @@ $(document).ready(function () {
       }).done(function (data) {
         console.log(productObj);
         console.log(data);
-        alert("Products added successfully");
+        $("#myModalBody").html("Products added successfully");
+        $("#myModal").modal("show");
+        // alert("Products added successfully");
         refreshInventoryList();
       });
       // $(".close").alert("close");
@@ -68,6 +73,7 @@ $(document).ready(function () {
       var id = $("#id").html();
       console.log(id);
       var product = creatObject();
+      isValidProduct(product);
       $.ajax({
         url: "/api/products/" + id,
         type: "PUT",
@@ -81,7 +87,9 @@ $(document).ready(function () {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        alert("Product updated succesfully");
+        $("#myModalBody").html("Product updated succesfully");
+        $("#myModal").modal("show");
+        // alert("Product updated succesfully");
         refreshInventoryList();
       });
     });
@@ -101,7 +109,9 @@ $(document).ready(function () {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        alert("Products archieved successfully");
+        $("#myModalBody").html("Products archieved successfully");
+        $("#myModal").modal("show");
+        // alert("Products archieved successfully");
         refreshInventoryList();
       });
     });
@@ -533,7 +543,9 @@ function updateOrderStatus(orderId, status) {
       alert("AJAX error: " + jqxhr.responseText);
     },
   }).done(function () {
-    alert("Status updated succesfully");
+    $("#myModalBody").html("Status updated succesfully");
+    $("#myModal").modal("show");
+    // alert("Status updated succesfully");
     refreshOrderList();
   });
 }
