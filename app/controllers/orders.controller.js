@@ -10,6 +10,7 @@ const { error } = require("npmlog");
 
 //get all orders with username and/or sellername
 exports.getAll = (req, res) => {
+
   Auth.execIfAuthValid(req, res, null, (req, res, user) => {
     let sellerName;
     let buyerName;
@@ -33,6 +34,7 @@ exports.getAll = (req, res) => {
       default:
         res.status(500).send({ message: "Some error occurred while authenticating user." });
     }
+    console.log(sellerName, buyerName, statusFilter);
     Orders.getAll(sellerName, buyerName, statusFilter, (err, data) => {
       if (err) {
         res.status(500).send({ message: err.message || "Some error occurred while retrieving orders." });
@@ -45,11 +47,84 @@ exports.getAll = (req, res) => {
 
 //get one order with id
 exports.getOne = (req, res) => {
-  
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    Orders.userPermitted(req.params.id, user.id, user.role, (err, data) => {
+      if (err) {
+        return res.status(500).send({message: err.message|| "get permission error"})
+      } else {
+        if (data.permitted == false) {
+          return res.status(500).send({message:  "not permitted"})
+        } else {
+          Orders.findById(req.params.id, (err, data) => {
+            if (err) {
+              return res.status(500).send({ message: err.message || "" })
+            } else {
+              return res.status(200).send(data)
+            }
+          })//Orders.findById end
+        }
+      }
+    })//Orders.userPermitted
+
+  })//Auth.execIfAuthValid
 }
 
 //confirm an order, calculate price and fees
-exports.buyerConfirm = (req, res) => { }
+exports.buyerConfirm = (req, res) => { 
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    if (!(user.role == "buyer")) {
+      return res.status(500).send({message:"only buyer can confirm"})
+    } else {
+      Orders.findById(req.params.id, (err, data) => {
+        if (err) {
+          return res.status(500).send({message:err.message||"get order error"})
+        } else {
+          if (data.length == 0) {
+            return res.status(500).send({message:"no order found"})
+          } else {
+            if (!(data[0].buyerId == user.id && data[0].status=="unSubmitted")) {
+              return res.status(500).send({message:"not permitted"})
+            } else {
+              let order = new Orders(data[0]);
+              order.status = "BuyerConfirmed";
+              order.orderTime = new Date().toLocaleDateString();
+              if (req.body.deliveryInfo) {
+                order.deliveryInfo = req.body.deliveryInfo
+              };
+              OrderItem.getByOrderId(req.params.id, (err, data) => {
+                if (err) {
+                  return res.status(500).send({message:err.message||"get order item error"})
+                } else {
+                  if (data.length == 0) {
+                    return res.status(500).send({message:"no order items found"})
+                  } else {
+                    let totalPrice = 0;
+                    for (let i = 0; i < data.length; i++){
+                      totalPrice = Number(totalPrice) + Number(data[i].price * data[i].amount);
+                    }
+                    order.totalPrice = totalPrice;
+                    order.taxes = totalPrice * 0.15;
+                    order.shippingFee = (totalPrice * 0.1 < 5) ? 5 : (totalPrice * 0.1);
+                    order.finalTotalPay = Number(order.totalPrice) + Number(order.taxes) + Number(order.shippingFee);
+                    //update order
+                    Orders.updateById(req.params.id, order, (err, data) => {
+                      if (err) {
+                        return res.status(500).send({message:err.message||"update error"})
+                      } else {
+                        return res.status(200).send(data);
+                      }
+                    })//Orders.updateById
+                  }
+                }
+              })//OrderItem.getByOrderId
+            }
+          }
+        }
+      })//Orders.findById
+    }
+
+  })//Auth.execIfAuthValid
+}
 
 //delete order -- to be fixed
 exports.delete = (req, res) => {
