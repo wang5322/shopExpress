@@ -132,13 +132,24 @@ exports.delete = (req, res) => {
     switch (user.role) {
       case "seller": {
         //seller not allowed to delete
-        return;
+        return res.status(500).send({message: "delete not permitted"})
       }
       case "buyer": {
-        //buyer not allowed to delete other's order
-        if (!(req.body.buyerId == user.id)) {
-          return;
-        }
+        //validate if permitted
+        Orders.findById(req.params.id, (err, data) => {
+            if (err) {
+              return res.status(500).send({message:err.message|| "delete not permitted"})
+            } else {
+              if (data.length == 0) {
+                return res.status(500).send({message: "order not found"})
+              } else {
+                if (!(data[0].buyerId==user.id &&(data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed"))) {
+                  
+                }
+              }
+            }
+          })
+        
         break;
       }
       case "admin": {
