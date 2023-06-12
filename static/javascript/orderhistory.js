@@ -49,9 +49,163 @@ function refreshProductList() {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     },
   }).done(function (orders, status, xhr) {
-    // create a string variable to store all card html of orders
-    let orderCard = "";
 
+
+    console.log(orders)
+    //dom version
+    let orderCards = $("#newordercards");
+    for (let order of orders) {
+      orderCards.append(`<div id="card-div1-${order.id}" class="row d-flex justify-content-center align-items-center h-100"></div>`);
+      $(`#card-div1-${order.id}`).append(`<div id="card-div2-${order.id}" class="col"></div>`)
+      $(`#card-div2-${order.id}`).append(`<div id="card-div3-${order.id}" class="card card-stepper" style="border-radius: 10px;"></div>`)
+      $(`#card-div3-${order.id}`).append(`<div id="card-div4-${order.id}" class="card-body p-4"></div>`)
+      $(`#card-div4-${order.id}`).append(`<div id="card-div5-${order.id}" class="d-flex justify-content-between align-items-center"></div>`)
+      $(`#card-div5-${order.id}`).append(`<div id="card-div6-${order.id}" class="d-flex flex-column"></div>`)
+
+      $(`#card-div6-${order.id}`).append(`<span class="text-muted small">order #${order.id}</span>`)
+      $(`#card-div6-${order.id}`).append(`<span class="lead fw-normal" id="status">${order.status}</span>`)
+      $(`#card-div6-${order.id}`).append(`<span class="lead fw-normal" id="sellerName">Seller: ${order.sellerName}</span>`)
+
+      //get orderItems
+      $.ajax({
+        url: "/api/orderItem/order/" + order.id,
+        type: "GET",
+        headers: {
+          "x-auth-username": username,
+          "x-auth-password": password,
+          "x-auth-role": role,
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+        },
+      }).done(function (orderitems, status, xhr) {
+        for (let item of orderitems) {
+          if (order.status === "unSubmitted") {
+            $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
+            <span class="fw-normal" id="item-id-${item.id}"># ${item.id}</span>
+            <span class="fw-normal" id="item-productCode-${item.id}">Code: ${item.productCode}</span>
+            <span class="fw-normal" id="item-productName-${item.id}">Product: ${item.productName}</span>
+            <span class="fw-normal" id="item-price-${item.id}">Price: ${item.price}</span>
+            <span class="fw-normal" id="item-amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
+            <input type="number" id="item-amount-${item.id}" value=${item.amount}>
+            <button id="item-modify-amount-${item.id}" class="btn btn-outline-primary" type="button">Modify</button>
+            <button id="item-delete-${item.id}" class="btn btn-outline-primary" type="button">delete</button>
+            </div>
+            `)
+
+            //match the oringinal paroduct
+
+            //check matched , add refresh button if not matched
+            $.ajax({
+              url: "/api/orderItem/match/" + item.id,
+              type: "GET",
+              headers: {
+                "x-auth-username": username,
+                "x-auth-password": password,
+                "x-auth-role": role,
+              },
+              error: function (jqxhr, status, errorThrown) {
+                alert(
+                  "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+                );
+              },
+            }).done(function (orderItmeMatched, status, xhr) {
+              console.log($(`#itemDiv-${item.id}`))
+              if (!(orderItmeMatched.matched)) {
+                $(`#itemDiv-${item.id}`).css({ "color": "red" });
+                $(`#itemDiv-${item.id}`).append(`<button id="item-refresh-${item.id}" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
+              } else {
+                $(`#itemDiv-${item.id}`).css({ "color": "green" });
+              }
+            }
+            ) //match end
+
+          } else {
+            $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
+            <span class="fw-normal" id="item-productName-${item.id}">${item.productName}</span>
+            <span class="fw-normal" id="item-amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
+            <span class="fw-normal" id="item-amount-${item.id}" style="margin-left: 10px;">${item.amount}</span>
+        </div>`)
+            
+            
+            
+
+
+          }
+        }
+      })//orderItems end
+        
+
+
+
+      $(`#card-div5-${order.id}`).append(`<div class="d-flex flex-column justify-content-between">
+      <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+      <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
+      <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
+      <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
+      <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
+      <span class="fw-normal small" id="Order summary">Deliver to: ${order.deliveryInfo}</span>
+      <span class="fw-normal small" id="Order summary">Payment Info: ${order.paymentInfo}</span>
+      </div>`);
+
+      //delete order button if allowed
+      if (
+        order.status === "unSubmitted" ||
+        order.status === "BuyerConfirmed" /*||
+        order.status === "Received"*/
+      ) {
+        $(`#card-div5-${order.id}`).append(`<div><button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete</button></div>`);
+      }
+      //delete order button end
+
+
+      //changable button
+      switch (order.status) {
+        case "unSubmitted":
+          buttonType = "Confirm";
+          buttonId = `confirm-button-${order.id}`;
+          break;
+        case "BuyerConfirmed":
+          buttonType = "Pay";
+          buttonId = `pay-button-${order.id}`;
+          break;
+        case "Received":
+          buttonType = "unshown";
+          buttonId = `unshown-button-${order.id}`;
+          break;
+          
+        default:
+          buttonType = "Received";
+          buttonId = `received-button-${order.id}`;
+          break;
+      }
+      $(`#card-div5-${order.id}`).append(`<div><button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button></div>`)
+      if (buttonType=="unshown"){$(`#${buttonId}`).hide()}
+      //changable button end
+
+
+      $(`#card-div4-${order.id}`).append(`<div class="d-flex flex-row justify-content-between align-items-center">
+      <div class="d-flex flex-column align-items-start" id="order time">
+      ${order.orderTime ? `<span>${order.orderTime}</span><span>Order placed</span>` : ""}
+      </div>
+      </div>`)
+      
+
+      
+      
+
+    
+      }//dom version end
+      
+    
+    
+    
+    
+    
+
+    // string version create a string variable to store all card html of orders
     for (let order of orders) {
       // get orderitem info from orderitems table
 
@@ -76,16 +230,48 @@ function refreshProductList() {
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex flex-column">
                           <span class="text-muted small">order #${order.id}</span>
-                          <span class="lead fw-normal" id="status">${order.status}</span>`;
+                          <span class="lead fw-normal" id="status">${order.status}</span>
+                          <span class="lead fw-normal" id="sellerName">Seller: ${order.sellerName}</span>
+                          `;
 
         for (let item of orderitems) {
           if (order.status === "unSubmitted") {
-            orderCard += `<div style="display: flex; align-items: center;">
-                              <span class="fw-normal" id="productName">${item.productName}</span>
-                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+            orderCard += `<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
+                              <span class="fw-normal" id="item-id-${item.id}"># ${item.id}</span>
+                              <span class="fw-normal" id="productCode-${item.id}">Code: ${item.productCode}</span>
+                              <span class="fw-normal" id="productName-${item.id}">Product: ${item.productName}</span>
+                              <span class="fw-normal" id="price-${item.id}">Price: ${item.price}</span>
+                              <span class="fw-normal" id="amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
                               <select id="productAmount" name="productAmount" style="margin-left: 10px;">`;
+                              //get matched status                 
+            //check matched , add refresh button if not matched
+            $.ajax({
+              url: "/api/orderItem/match/" + item.id,
+              type: "GET",
+              headers: {
+                "x-auth-username": username,
+                "x-auth-password": password,
+                "x-auth-role": role,
+              },
+              error: function (jqxhr, status, errorThrown) {
+                alert(
+                  "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+                );
+              },
+            }).done(function (orderItmeMatched, status, xhr) {
+              console.log($(`#itemDiv-${item.id}`))
+              if (!(orderItmeMatched.matched)) {
+                $(`#itemDiv-${item.id}`).css({ "color": "red" });
+                $(`#itemDiv-${item.id}`).append(`<button id="refresh-${item.id}" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
+              } else {
+                $(`#itemDiv-${item.id}`).css({"color":"green"});
+              }
+            }
+            )
+            
 
             // Populate select options from 1 to 30
+            // todo : number could be others
             for (let i = 1; i <= 30; i++) {
               if (i === item.amount) {
                 // If current count equals to the amount, make it selected
@@ -117,16 +303,15 @@ function refreshProductList() {
             buttonType = "Pay";
             buttonId = `pay-button-${order.id}`;
             break;
-          case "Received":
-            buttonType = "finished";
-            buttonId = `finished-button-${order.id}`
-            disabled = true;
-            Style.display = "none";
+          /*case "Received":
+            buttonType = "unshown";
+            buttonId = `unshown-button-${order.id}`;
+            style.visibility = "hidden"
             break;
-            
+            */
           default:
-            buttonType = "Received";
-            buttonId = `received-button-${order.id}`;
+            buttonType = "Receive";
+            buttonId = `receive-button-${order.id}`;
             break;
         }
 
@@ -146,10 +331,11 @@ function refreshProductList() {
         // add cancel order button according to order.status
         if (
           order.status === "unSubmitted" ||
-          order.status === "BuyerConfirmed"
+          order.status === "BuyerConfirmed" /*||
+          order.status === "Received"*/
         ) {
           orderCard += `<div>
-          <button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete order</button>
+          <button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete</button>
         </div>`;
         }
 
@@ -170,8 +356,12 @@ function refreshProductList() {
 </div>`;
 
         $("#ordercards").html(orderCard);
-      });
+      })
     }
+    $("#ordercards").hide();
+    //string version code end 
+
+
   });
 }
 
@@ -179,4 +369,4 @@ $("#signout").click(function () {
   ifLoggedIn = "false";
   sessionStorage.clear();
   window.open("index.html");
-});
+})
