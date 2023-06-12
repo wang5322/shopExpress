@@ -18,7 +18,7 @@ exports.getAll = (req, res) => {
                 if (err) {
                     return res.status(404).send({ message: err.message || "Can not find cart record" });
                 } else {
-                    if (!data[0].id) {
+                    if (data.length==0) {
                         return res.status(404).send({ message: "Can not find cart record" });
                     } else {
                         if (!(user.id == data[0].buyerId)) {
@@ -117,10 +117,10 @@ exports.updata = (req, res) => {
                 if (err) {
                     return res.status(404).send({ message: err.message || "Can not find cart record" });
                 } else {
-                    if (!data.id) {
+                    if (data.length==0) {
                         return res.status(404).send({ message: "Can not find cart record" });
                     } else {
-                        if (!(user.id == data.buyerId)) {
+                        if (!(user.id == data[0].buyerId)) {
                             //buyer can only match his own cartitem
                             return res.status(500).send({ message:"buyer can only update your own cartitem" });
                         } else {
@@ -166,10 +166,10 @@ exports.delete = (req, res) => {
                 if (err) {
                     return res.status(404).send({ message: err.message || "Can not find cart record" });
                 } else {
-                    if (!data.id) {
+                    if (data.length==0) {
                         return res.status(404).send({ message: "Can not find cart record" });
                     } else {
-                        if (!(user.id == data.buyerId)) {
+                        if (!(user.id == data[0].buyerId)) {
                             //buyer can only delete his own cartitem
                             return res.status(500).send({ message:"buyer can only delete your own cartitem" });
                         } else {

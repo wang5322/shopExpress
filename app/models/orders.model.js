@@ -12,6 +12,7 @@ const Orders = function (order) {
     this.taxes = order.taxes;
     this.shippingFee = order.shippingFee;
     this.finalTotalPay = order.finalTotalPay;
+    this.deliveryInfo = order.deliveryInfo;
 };
 
 //create a new order
@@ -102,14 +103,14 @@ Orders.getAll = (sellerName, buyerName, statusFilter, result) => {
 //update an order
 Orders.updateById = (id, order, result) => {
     db.query(
-        "UPDATE orders SET sellerId=?, buyerId=?, status=?, orderTime=?, paymentInfo=?, totalPrice=?, taxes=?, shippingFee=?, finalTotalPay=?, WHERE id = ?", [order.sellerId, order.buyerId, order.status, order.orderTime, order.paymentInfo, order.totalPrice, order.taxes, order.shippingFee, order.finalTotalPay, id],
+        "UPDATE orders SET sellerId=?, buyerId=?, status=?, orderTime=?, paymentInfo=?, totalPrice=?, taxes=?, shippingFee=?, finalTotalPay=?, deliveryInfo = ? WHERE id = ?", [order.sellerId, order.buyerId, order.status, order.orderTime, order.paymentInfo, order.totalPrice, order.taxes, order.shippingFee, order.finalTotalPay,order.deliveryInfo, id],
         (err, res) => {
             if (err) {
                 console.log("error: ", err);
                 result(err, null);
                 return;
             } else {
-                console.log("updated order: ", { id: id, ...order });
+                console.log("updated order: ", res);
                 result(null, { id: id, ...order });
             }
         }
