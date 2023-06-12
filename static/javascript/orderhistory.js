@@ -77,28 +77,32 @@ function refreshProductList() {
                           <span class="text-muted small">order #${order.id}</span>
                           <span class="lead fw-normal" id="status">${order.status}</span>`;
 
-        // for (let item of orderitems) {
-        //   orderCard += `<span class=" fw-normal" id="productName">${item.productName}</span>`;
-        // }
-
         for (let item of orderitems) {
-          // Add label and select input for product amount
-          orderCard += `<div style="display: flex; align-items: center;">
-                            <span class="fw-normal" id="productName">${item.productName}</span>
-                            <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
-                            <select id="productAmount" name="productAmount" style="margin-left: 10px;">`;
+          if (order.status === "unSubmitted") {
+            orderCard += `<div style="display: flex; align-items: center;">
+                              <span class="fw-normal" id="productName">${item.productName}</span>
+                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+                              <select id="productAmount" name="productAmount" style="margin-left: 10px;">`;
 
-          // Populate select options from 1 to 30
-          for (let i = 1; i <= 30; i++) {
-            if (i === item.amount) {
-              // If current count equals to the amount, make it selected
-              orderCard += `<option value="${i}" selected>${i}</option>`;
-            } else {
-              orderCard += `<option value="${i}">${i}</option>`;
+            // Populate select options from 1 to 30
+            for (let i = 1; i <= 30; i++) {
+              if (i === item.amount) {
+                // If current count equals to the amount, make it selected
+                orderCard += `<option value="${i}" selected>${i}</option>`;
+              } else {
+                orderCard += `<option value="${i}">${i}</option>`;
+              }
             }
+            orderCard += `</select>
+                          <button id="modify-amount-${item.id}" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">Modify Amount</button>
+                        </div>`;
+          } else {
+            orderCard += `<div style="display: flex; align-items: center;">
+                              <span class="fw-normal" id="productName">${item.productName}</span>
+                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+                              <span class="fw-normal" id="productAmount" style="margin-left: 10px;">${item.amount}</span>
+                          </div>`;
           }
-
-          orderCard += `</select></div>`;
         }
         //dynamic button
         let buttonType;
@@ -123,32 +127,39 @@ function refreshProductList() {
         //               </div>`;
 
         orderCard += `</div>
-                        <div class="d-flex flex-column justify-content-between">
-                          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
-                          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
-                          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
-                          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
-                          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
-                        </div>
-                        <div>
-                        <button id="cancel-button-${order.id}" class="btn btn-outline-primary" type="button">Cancel order</button>
-                        </div>
-                        <div>
-                        <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
-                      </div>
-                  
-                      </div>
-                      <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-                      </div>
-                      <div class="d-flex flex-row justify-content-between align-items-center">
-                        <div class="d-flex flex-column align-items-start" id="order time">
-                          <span>${order.orderTime}</span><span>Order placed</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>`;
+        <div class="d-flex flex-column justify-content-between">
+          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
+          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
+          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
+          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
+        </div>`;
+
+        // add cancel order button according to order.status
+        if (
+          order.status === "unSubmitted" ||
+          order.status === "BuyerConfirmed"
+        ) {
+          orderCard += `<div>
+          <button id="cancel-button-${order.id}" class="btn btn-outline-primary" type="button">Cancel order</button>
+        </div>`;
+        }
+
+        orderCard += `<div>
+      <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+    </div>
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <div class="d-flex flex-column align-items-start" id="order time">
+        <span>${order.orderTime}</span><span>Order placed</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>`;
 
         $("#ordercards").html(orderCard);
       });
