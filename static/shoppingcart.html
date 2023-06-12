@@ -91,7 +91,7 @@
   </header>
 
   <section class="container-fluid row m-5">
-    <div class="editPane rounded col-md-7 mx-4 ">
+    <div id="shoppingCart" class="editPane rounded col-md-7 mx-4 ">
       <h1>Shopping Cart</h1>
       <div id="container-carts"></div>
     </div>
@@ -103,7 +103,7 @@
       </div>
       <div class="text-center">
         <button type="button" class="btn btn-secondary my-2">Submit order</button>
-      </div>   
+      </div>
     </div>
 
   </section>
@@ -211,7 +211,7 @@
                                       <h4>Price: ${cartItem.price}</h4>
                                       <em class="card-text">ProductId: ${cartItem.productCode}</em>
                                       <input class="input-amout" type="number" min="0" value="${cartItem.amount}">
-                                      <button type="button" class="btn btn-secondary btn-sm">Delete</button>
+                                      <button id="delete"type="button" class="btn btn-secondary btn-sm">Delete</button>
                                     </div>
                                   </div>
                                 </div>
@@ -226,6 +226,27 @@
         }
       })
     }
+
+    $('#shoppingCart').on("click", '#delete', function () {
+      let checkedboxes = $(".delete-order:checked");
+      for (box of checkedboxes) {
+        $.ajax({
+          url: "/api/cartItem/" +,
+          type: "DELETE",
+          headers: {
+            'x-auth-username': sessionStorage.getItem('username'),
+            'x-auth-password': sessionStorage.getItem('password'),
+            'x-auth-role': sessionStorage.getItem('role')
+          },
+          error: function (jqxhr, status, errorThrown) {
+            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+          }
+        }).done(function () {
+          refreshOrderList(searchedUsername);
+        })
+      }
+    });
+
 
     $("#container-carts").on("change", ".form-check-input", function () {
       calculateSubTotal();
