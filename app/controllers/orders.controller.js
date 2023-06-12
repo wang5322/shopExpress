@@ -10,7 +10,6 @@ const { error } = require("npmlog");
 
 //get all orders with username and/or sellername
 exports.getAll = (req, res) => {
-
   Auth.execIfAuthValid(req, res, null, (req, res, user) => {
     let sellerName;
     let buyerName;
@@ -26,8 +25,8 @@ exports.getAll = (req, res) => {
         break;
       }
       case "admin": {
-        sellerName = req.body.sellerName;
-        buyerName = req.body.buyerName;
+        sellerName = req.params.sellerName;
+        buyerName = req.params.buyerName;
         statusFilter = true;
         break;
       }
