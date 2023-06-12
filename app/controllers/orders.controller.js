@@ -1,5 +1,5 @@
 "use strict";
-
+const url = require('url');
 const Orders = require("../models/orders.model");
 const OrderItem = require("../models/orderItems.model");
 const Products = require("../models/products.model");
@@ -138,51 +138,214 @@ exports.delete = (req, res) => {
         //validate if permitted
         Orders.findById(req.params.id, (err, data) => {
             if (err) {
-              return res.status(500).send({message:err.message|| "delete not permitted"})
+              return res.status(500).send({message:err.message|| "find order error"})
             } else {
               if (data.length == 0) {
                 return res.status(500).send({message: "order not found"})
               } else {
                 if (!(data[0].buyerId==user.id &&(data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed"))) {
-                  
+                  return res.status(500).send({message:"delete not permitted"})
+                } else {
+                  OrderItem.removeAll(req.params.id, (err, data) => {
+                    if (err) {
+                      return res.status(500).send({message:err.message|| "delete orderitems error"})
+                    } else {
+                      Orders.remove(req.params.id, (err, data) => {
+                        if (err) {
+                          return res.status(500).send({message:err.message|| "delete order error"})
+                        } else {
+                          if (data.affectedRows == 0) {
+                            return res.status(500).send({message: "order not deleted"})
+                          } else {
+                            return res.status(200).send(data)
+                          }
+                        }
+                      })//Orders.remove end
+                    }
+                  })//OrderItem.getByOrderId end
                 }
               }
             }
-          })
+          })//Orders.findById
         
         break;
       }
       case "admin": {
+        Orders.findById(req.params.id, (err, data) => {
+          if (err) {
+            return res.status(500).send({message:err.message|| "find order error"})
+          } else {
+            if (data.length == 0) {
+              return res.status(500).send({message: "order not found"})
+            } else {
+              //admin not allowed to delete unpaid order
+              if (data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed") {
+                return res.status(500).send({message:"delete not permitted"})
+              } else {
+                OrderItem.removeAll(req.params.id, (err, data) => {
+                  if (err) {
+                    return res.status(500).send({message:err.message|| "delete orderitems error"})
+                  } else {
+                    Orders.remove(req.params.id, (err, data) => {
+                      if (err) {
+                        return res.status(500).send({message:err.message|| "delete order error"})
+                      } else {
+                        if (data.affectedRows == 0) {
+                          return res.status(500).send({message: "order not deleted"})
+                        } else {
+                          return res.status(200).send(data)
+                        }
+                      }
+                    })//Orders.remove end
+                  }
+                })//OrderItem.getByOrderId end
+              }
+            }
+          }
+        })//Orders.findById
+      
+
         break;
       }
       default:
-        return;
+        return res.status(500).send({message:"role error"});
     }
 
-    Orders.remove(req.params.id, (err, data) => {
-      if (err) {
-        if (err.kind === "not_found") {
-          res.status(404).send({
-            message: `Not found order with id ${req.params.id}.`,
-          });
-        } else {
-          res.status(500).send({
-            message: "Could not delete order with id " + req.params.id,
-          });
-        }
-      } else res.status(200).send({ message: true });
-    }); //Orders.remove end
   }); //Auth.execIfAuthValid end
 };
-
+    
 //pay an order
-exports.payOrder= (req, res) => {
+exports.payOrder = (req, res) => {
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    if (!(user.role == "buyer")) {
+      return res.status(500).send({message:err.message||"only buyer can pay an order"})
+    } else {
+      Orders.findById(req.params.id, (err, data) => {
+        if (err) {
+          return res.status(500).send({message:err.message||"get order error"})
+        } else {
+          if (data.length == 0) {
+            return res.status(500).send({message:"order not found"})
+          } else {
+            if (!(data[0].buyerId==user.id && data[0].status == "buyerConfirmed")) {
+              return res.status(500).send({message:"pay not permitted"})
+            } else {
+              let order = data[0];
+              order.paymentInfo = randomString(16);
+              if (req.body.deliveryInfo) {
+                order.deliveryInfo = req.body.deliveryInfo;
+              };
+              Orders.updateById(date[0].id, order, (err, data) => {
+                if (err) {
+                  return res.status(500).send({
+                    message: err.message || "get order error",
+                    attention: "update order failed,please save your paymentInfo as a basis for refund!",
+                    paymentInfo: order.paymentInfo
+                  })
+                } else {
+                  if (data.affectedRows == 0) {
+                    return res.status(500).send({
+                      message: err.message || "get order error",
+                      attention: "update order failed,please save your paymentInfo as a basis for refund!",
+                      paymentInfo: order.paymentInfo
+                    })
+                  } else {
+                    return res.status(200).send(data)
+                  }
+                }
+
+              });//Orders.updateById
+            }
+          }
+        }
+      })//Orders.findById end
+    }
+
+
+  })//Auth.execIfAuthValid end
 
 };
 
+//Generate a random string, 
+//assuming it is a payment code, 
+//through which banking operations can be performed.
+function randomString(e) {    
+  e = e || 32;
+  var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+  a = t.length,
+  n = "";
+  for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+  return n
+}
 
 //patch order status
-exports.modifyStatus = (req, res) => { }
+exports.modifyStatus = (req, res) => { 
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    Orders.findById(req.params.id, (err, data) => {
+      if (err) {
+        return res.status(500).send({ message: err.message || "get order error" })
+      } else {
+        if (data.length == 0) {
+          return res.status(500).send({ message: "order not found" })
+        } else {
+          switch (user.role) {
+            case "buyer": {
+              if ((data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed") || (!(data[0].buyerId == user.id))) {
+                return res.status(500).send({ message: "not permitted" })
+              } else {
+                let order = data[0];
+                order.status = "Received";
+                Orders.updateById(req.params.id, (err, data) => {
+                  if (err) {
+                    return res.status(500).send({ message: err.message || "modify order error" })
+                  } else {
+                    if (data.affectedRows == 0) {
+                      return res.status(500).send({ message: "modify order failed" })
+                    } else {
+                      return res.status(200).send(data)
+                    }
+                  }
+                })//Orders.updateById
+              }
+              break;
+            }
+            case "seller": {
+              let validStatus = ['Paid', 'SellerConfirmed', 'Transporting', 'Received', 'Canceled'];
+              if (!validStatus.includes(req.body.status)) {
+                return res.status(500).send({ message: "not permitted" })
+              } else {
+                if (data[0].status == "unSubmitted" || data[0].status == "buyerConfirmed" || (!(data[0].sellerId == user.id))) {
+                  return res.status(500).send({ message: "not permitted" })
+                } else {
+                  let order = data[0];
+                  order.status = req.body.status;
+                  Orders.updateById(req.params.id, (err, data) => {
+                    if (err) {
+                      return res.status(500).send({ message: err.message || "modify order error" })
+                    } else {
+                      if (data.affectedRows == 0) {
+                        return res.status(500).send({ message: "modify order failed" })
+                      } else {
+                        return res.status(200).send(data)
+                      }
+                    }
+                  })//Orders.updateById
+                }
+
+              }
+              break;
+            }
+            default: {
+              return res.status(500).send({ message: "role error" })
+            }
+          }
+
+        }
+      }
+
+    })//Orders.findById
+  })//Auth.execIfAuthValid
+}
 
 
 
