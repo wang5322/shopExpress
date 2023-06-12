@@ -58,7 +58,7 @@ function refreshDisplay(username) {
       + "<td>Role: " + searchedUserObj.role + "</td></tr>"
       + "<tr><td>Email: " + searchedUserObj.email + "</td>"
       + "<td></td>"
-      + '<td><button type="button" id="deleteAccount">Delete Account</button></td></tr>'
+      + '<td><button type="button" id="modifyPassword">Modify password</button></td></tr>'
       + "<tr><td>Address: " + searchedUserObj.address + "</td></tr>";
     $("#tableUserinfo").html(result);
 

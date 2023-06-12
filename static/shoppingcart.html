@@ -39,13 +39,6 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo01">
 
           <ul class="navbar-nav my-2 mb-lg-0 text-center  ">
-            <!-- <li class="nav-item ">
-                            <form class="form-inline my-2 my-lg-0 d-flex">
-                                <input class="form-control mr-sm-2 " type="search" placeholder="Search">
-                                <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6"
-                                    type="submit">Search</button>
-                            </form>
-                        </li> -->
             <li class="nav-item">
               <a class="nav-link" href="index.html">seller's center</a>
             </li>
@@ -100,37 +93,17 @@
   <section class="container-fluid row m-5">
     <div class="editPane rounded col-md-7 mx-4 ">
       <h1>Shopping Cart</h1>
-      <!-- Dynamic card starts here -->
-      <div class="card mb-3" style="max-width: 800px; max-height:300px;">
-        <div class="form-check">
-          <input class="form-check-input " type="checkbox" value=""/>
-        </div>
-        <div class="row g-0">
-          <div class="col-md-4 ">
-            <img id="imageCursor" onclick="selectImage(imageId )" src="" 
-            class="img-fluid rounded-start cropped" alt=""
-              style="height: 100%; object-fit: cover;">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title" onclick="selectItem(product.id)">
-                product.productName </h5>
-              <h4>Price:+ product.price +</h4>
-              <p class="card-text">` product.productDesc </p><em class="card-text">ProductId: product.id</em>
-              <select class="form-select" id="quantitySelect">
-                <option selected value="1">1</option>
-                <option selected value="2">2</option>
-                <option selected value="3">3</option>
-              </select>
-              <button type="button" class="btn btn-secondary btn-sm">Delete</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="container-carts"></div>
     </div>
 
     <div class="editPane col-md-4 rounded ">
-      <h5 class="mt-5">subtotal</h5>
+      <div class="row">
+        <h5 class="mt-5">subtotal</h5>
+        <span id="subtotalSpan"></span>
+      </div>
+      <div class="text-center">
+        <button type="button" class="btn btn-secondary my-2">Submit order</button>
+      </div>   
     </div>
 
   </section>
@@ -144,9 +117,14 @@
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
     crossorigin="anonymous"></script>
   <script>
-    ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+    let ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+    let items = [];
     $(document).ready(function () {
       ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+      username = sessionStorage.getItem("username");
+      password = sessionStorage.getItem('password');
+      role = sessionStorage.getItem('role');
+
       if (ifLoggedIn !== "true") {
         alert("Access Forbidden: you are not logged in!");
         window.location.href = "index.html";
@@ -155,48 +133,130 @@
       }
     });
 
-    function refreshCart(){
+    function refreshCart() {
+      // get cart id by buyerId (user id)
+      $.ajax({
+        url: "/api/carts/",
+        type: "GET",
+        headers: {
+          'x-auth-username': username,
+          'x-auth-password': password,
+          'x-auth-role': role
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+        }
+      }).done(function (carts, status, xhr) {
+        // get item details of each cart
+        for (cart of carts) {
+          $.ajax({
+            url: "/api/cartItem/" + cart.id,
+            type: "GET",
+            headers: {
+              'x-auth-username': username,
+              'x-auth-password': password,
+              'x-auth-role': role
+            },
+            error: function (jqxhr, status, errorThrown) {
+              alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            }
+          }).done(function (cartItems, status, xhr) {
+            let cartCard = "";
+            items = cartItems;
+            console.log(items);
+            for (var i = 0; i < cartItems.length; i++) {
+              let cartItem = cartItems[i];
+              $.ajax({
+                url: "/api/products/" + cartItem.productId,
+                type: "GET",
+                headers: {
+                  'x-auth-username': username,
+                  'x-auth-password': password,
+                  'x-auth-role': role
+                },
+                error: function (jqxhr, status, errorThrown) {
+                  alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                }
+              }).done(function (product, status, xhr) {
+                // get image info
+                $.ajax({
+                  url: "/api/images/?productId=" + product.id,
+                  type: "GET",
+                  headers: {
+                    'x-auth-username': username,
+                    'x-auth-password': password,
+                    'x-auth-role': role
+                  },
+                  error: function (jqxhr, status, errorThrown) {
+                    alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                  }
+                }).done(function (allImages, status, xhr) {
+                  let image = allImages[0];
+                  cartCard += `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
+                                <div class="form-check">
+                                  <input id="${i}" class="form-check-input " type="checkbox" value=""/>
+                                </div>
+                                <div class="row g-0">
+                                  <div class="col-md-4 ">
+                                    <img id="${(image) ? image.id : 38}"
+                                    class="img-fluid rounded-start cropped"
+                                    src="api/images/${(image) ? image.id : 38}" 
+                                    alt="${product.productName}"
+                                    style="height: 100%; object-fit: cover;">
+                                  </div>
+                                  <div class="col-md-8">
+                                    <div class="card-body">
+                                      <h5 class="card-title">
+                                        ${cartItem.productName} </h5>
+                                      <h4>Price: ${cartItem.price}</h4>
+                                      <em class="card-text">ProductId: ${cartItem.productCode}</em>
+                                      <input class="input-amout" type="number" min="0" value="${cartItem.amount}">
+                                      <button type="button" class="btn btn-secondary btn-sm">Delete</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>`;
+                  $("#container-carts").html(cartCard);
+                })
 
+              });
+            }
+          })
+        }
+      })
     }
 
-    str =  `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
-                <div class="form-check">
-                  <input class="form-check-input " type="checkbox" value=""/>
-                </div>
-                <div class="row g-0">
-                  <div class="col-md-4 ">
-                    <img id="imageCursor" onclick="selectImage(imageId )" src="" 
-                    class="img-fluid rounded-start cropped" alt=""
-                      style="height: 100%; object-fit: cover;">
-                  </div>
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <h5 class="card-title" onclick="selectItem(product.id)">
-                        product.productName </h5>
-                      <h4>Price:+ product.price +</h4>
-                      <p class="card-text">product.productDesc </p><em class="card-text">ProductId: product.id</em>
-                      <select class="form-select" id="quantitySelect">
-                        <option selected value="1">1</option>
-                        <option selected value="2">2</option>
-                        <option selected value="3">3</option>
-                      </select>
-                      <button type="button" class="btn btn-secondary btn-sm">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>`
+    $("#container-carts").on("change", ".form-check-input", function () {
+      calculateSubTotal();
+    })
+
+    $("#container-carts").on("change", ".input-amout", function () {
+      calculateSubTotal();
+    })
+
+    function calculateSubTotal() {
+      let checkeds = $(".form-check-input:checked");
+      let subtotal = 0;
+      checkeds.each(function (index) {
+        let price = parseFloat($(this).parent().parent().children().eq(1).children().eq(1).children().eq(0).children().eq(1).text().substring(7));
+        let amount = parseInt($(this).parent().parent().children().eq(1).children().eq(1).children().eq(0).children().eq(3).val());
+        subtotal += price * amount;
+      })
+      $("#subtotalSpan").text(subtotal);
+    }
+
+    $("#container-carts").on("click", "img", function () {
+      // not required for now
+      // let id = $(this).id;
+    })
 
     $("#signout").click(function () {
       ifLoggedIn = "false";
       sessionStorage.clear();
       window.open("index.html");
     });
-
   </script>
-
-
-
 </body>
 
 </html>

@@ -42,7 +42,7 @@ exports.findOne = (req, res) => {
     return;
   }
 
-  Auth.execIfAuthValid(req, res, "admin", (req, res, user) => {
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
     User.findByUsername(req.params.username, (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
@@ -56,16 +56,24 @@ exports.findOne = (req, res) => {
           });
         }
       } else {
-        if (
-          data.role === "admin" &&
-          req.params.username != req.headers["x-auth-username"]
-        ) {
-          res.status(403).send({
-            message:
-              "Access Forbidden! Admin cannot view another admin's information",
-          });
+        if (req.headers["x-auth-role"] !== 'admin') {
+          if (req.params.username != req.headers["x-auth-username"]) {
+            res.status(403).send({
+              message:
+                "Access Forbidden! User cannot view another user's information",
+            });
+          } else {
+            res.status(200).send(data);
+          }
         } else {
-          res.status(200).send(data);
+          if (data.role === "admin" && req.params.username != req.headers["x-auth-username"]) {
+            res.status(403).send({
+              message:
+                "Access Forbidden! Admin cannot view another admin's information",
+            });
+          } else {
+            res.status(200).send(data);
+          }
         }
       }
     });

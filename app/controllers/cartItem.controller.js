@@ -5,27 +5,27 @@ const Products = require("../models/products.model");
 const Carts = require("../models/carts.model");
 const Auth = require("../utils/auth");
 
-//get all cartItems with indicated carts' id in req.body
+//get all cartItems with indicated carts' id in req.params
 exports.getAll = (req, res) => {
-    //validate id existing in req.body
-    if (!(req.body.id)) return res.status(500).send({ message: "id not indicated!" });
+    //validate id existing in req.params
+    if (!(req.params.id)) return res.status(500).send({ message: "id not indicated!" });
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         if (!(user.role == "buyer")) {
             return res.status(500).send({ message: "Only buyer can use carts." });
         }//only buyer can use carts
         else {
-            Carts.findById(req.body.id, (err, data) => {
+            Carts.findById(req.params.id, (err, data) => {
                 if (err) {
                     return res.status(404).send({ message: err.message || "Can not find cart record" });
                 } else {
-                    if (!data.id) {
+                    if (!data[0].id) {
                         return res.status(404).send({ message: "Can not find cart record" });
                     } else {
-                        if (!(user.id == data.buyerId)) {
+                        if (!(user.id == data[0].buyerId)) {
                             //buyer can only delete his own cartitem
                             return res.status(500).send({ message:"buyer can only delete your own cartitem" });
                         } else {
-                            CartItems.getByCartId(req.body.id, (err, data) => {
+                            CartItems.getByCartId(req.params.id, (err, data) => {
                                 if (err) {
                                     return res.status(500).send({ message: err.message || "query failed!" });
                                 } else {
