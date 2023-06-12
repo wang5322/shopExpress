@@ -18,5 +18,8 @@ module.exports = (app) => {
     //Delete user by name
     router.delete("/:username", users.delete);
 
+    // reset user password
+    router.patch("/reset/:username", users.reset);
+
     app.use("/api/users", router);
 }

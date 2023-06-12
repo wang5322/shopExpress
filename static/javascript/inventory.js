@@ -1,23 +1,29 @@
-var available = 1;
-var sessionUsername = sessionStorage.getItem("username");
-var sessionPassword = sessionStorage.getItem("password");
-var sellerId = sessionStorage.getItem("id");
-let ifLoggedIn;
+let available = 1;
+let sessionUsername = sessionStorage.getItem("username");
+let sessionPassword = sessionStorage.getItem("password");
+let sellerId = sessionStorage.getItem("id");
+let role = sessionStorage.getItem("role");
+
+ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
 
 $(document).ready(function () {
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
   if (ifLoggedIn !== "true") {
-    alert("Access Forbidden: you are not logged in!");
+    $("#myModalBody").html("Access Forbidden: you are not logged in!");
+    $("#myModal").modal("show");
+    // alert("Access Forbidden: you are not logged in!");
     window.location.href = "index.html";
   } else {
     refreshInventoryList();
+    refreshOrderList();
     console.log("page is fully loaded");
     console.log(sellerId);
 
     // $("#alert").hide(); // error message alert
 
     $("#add").on("click", function () {
-      var productObj = creatObject();
+      var productObj = createObject();
+      isValidProduct(product);
 
       $.ajax({
         url: "/api/products",
@@ -34,7 +40,9 @@ $(document).ready(function () {
       }).done(function (data) {
         console.log(productObj);
         console.log(data);
-        alert("Products added successfully");
+        $("#myModalBody").html("Products added successfully");
+        $("#myModal").modal("show");
+        // alert("Products added successfully");
         refreshInventoryList();
       });
       // $(".close").alert("close");
@@ -65,6 +73,7 @@ $(document).ready(function () {
       var id = $("#id").html();
       console.log(id);
       var product = creatObject();
+      isValidProduct(product);
       $.ajax({
         url: "/api/products/" + id,
         type: "PUT",
@@ -78,7 +87,9 @@ $(document).ready(function () {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        alert("Product updated succesfully");
+        $("#myModalBody").html("Product updated succesfully");
+        $("#myModal").modal("show");
+        // alert("Product updated succesfully");
         refreshInventoryList();
       });
     });
@@ -92,12 +103,15 @@ $(document).ready(function () {
         headers: {
           "x-auth-username": sessionUsername,
           "x-auth-password": sessionPassword,
+          "x-auth-role": role,
         },
         data: { stockNum: 0, available: 0 },
         error: function (jqxhr, status, errorThrown) {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
+        // $("#myModalBody").html("Products archieved successfully");
+        // $("#myModal").modal("show");
         alert("Products archieved successfully");
         refreshInventoryList();
       });
@@ -112,24 +126,33 @@ $(document).ready(function () {
 
       // Validation
       if (!file) {
-        alert("Please select an image file.");
+        c;
+        // alert("Please select an image file.");
         return;
       }
 
       if (titleVal.trim() === "" || productIdVal.trim() === "") {
-        alert("Please fill in all the fields.");
+        $("#myModalBody").html("Please fill in all the fields.");
+        $("#myModal").modal("show");
+        // alert("Please fill in all the fields.");
         return;
       }
 
       console.log(existProductId);
       if (existProductId.includes(productIdVal)) {
-        alert("This productId already has the image.");
+        $("#myModalBody").html("This productId already has the image.");
+        $("#myModal").modal("show");
+        // alert("This productId already has the image.");
         return;
       }
       let mimeTypeVal = file.type;
       const validMimeTypes = ["image/jpeg", "image/png"];
       if (!validMimeTypes.includes(mimeTypeVal)) {
-        alert("Invalid file type. Only jpeg and png images are allowed.");
+        $("#myModalBody").html(
+          "Invalid file type. Only jpeg and png images are allowed."
+        );
+        $("#myModal").modal("show");
+        // alert("Invalid file type. Only jpeg and png images are allowed.");
         return;
       }
 
@@ -169,6 +192,22 @@ $(document).ready(function () {
       reader.readAsBinaryString(file);
 
       return;
+    });
+
+    // Handle click events for each type of button
+    $(document).on("click", '[id^="confirm-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "SellerConfirmed");
+    });
+
+    $(document).on("click", '[id^="transport-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "Transporting");
+    });
+
+    $(document).on("click", '[id^="cancel-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "Canceled");
     });
   }
 });
@@ -322,6 +361,12 @@ function createObject() {
   return productObj;
 }
 
+$("#signout").click(function () {
+  ifLoggedIn = "false";
+  sessionStorage.clear();
+  window.open("index.html");
+});
+
 //Validation for product input
 function isValidProduct(object) {
   var categoryArray = [
@@ -333,37 +378,201 @@ function isValidProduct(object) {
     "Baby",
   ];
   if (!categoryArray.includes(object.category)) {
-    alert(
+    $("#myModalBody").html(
       "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
     );
+    $("#myModal").modal("show");
+    // alert(
+    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
+    // );
+
     return false;
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
-    alert("Product Code needs to be 1-45 characters");
+    $("#myModalBody").html("Product Code needs to be 1-45 characters");
+    $("#myModal").modal("show");
+    // alert("Product Code needs to be 1-45 characters");
     return false;
   }
   if (!object.sellerId) {
-    alert("No sellerId provided. Please login first");
+    $("#myModalBody").html("No sellerId provided. Please login first");
+    $("#myModal").modal("show");
+    // alert("No sellerId provided. Please login first");
     return false;
   }
   if (isNaN(object.price)) {
-    alert("Price needs to be a number");
+    $("#myModalBody").html("Price needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Price needs to be a number");
     return false;
   }
   let splitPrice = object.price.toString().split(".");
   if (splitPrice.length > 1) {
     if (splitPrice[1].length > 2) {
-      alert("Price can have only two decimals");
+      $("#myModalBody").html("Price can have only two decimals");
+      $("#myModal").modal("show");
+      // alert("Price can have only two decimals");
       return false;
     }
   }
   if (splitPrice[0].length > 8) {
-    alert("Price exceeds site limit");
+    $("#myModalBody").html("Price exceeds site limit");
+    $("#myModal").modal("show");
+    // alert("Price exceeds site limit");
     return false;
   }
   if (isNaN(object.stockNum)) {
-    alert("Stock number needs to be a number");
+    $("#myModalBody").html("Stock number needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Stock number needs to be a number");
     return false;
   }
   return true;
+}
+
+function refreshOrderList() {
+  // get orders by username
+  $.ajax({
+    url: `/api/orders/buyfrom`,
+    // url: `/api/orders/?username=${username}`,
+    type: "GET",
+    headers: {
+      "x-auth-username": sessionUsername,
+      "x-auth-password": sessionPassword,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done(function (orders, status, xhr) {
+    // create a string variable to store all card html of orders
+    let orderCard = "";
+
+    for (let order of orders) {
+      // get orderitem info from orderitems table
+
+      $.ajax({
+        url: "/api/orderItem/order/" + order.id,
+        type: "GET",
+        headers: {
+          "x-auth-username": sessionUsername,
+          "x-auth-password": sessionPassword,
+          "x-auth-role": role,
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+        },
+      }).done(function (orderitems, status, xhr) {
+        orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                  <div class="card card-stepper" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                          <span class="text-muted small">order #${order.id}</span>
+                          <span class="lead fw-normal" id="status">${order.status}</span>`;
+
+        for (let item of orderitems) {
+          orderCard += `<div style="display: flex; align-items: center;">
+                              <span class="fw-normal" id="productName">${item.productName}</span>
+                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+                              <span class="fw-normal" id="productAmount" style="margin-left: 10px;">${item.amount}</span>
+                          </div>`;
+          // }
+        }
+        //dynamic button
+        let buttonType;
+        let buttonId;
+        let buttonHTML = "";
+        switch (order.status) {
+          case "Paid":
+            buttonType = "Confirm";
+            buttonId = `confirm-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+          case "SellerConfirmed":
+            buttonType = "Ship";
+            buttonId = `transport-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+          case "Received":
+            // buttonType = "Received";
+            // buttonId = `received-button-${order.id}`;
+            break;
+          case "Canceled":
+            // buttonType = "N/A";
+            // buttonId = `N/A-button-${order.id}`;
+            break;
+          default:
+            buttonType = "Cancel";
+            buttonId = `cancel-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+        }
+
+        orderCard += `</div>
+        <div class="d-flex flex-column justify-content-between">
+          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
+          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
+          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
+          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
+          <span class="fw-normal small" id="Order summary">Delivery Info: ${order.deliveryInfo}</span>
+        </div>`;
+
+        orderCard +=
+          buttonHTML +
+          `    
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <div class="d-flex flex-column align-items-start" id="order time">
+        <span>${order.orderTime}</span><span>Order placed</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>`;
+
+        $("#orderList").html(orderCard);
+      });
+    }
+  });
+}
+
+// A general function to handle status updates
+function updateOrderStatus(orderId, status) {
+  $.ajax({
+    url: `api/orders/${orderId}`,
+    type: "PATCH",
+    data: {
+      status: status,
+    },
+    headers: {
+      "x-auth-username": sessionUsername,
+      "x-auth-password": sessionPassword,
+      "x-auth-role": role,
+    },
+    dataType: "json",
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText);
+    },
+  }).done(function () {
+    $("#myModalBody").html("Status updated succesfully");
+    $("#myModal").modal("show");
+    // alert("Status updated succesfully");
+    refreshOrderList();
+  });
 }
