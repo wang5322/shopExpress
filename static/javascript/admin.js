@@ -114,7 +114,6 @@ function refreshOrderList(username) {
 }
 
 $("#tableUserinfo").on("click", "#deleteAccount", function () {
-  console.log("test: delete account button is clicked!");
   $.ajax({
     url: "/api/users/" + searchedUsername,
     type: "DELETE",
@@ -133,7 +132,6 @@ $("#tableUserinfo").on("click", "#deleteAccount", function () {
 });
 
 $("#tableOrders").on("click", "#deleteOrder", function () {
-  console.log("test: delete order button is clicked!");
   let checkedboxes = $(".delete-order:checked");
   for (box of checkedboxes) {
     let orderid = parseInt(box.parent().parent().children().eq(1).text());

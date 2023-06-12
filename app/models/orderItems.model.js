@@ -141,6 +141,7 @@ OrderItem.userPermitted = (id, userId, userRole, result) => {
             result(new Error("user role error"), null);
         };
     }
+
     db.query(queryStr, args, (err, res) => {
         if (err) {
             console.log("error: ", err);
