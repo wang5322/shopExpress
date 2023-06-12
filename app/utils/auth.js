@@ -40,7 +40,6 @@ exports.execIfAuthValid = (req, res, role, callIfAuth) => {
         });
       }
     } else {
-      console.log("User found: " + JSON.stringify(user));
       if (user.password == passwordHash) {
         delete user.password;
         if (role !== undefined && role !== null) {

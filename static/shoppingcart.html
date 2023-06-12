@@ -100,14 +100,15 @@
   <section class="container-fluid row m-5">
     <div class="editPane rounded col-md-7 mx-4 ">
       <h1>Shopping Cart</h1>
+      <!-- Dynamic card starts here -->
       <div class="card mb-3" style="max-width: 800px; max-height:300px;">
         <div class="form-check">
-          <input class="form-check-input " type="checkbox" value="" name="group1[]" />
+          <input class="form-check-input " type="checkbox" value=""/>
         </div>
         <div class="row g-0">
           <div class="col-md-4 ">
-            <img id="imageCursor" onclick="selectImage(
-                imageId )" src="" class="img-fluid rounded-start cropped" alt=""
+            <img id="imageCursor" onclick="selectImage(imageId )" src="" 
+            class="img-fluid rounded-start cropped" alt=""
               style="height: 100%; object-fit: cover;">
           </div>
           <div class="col-md-8">
@@ -115,31 +116,22 @@
               <h5 class="card-title" onclick="selectItem(product.id)">
                 product.productName </h5>
               <h4>Price:+ product.price +</h4>
-              <p class="card-text">` +
-                product.productDesc +
-                `</p><em class="card-text">ProductId:` +
-                product.id +
-                ` </em>
+              <p class="card-text">` product.productDesc </p><em class="card-text">ProductId: product.id</em>
               <select class="form-select" id="quantitySelect">
                 <option selected value="1">1</option>
                 <option selected value="2">2</option>
                 <option selected value="3">3</option>
               </select>
-              <button type="button" class="btn btn-secondary btn-sm">Delect</button>
-
+              <button type="button" class="btn btn-secondary btn-sm">Delete</button>
             </div>
           </div>
         </div>
       </div>
-
     </div>
-
 
     <div class="editPane col-md-4 rounded ">
-      <h5 class="mt-5">subttotal</h5>
+      <h5 class="mt-5">subtotal</h5>
     </div>
-
-
 
   </section>
   <footer>
@@ -159,52 +151,47 @@
         alert("Access Forbidden: you are not logged in!");
         window.location.href = "index.html";
       } else {
-        // $ajax({
-        //   url: "/api/cartItem/",
-        //   type: "PUT",
-        //   dataType: "json",
-        //   data: xxx,
-        //   error: function (jqxhr, status, errorThrown) {
-        //     alert("AJAX error: " + jqxhr.responseText);
-        //   },
-        // }).done(function (data) {
-        //   refreshCartList();
-        // });
+        refreshCart()
       }
     });
+
+    function refreshCart(){
+
+    }
+
+    str =  `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
+                <div class="form-check">
+                  <input class="form-check-input " type="checkbox" value=""/>
+                </div>
+                <div class="row g-0">
+                  <div class="col-md-4 ">
+                    <img id="imageCursor" onclick="selectImage(imageId )" src="" 
+                    class="img-fluid rounded-start cropped" alt=""
+                      style="height: 100%; object-fit: cover;">
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title" onclick="selectItem(product.id)">
+                        product.productName </h5>
+                      <h4>Price:+ product.price +</h4>
+                      <p class="card-text">product.productDesc </p><em class="card-text">ProductId: product.id</em>
+                      <select class="form-select" id="quantitySelect">
+                        <option selected value="1">1</option>
+                        <option selected value="2">2</option>
+                        <option selected value="3">3</option>
+                      </select>
+                      <button type="button" class="btn btn-secondary btn-sm">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>`
 
     $("#signout").click(function () {
       ifLoggedIn = "false";
       sessionStorage.clear();
       window.open("index.html");
     });
-
-    function refreshCartList() {
-      $ajax({
-        url: "/api/cartItem/",
-        type: "GET",
-        dataType: "json",
-        data: xxx,
-        error: function (jqxhr, status, errorThrown) {
-          alert("AJAX error: " + jqxhr.responseText);
-        },
-
-      }).done(function (response) {
-        // loop the info of products
-        for (let i = 0; i < response.length; i++) {
-          var product = response[i];
-          console.log(product);
-          var imagepath;
-          var imageId = product.image_id;
-          if (imageId) {
-            imagepath = `api/images/${imageId}`;
-          } else {
-            // Handle case when no images are returned
-            imagepath = "api/images/38";
-          }
-        }
-      });
-    }
 
   </script>
 

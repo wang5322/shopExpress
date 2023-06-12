@@ -212,10 +212,10 @@ exports.delete = (req, res) => {
 //get all orderItems in an order --maybe not needed
 exports.getAllByOrderId = (req, res) => {
     //validate id existing in req.body
-    if (!(req.body.id)) return res.status(500).send({ message: "id not indicated!" });
+    if (!(req.params.id)) return res.status(500).send({ message: "id not indicated!" });
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         //user permitted
-        Orders.userPermitted(req.body.id, user.id, user.role, (err, data) => {
+        Orders.userPermitted(req.params.id, user.id, user.role, (err, data) => {
             if (err) {
                 return res.status(500).send({ message:err.message|| "get permission failed" })
             } else {
@@ -223,7 +223,7 @@ exports.getAllByOrderId = (req, res) => {
                     return res.status(500).send({ message: "no permission to get orderitems" })
                 } else {
                     //get orderItems by order id
-                    OrderItems.getByOrderId(req.body.id, (err, data) => {
+                    OrderItems.getByOrderId(req.params.id, (err, data) => {
                         if (err) {
                             return res.status(500).send({ message: err.message||"get orderitems failed" })
                         } else {
