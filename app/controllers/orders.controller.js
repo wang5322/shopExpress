@@ -294,7 +294,7 @@ exports.modifyStatus = (req, res) => {
               } else {
                 let order = data[0];
                 order.status = "Received";
-                Orders.updateById(req.params.id, (err, data) => {
+                Orders.updateById(req.params.id,order, (err, data) => {
                   if (err) {
                     return res.status(500).send({ message: err.message || "modify order error" })
                   } else {
@@ -318,7 +318,7 @@ exports.modifyStatus = (req, res) => {
                 } else {
                   let order = data[0];
                   order.status = req.body.status;
-                  Orders.updateById(req.params.id, (err, data) => {
+                  Orders.updateById(req.params.id,order, (err, data) => {
                     if (err) {
                       return res.status(500).send({ message: err.message || "modify order error" })
                     } else {

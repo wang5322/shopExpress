@@ -117,6 +117,13 @@ function refreshProductList() {
             buttonType = "Pay";
             buttonId = `pay-button-${order.id}`;
             break;
+          case "Received":
+            buttonType = "finished";
+            buttonId = `finished-button-${order.id}`
+            disabled = true;
+            Style.display = "none";
+            break;
+            
           default:
             buttonType = "Received";
             buttonId = `received-button-${order.id}`;
@@ -142,7 +149,7 @@ function refreshProductList() {
           order.status === "BuyerConfirmed"
         ) {
           orderCard += `<div>
-          <button id="cancel-button-${order.id}" class="btn btn-outline-primary" type="button">Cancel order</button>
+          <button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete order</button>
         </div>`;
         }
 
