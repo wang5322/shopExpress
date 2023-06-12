@@ -212,7 +212,7 @@ exports.delete = (req, res) => {
 //get all orderItems in an order --maybe not needed
 exports.getAllByOrderId = (req, res) => {
     //validate id existing in req.body
-    if (!(req.params.id)) return res.status(500).send({ message: "id not indicated!" });
+    //if (!(req.body.id)) return res.status(500).send({ message: "id not indicated!" });
     Auth.execIfAuthValid(req, res, null, (req, res, user) => {
         //user permitted
         Orders.userPermitted(req.params.id, user.id, user.role, (err, data) => {

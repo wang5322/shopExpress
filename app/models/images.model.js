@@ -72,22 +72,21 @@ ImageClass.getAll = (productId, sortOrder, result) => {
   });
 };
 
-ImageClass.removeById = (id, result) => {
-  let queryStr = `DELETE FROM images WHERE id=?`;
-  db.query(queryStr, id, (err, res) => {
+ImageClass.removeByProductId = (productId, result) => {
+  let queryStr = `DELETE FROM images WHERE productId=?`;
+  db.query(queryStr, productId, (err, res) => {
     if (err) {
       console.log("error: ", err);
-      result(null, err);
+      result(err, null);
       return;
     }
 
     if (res.affectedRows == 0) {
-      // not found Todos with the product
-      result({ kind: "not_found" }, null);
-      return;
+      console.log("No image found for product id: ", productId);
+    } else {
+      console.log("Deleted image(s) for product id: ", productId);
     }
 
-    console.log("deleted image with id: ", id);
     result(null, res);
   });
 };

@@ -77,10 +77,11 @@ exports.regIfInputValid = (req, res, callIfValid) => {
     return false;
   }
 
-  let pwdFormat = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  let pwdFormat =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   let mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-  if (!req.body.password.match(pwdFormat)){
+  if (!req.body.password.match(pwdFormat)) {
     res.status(400).send({
       message:
         "password must be length 8+, at least one uppercase, lowercase, digit, and special character",
@@ -88,10 +89,9 @@ exports.regIfInputValid = (req, res, callIfValid) => {
     return false;
   }
 
-  if (!req.body.email.match(mailFormat)){
+  if (!req.body.email.match(mailFormat)) {
     res.status(400).send({
-      message:
-        "invalid email address",
+      message: "invalid email address",
     });
     return false;
   }
@@ -111,7 +111,11 @@ exports.regIfInputValid = (req, res, callIfValid) => {
         callIfValid(req, res);
       } else {
         res.status(500).send({
-          message: err.message || 'Error retrieving user with username ' + username + 'during input validation'
+          message:
+            err.message ||
+            "Error retrieving user with username " +
+              username +
+              "during input validation",
         });
         return false;
       }
@@ -123,5 +127,4 @@ exports.regIfInputValid = (req, res, callIfValid) => {
       return false;
     }
   });
-}
-
+};

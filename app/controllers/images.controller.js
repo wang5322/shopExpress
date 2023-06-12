@@ -1,31 +1,61 @@
 const ImageClass = require("../models/images.model");
-
+const Auth = require("../utils/auth");
+const allowedMimeTypes = ["image/jpeg", "image/png"];
 //Create and Save a new Todo
 exports.create = (req, res) => {
-  // TODO: validate, e.g. check max size, mime-type, title content
-  // console.log("REQ BODY: " + JSON.stringify(req.body)); // careful, you'll print out the whole uploaded file, can be hundreds of lines of text
-  const item = new ImageClass({
-    title: req.body.title,
-    data: Buffer.from(req.body.data, "base64"), // decode base64 to binary data for storage
-    mimeType: req.body.mimeType || "Pending",
-    productId: req.body.productId || null,
-  });
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    if (!req.body) {
+      return res.status(400).send({
+        message: "Content can not be empty!",
+      });
+    }
 
-  // Save ToDo in the database
-  ImageClass.create(item, (err, item) => {
-    //TODO: check if productId exists
-    if (err)
-      if ((err = "ER_NO_REFERENCED_ROW_2")) {
-        res.status(400).send({
-          message: "The product id doesn't exist.",
-        });
-      } else
-        res.status(500).send({
-          message:
-            err.message ||
-            "Internal error occurred while creating this document.",
-        });
-    else res.status(201).send(item);
+    // Check if the mime type is valid
+    if (!allowedMimeTypes.includes(req.body.mimeType)) {
+      return res.status(400).send({
+        message: "Invalid file type. Only jpeg, png are allowed",
+      });
+    }
+
+    // Check if title and productId is provided
+    if (!req.body.title || !req.body.productId) {
+      return res.status(400).send({
+        message: "Image title and product Id must be provided",
+      });
+    }
+
+    // TODO: validate, e.g. check max size, mime-type, title content
+    // console.log("REQ BODY: " + JSON.stringify(req.body)); // careful, you'll print out the whole uploaded file, can be hundreds of lines of text
+    const item = new ImageClass({
+      title: req.body.title,
+      data: Buffer.from(req.body.data, "base64"), // decode base64 to binary data for storage
+      mimeType: req.body.mimeType || "Pending",
+      productId: req.body.productId || null,
+    });
+
+    // Save ToDo in the database
+    ImageClass.create(item, (err, item) => {
+      if (err) {
+        if (err.code === "ER_NO_REFERENCED_ROW_2") {
+          res.status(400).send({
+            message: "The product id doesn't exist.",
+          });
+        } else if (err.code === "ER_DUP_ENTRY") {
+          res.status(400).send({
+            message:
+              "Duplicate entry. The item already exists in the database.",
+          });
+        } else {
+          res.status(500).send({
+            message:
+              err.message ||
+              "Internal error occurred while creating this document.",
+          });
+        }
+      } else {
+        res.status(201).send(item);
+      }
+    });
   });
 };
 
@@ -72,18 +102,20 @@ exports.findOne = (req, res) => {
 };
 
 exports.delete = (req, res) => {
-  ImageClass.removeById(req.params.id, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        res.status(404).send({
-          message: `Not found Images with id ${req.params.id}`,
-        });
-      } else {
-        res.status(500).send({
-          message: "Could not delete Images with id " + req.params.id,
-        });
-      }
-    } else
-      res.status(200).send({ message: `Product was deleted successfully!` });
-  });
+  Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+    ImageClass.removeByProductId(req.params.id, (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: `Not found Images with product id ${req.params.id}`,
+          });
+        } else {
+          res.status(500).send({
+            message: "Could not delete Images with product id " + req.params.id,
+          });
+        }
+      } else
+        res.status(200).send({ message: `Product was deleted successfully!` });
+    });
+  }); // Auth.execIfAuthValid end
 };

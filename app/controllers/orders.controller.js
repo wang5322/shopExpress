@@ -4,14 +4,9 @@ const Orders = require("../models/orders.model");
 const OrderItem = require("../models/orderItems.model");
 const Products = require("../models/products.model");
 const CartItem = require("../models/cartItems.model");
+const db = require("../models/db");
 const Auth = require("../utils/auth");
 const { error } = require("npmlog");
-/*
-//add an order into orders table
-exports.create = (req, res) => {
-
-};
-*/
 
 //get all orders with username and/or sellername
 exports.getAll = (req, res) => {
@@ -54,9 +49,9 @@ exports.getOne = (req, res) => {
 }
 
 //confirm an order, calculate price and fees
-exports.confirmOrder = (req, res) => { }
+exports.buyerConfirm = (req, res) => { }
 
-//delete order
+//delete order -- to be fixed
 exports.delete = (req, res) => {
   Auth.execIfAuthValid(req, res, null, (req, res, user) => {
     switch (user.role) {
@@ -105,11 +100,12 @@ exports.modifyStatus = (req, res) => { }
 
 
 
-
+//add cartitem or product with amount to exist order if permitted, or create a new order
 exports.create = (req, res) => {
 
   let from;
   let sellerId;
+  let sellerName;
   let orderId;
   let buyerId;
   let newOrder;
@@ -122,226 +118,259 @@ exports.create = (req, res) => {
   };
     
   if (!(req.body.id && req.body.amount)) {
-    return res.status(500).send({message:"id and amount required"})
+    return res.status(500).send({ message: "id and amount required" })
   } else {
-      Products.getById(from == "carts" ? req.body.productId : req.body.id, (err, data) => {
-    //get product record from products table
-    if (err) {
-      return res.status(500).send({ message: err.message || "errors when demanding products" });
-    } else {
-      if (!(data.id)) {
-        res.status(500).send({ message: "Cannot find products!" });
-        return;
+    Products.getById((from == "carts") ? req.body.productId : req.body.id, (err, data) => {
+      //get product record from products table
+      if (err) {
+        return res.status(500).send({ message: err.message || "errors when demanding products" });
       } else {
-        sellerId = data.sellerId;
-      //write product information into a new orderitem object
-        newOrderItem = new OrderItem({
-          productId: data.id,
-          productCode: data.productCode,
-          productName: data.productName,
-          price: Number(data.price),
-          amount: req.body.amount
-        })
-        Auth.execIfAuthValid(req, res, null, (req, res, user) => {
+        if (!(data.id)) {
+          res.status(500).send({ message: "Cannot find products!" });
+          return;
+        } else {
+          sellerId = data.sellerId;
+          //write product information into a new orderitem object
+          newOrderItem = new OrderItem({
+            productId: data.id,
+            productCode: data.productCode,
+            productName: data.productName,
+            price: Number(data.price),
+            amount: req.body.amount
+          })
+          Auth.execIfAuthValid(req, res, null, (req, res, user) => {
                     
-          if (!(user.role == "buyer")) {
-            return res.status(500).send({ message: `Only buyer can add order!` });
-          } else {
-            buyerId = user.id;
-            if (from == "carts") {
-              //if match the product table
-              OrderItem.matchById(data[0].id, (err, data) => {
-                if (err) {
-                  return res.status(500).send({message:err.message||"matching failed"})
-                } else {
-                  if (data.matched==false) {
-                    return res.status(500).send({message:err.message||"matching failed"})
-                  } else {
-                    //select existing unSubmitted order
-                Orders.getAll(sellerId, buyerId, "unSubmitted", (err, data) => {
+            if (!(user.role == "buyer")) {
+              return res.status(500).send({ message: "Only buyer can add order!" });
+            } else {
+              buyerId = user.id;
+              if (from == "carts") {
+                //if match the product table
+                OrderItem.matchById(data.id, (err, data) => {
                   if (err) {
-                    return res.status(500).send({ message: err.message || "Create failed!" });
+                    return res.status(500).send({ message: err.message || "matching failed" })
                   } else {
-                    if (data.length == 0) {
-                      //create a new order
-                      newOrder = {
-                        sellerId: sellerId,
-                        buyerId: buyerId,
-                        deliveryInfo: `${user.name}, ${user.address}`
-                      };
-                      Orders.create(newOrder, (err, data) => {
-                        if (err) {
-                          return res
-                            .status(500)
-                            .send({ message: err.message || "Create order failed!" });
-                        } else {
-                          orderId = data.id;
-                          newOrder = data;
-                          newOrderItem.orderId = newOrder.id;
-                          OrderItem.create(newOrderItem, (err, data) => {
-                            if (err) {
-                              return res.status(500).send({
-                                message:
-                                  err.message || "Create order item failed!",
-                              });
-                            } else {
-                              if (from == "carts") {
-                                //delete cart item when transfered to order
-                                CartItem.remove(req.body.id, (err, data) => {
-                                  if (err) {
-                                    return res.status(500).send({message: err.message || "delete from cart failed!"});
-                                  } else {
-                                    if (data.affectedRows == 0) {
-                                      return res.status(500).send({ message:"delete from cart failed!"});
-                                    } else {
-                                      return res.status(200).send({order:newOrder,orderItem:newOrderItem});
-                                    }
-                                    
-                                  }
-                                });//CartItem.remove
-                              }
-                            }
-                          }); //OrderItem.create end
-                        }
-                      }); //Orders.create end
+                    if (data.matched == false) {
+                      return res.status(500).send({ message: err.message || "matching failed" })
                     } else {
-                      //use the existing order record in orders table
-                      //orderId = data[0].id;
-                      newOrder = data[0];
-                      newOrderItem.orderId = newOrder.id;
-                      OrderItem.create(newOrderItem, (err, data) => {
+                      //select existing unSubmitted order
+                      db.query("select * from users where id= ? ", sellerId, (err, data) => {
                         if (err) {
-                          return res.status(500).send({
-                            message: err.message || "Create order item failed!",
-                          });
+                          return res.status(500).send({ message: err.message || "seller error" })
                         } else {
-                          if (from == "carts") {
-                            //delete cart item when transfered to order
-                            CartItem.remove(req.body.id, (err, data) => {
+                          if (data.length == 0) {
+                            return res.status(500).send({ message: "seller not found" })
+                          } else {
+                            sellerName = data[0].userName;
+                            
+                            Orders.getAll(sellerName, user.userName, false, (err, data) => {
                               if (err) {
-                                return res.status(500).send({
-                                  message:
-                                    err.message || "delete from cart failed!",
-                                });
+                                return res.status(500).send({ message: err.message || "Create failed!" });
                               } else {
-                                //todo : successfully
-                                if (data.affectedRows == 0) {
-                                  return res.status(500).send({ message: "remove cartItem failed" })
+                                if (data.length == 0) {
+                                  //create a new order
+                                  newOrder = {
+                                    sellerId: sellerId,
+                                    buyerId: buyerId,
+                                    deliveryInfo: `${user.userName}, ${user.address}`
+                                  };
+                                  Orders.create(newOrder, (err, data) => {
+                                    if (err) {
+                                      return res
+                                        .status(500)
+                                        .send({ message: err.message || "Create order failed!" });
+                                    } else {
+                                      orderId = data.id;
+                                      newOrder = data;
+                                      newOrderItem.orderId = newOrder.id;
+                                      OrderItem.create(newOrderItem, (err, data) => {
+                                        if (err) {
+                                          return res.status(500).send({
+                                            message:
+                                              err.message || "Create order item failed!",
+                                          })
+                                        } else {
+                                          if (from == "carts") {
+                                            //delete cart item when transfered to order
+                                            CartItem.remove(req.body.id, (err, data) => {
+                                              if (err) {
+                                                return res.status(500).send({ message: err.message || "delete from cart failed!" });
+                                              } else {
+                                                if (data.affectedRows == 0) {
+                                                  return res.status(500).send({ message: "delete from cart failed!" });
+                                                } else {
+                                                  return res.status(200).send({ order: newOrder, orderItem: newOrderItem });
+                                                }
+                                    
+                                              }
+                                            });//CartItem.remove
+                                          }
+                                        }
+                                      }); //OrderItem.create end
+                                    }
+                                  }); //Orders.create end
                                 } else {
-                                  return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                                  //use the existing order record in orders table
+                                  //orderId = data[0].id;
+                                  newOrder = data[0];
+                                  newOrderItem.orderId = newOrder.id;
+                                  OrderItem.create(newOrderItem, (err, data) => {
+                                    if (err) {
+                                      return res.status(500).send({
+                                        message: err.message || "Create order item failed!",
+                                      });
+                                    } else {
+                                      if (from == "carts") {
+                                        //delete cart item when transfered to order
+                                        CartItem.remove(req.body.id, (err, data) => {
+                                          if (err) {
+                                            return res.status(500).send({
+                                              message:
+                                                err.message || "delete from cart failed!",
+                                            });
+                                          } else {
+                                            //todo : successfully
+                                            if (data.affectedRows == 0) {
+                                              return res.status(500).send({ message: "remove cartItem failed" })
+                                            } else {
+                                              return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                                            }
+                                          }
+                                        })//CartItem.remove
+                                      } else {
+                                        return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                                      }
+                                    }
+                                  })//OrderItem.create
                                 }
                               }
-                            })//CartItem.remove
-                          } else {
-                            return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                            });//Orders.getAll end
                           }
                         }
-                      })//OrderItem.create
+                        
+                      })//db.query seller end
+
+
+
+
                     }
                   }
-                });//Orders.getAll end
-                  }
-                }
                   
-              })//OrderItem.matchById
-            }//from product
-            else {
-              //todo 
-              Orders.getAll(sellerId, buyerId, "unSubmitted", (err, data) => {
-                if (err) {
-                  return res.status(500).send({ message: err.message || "Create failed!" });
-                } else {
-                  //create a new order
-                  if (data.length == 0) {
-                    newOrder = {
-                      sellerId: sellerId,
-                      buyerId: buyerId,
-                      deliveryInfo: `${user.name}, ${user.address}`
-                    };
-                    Orders.create(newOrder, (err, data) => {
-                      if (err) {
-                        return res
-                          .status(500)
-                          .send({ message: err.message || "Create order failed!" });
-                      } else {
-                        orderId = data.id;
-                        newOrder = data;
-                        newOrderItem.orderId = newOrder.id;
-                        OrderItem.create(newOrderItem, (err, data) => {
-                          if (err) {
-                            return res.status(500).send({
-                              message:
-                                err.message || "Create order item failed!",
-                            });
-                          } else {
-                            if (from == "carts") {
-                              //delete cart item when transfered to order
-                              CartItem.remove(req.body.id, (err, data) => {
-                                if (err) {
-                                  return res.status(500).send({message: err.message || "delete from cart failed!"});
-                                } else {
-                                  if (data.affectedRows == 0) {
-                                    return res.status(500).send({ message:"delete from cart failed!"});
-                                  } else {
-                                    return res.status(200).send({order:newOrder,orderItem:newOrderItem});
-                                  }
-                                  
-                                }
-                              });//CartItem.remove
-                            }
-                          }
-                        }); //OrderItem.create end
-                      }
-                    }); //Orders.create end
+                })//OrderItem.matchById
+              }//from product
+              else {
+                //from products 
+                db.query("select * from users where id= ? ", sellerId, (err, data) => {
+                  if (err) {
+                    return res.status(500).send({ message: err.message || "seller error" })
                   } else {
-                    //use the existing order record in orders table
-                    //orderId = data[0].id;
-                    newOrder = data[0];
-                    newOrderItem.orderId = newOrder.id;
-                    OrderItem.create(newOrderItem, (err, data) => {
-                      if (err) {
-                        return res.status(500).send({
-                          message: err.message || "Create order item failed!",
-                        });
-                      } else {
-                        console.log(data)
-                        if (from == "carts") {
-                          //delete cart item when transfered to order
-                          CartItem.remove(req.body.id, (err, data) => {
-                            if (err) {
-                              return res.status(500).send({
-                                message:
-                                  err.message || "delete from cart failed!",
-                              });
-                            } else {
-                              if (data.affectedRows == 0) {
-                                return res.status(500).send({ message: "remove cartItem failed" })
-                              } else {
-                                return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
-                              }
-                            }
-                          })//CartItem.remove
+                    if (data.length == 0) {
+                      return res.status(500).send({ message: "seller not found" })
+                    } else {
+                      sellerName = data[0].userName;
+                      Orders.getAll(sellerName, user.userName, false, (err, data) => {
+                        if (err) {
+                          return res.status(500).send({ message: err.message || "get order error!" });
                         } else {
-                          return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                          //create a new order
+                          if (data.length == 0) {
+                            newOrder = {
+                              sellerId: sellerId,
+                              buyerId: buyerId,
+                              deliveryInfo: `${user.userName}, ${user.address}`
+                            };
+                            Orders.create(newOrder, (err, data) => {
+                              if (err) {
+                                return res
+                                  .status(500)
+                                  .send({ message: err.message || "Create order failed!" });
+                              } else {
+                                newOrder = data;
+                                newOrderItem.orderId = data.id;
+                                OrderItem.create(newOrderItem, (err, data) => {
+                                  if (err) {
+                                    return res.status(500).send({
+                                      message:
+                                        err.message || "Create order item failed!",
+                                    });
+                                  } else {
+                                    if (from == "carts") {
+                                      //delete cart item when transfered to order
+                                      CartItem.remove(req.body.id, (err, data) => {
+                                        if (err) {
+                                          return res.status(500).send({ message: err.message || "delete from cart failed!" });
+                                        } else {
+                                          if (data.affectedRows == 0) {
+                                            return res.status(500).send({ message: "delete from cart failed!" });
+                                          } else {
+                                            return res.status(200).send({ order: newOrder, orderItem: newOrderItem });
+                                          }
+                                  
+                                        }
+                                      });//CartItem.remove
+                                    }
+                                    else {
+                                      return res.status(200).send({ order: newOrder, orderItem: newOrderItem });
+                                    }
+                                  }
+                                }); //OrderItem.create end
+                              }
+                            }); //Orders.create end
+                          } else {
+                            //use the existing order record in orders table
+                            //orderId = data[0].id;
+                            newOrder = data[0];
+                            newOrderItem.orderId = newOrder.id;
+                            OrderItem.create(newOrderItem, (err, data) => {
+                              if (err) {
+                                return res.status(500).send({
+                                  message: err.message || "Create order item failed!",
+                                })
+                              } else {
+                                console.log("created:", data)
+                                if (from == "carts") {
+                                  //delete cart item when transfered to order
+                                  CartItem.remove(req.body.id, (err, data) => {
+                                    if (err) {
+                                      return res.status(500).send({
+                                        message:
+                                          err.message || "delete from cart failed!",
+                                      });
+                                    } else {
+                                      if (data.affectedRows == 0) {
+                                        return res.status(500).send({ message: "remove cartItem failed" })
+                                      } else {
+                                        return res.status(200).send({ order: newOrder, orderItem: newOrderItem })
+                                      }
+                                    }
+                                  })//CartItem.remove
+                                } else {
+                                  return res.status(200).send({ order: newOrder, orderItem: newOrderItem });
+                                }
+                              }
+                            })//OrderItem.create
+                          }
                         }
-                      }
-                    })//OrderItem.create
+                      });//Orders.getAll end
+                    }
                   }
-                }
-              });//Orders.getAll end
-                        
-            }//add to order end
-          }
+                })//db.query sellername end
 
-        });//Auth.execIfAuthValid end
+
+
+                        
+              }//add to order end
+            }
+
+          });//Auth.execIfAuthValid end
               
-      }
-    };
+        }
+      };
         
-  });//Products.getById end
+    });//Products.getById end
   }
 
     
-};
+}
                   
 
