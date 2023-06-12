@@ -40,23 +40,12 @@ $(document).ready(function () {
       }).done(function (data) {
         console.log(productObj);
         console.log(data);
-        $("#myModalBody").html("Products added successfully");
-        $("#myModal").modal("show");
-        // alert("Products added successfully");
+        // $("#myModalBody").html("Products added successfully");
+        // $("#myModal").modal("show");
+        alert("Products added successfully");
         refreshInventoryList();
       });
-      // $(".close").alert("close");
     });
-
-    // $('input[type="checkbox"]').on("change", function () {
-    //   $('input[name="' + this.name + '"]')
-    //     .not(this)
-    //     .prop("checked", false);
-    // });
-
-    // $("#deselectAll").on("click", function () {
-    //   $(".form-check-input").prop("checked", false);
-    // });
 
     $("#clear").on("click", function () {
       $("#id").html("");
