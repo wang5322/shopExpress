@@ -35,7 +35,8 @@ $(document).ready(function () {
 function refreshProductList() {
   // get orders by username
   $.ajax({
-    url: `/api/orders/?username=${username}`,
+    url: `/api/orders/buyfrom`,
+    // url: `/api/orders/?username=${username}`,
     type: "GET",
     headers: {
       "x-auth-username": username,
@@ -52,7 +53,7 @@ function refreshProductList() {
     let orderCard = "";
 
     for (let order of orders) {
-      // get product name from orderitems
+      // get orderitem info from orderitems table
 
       $.ajax({
         url: "/api/orderItem/order/" + order.id,
