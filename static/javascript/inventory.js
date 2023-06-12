@@ -125,24 +125,33 @@ $(document).ready(function () {
 
       // Validation
       if (!file) {
-        alert("Please select an image file.");
+        c;
+        // alert("Please select an image file.");
         return;
       }
 
       if (titleVal.trim() === "" || productIdVal.trim() === "") {
-        alert("Please fill in all the fields.");
+        $("#myModalBody").html("Please fill in all the fields.");
+        $("#myModal").modal("show");
+        // alert("Please fill in all the fields.");
         return;
       }
 
       console.log(existProductId);
       if (existProductId.includes(productIdVal)) {
-        alert("This productId already has the image.");
+        $("#myModalBody").html("This productId already has the image.");
+        $("#myModal").modal("show");
+        // alert("This productId already has the image.");
         return;
       }
       let mimeTypeVal = file.type;
       const validMimeTypes = ["image/jpeg", "image/png"];
       if (!validMimeTypes.includes(mimeTypeVal)) {
-        alert("Invalid file type. Only jpeg and png images are allowed.");
+        $("#myModalBody").html(
+          "Invalid file type. Only jpeg and png images are allowed."
+        );
+        $("#myModal").modal("show");
+        // alert("Invalid file type. Only jpeg and png images are allowed.");
         return;
       }
 
@@ -368,36 +377,53 @@ function isValidProduct(object) {
     "Baby",
   ];
   if (!categoryArray.includes(object.category)) {
-    alert(
+    $("#myModalBody").html(
       "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
     );
+    $("#myModal").modal("show");
+    // alert(
+    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
+    // );
+
     return false;
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
-    alert("Product Code needs to be 1-45 characters");
+    $("#myModalBody").html("Product Code needs to be 1-45 characters");
+    $("#myModal").modal("show");
+    // alert("Product Code needs to be 1-45 characters");
     return false;
   }
   if (!object.sellerId) {
-    alert("No sellerId provided. Please login first");
+    $("#myModalBody").html("No sellerId provided. Please login first");
+    $("#myModal").modal("show");
+    // alert("No sellerId provided. Please login first");
     return false;
   }
   if (isNaN(object.price)) {
-    alert("Price needs to be a number");
+    $("#myModalBody").html("Price needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Price needs to be a number");
     return false;
   }
   let splitPrice = object.price.toString().split(".");
   if (splitPrice.length > 1) {
     if (splitPrice[1].length > 2) {
-      alert("Price can have only two decimals");
+      $("#myModalBody").html("Price can have only two decimals");
+      $("#myModal").modal("show");
+      // alert("Price can have only two decimals");
       return false;
     }
   }
   if (splitPrice[0].length > 8) {
-    alert("Price exceeds site limit");
+    $("#myModalBody").html("Price exceeds site limit");
+    $("#myModal").modal("show");
+    // alert("Price exceeds site limit");
     return false;
   }
   if (isNaN(object.stockNum)) {
-    alert("Stock number needs to be a number");
+    $("#myModalBody").html("Stock number needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Stock number needs to be a number");
     return false;
   }
   return true;
