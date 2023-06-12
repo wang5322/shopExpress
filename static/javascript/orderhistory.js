@@ -1,0 +1,115 @@
+let ifLoggedIn;
+let username, password, role;
+$(document).ready(function () {
+  ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+  username = sessionStorage.getItem("username");
+  password = sessionStorage.getItem("password");
+  role = sessionStorage.getItem("role");
+
+  if (ifLoggedIn !== "true") {
+    alert("Access Forbidden: you are not logged in!");
+    window.location.href = "index.html";
+  } else {
+    refreshProductList();
+  }
+});
+
+function refreshProductList() {
+  // get orders by username
+  $.ajax({
+    url: `/api/orders/?username=${username}`,
+    type: "GET",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done(function (orders, status, xhr) {
+    // create a string variable to store all card html of orders
+    let orderCard = "";
+
+    for (let order of orders) {
+      // get product name from orderitems
+
+      $.ajax({
+        url: "/api/orderItem/order/" + order.id,
+        type: "GET",
+        headers: {
+          "x-auth-username": username,
+          "x-auth-password": password,
+          "x-auth-role": role,
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+        },
+      }).done(function (orderitems, status, xhr) {
+        let productCount = {};
+
+        // Count each product in the order
+        for (let item of orderitems) {
+          if (productCount[item.productName]) {
+            productCount[item.productName]++;
+          } else {
+            productCount[item.productName] = 1;
+          }
+        }
+        orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                  <div class="card card-stepper" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                          <span class="text-muted small">order #${order.id}</span>
+                          <span class="lead fw-normal" id="status">${order.status}</span>`;
+
+        // for (item of orderitems) {
+        //   orderCard += `<span class=" fw-normal" id="productName">${item.productName}</span>`;
+        // }
+
+        // use the productCount object to list each product and its count
+        for (let productName in productCount) {
+          orderCard += `<span class="fw-normal" id="productName">${productName} (x${productCount[productName]})</span>`;
+        }
+
+        orderCard += `</div>
+                        <div class="d-flex flex-column justify-content-between">
+                          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+                          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
+                          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
+                          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
+                          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
+                        </div>
+                        <div>
+                          <button class="btn btn-outline-primary" type="button">Cancel order</button>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+                      </div>
+                      <div class="d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-column align-items-start" id="order time">
+                          <span>${order.orderTime}</span><span>Order placed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+
+        $("#ordercards").html(orderCard);
+      });
+    }
+  });
+}
+
+$("#signout").click(function () {
+  ifLoggedIn = "false";
+  sessionStorage.clear();
+  window.open("index.html");
+});

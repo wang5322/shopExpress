@@ -54,7 +54,7 @@
                             <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" id="signout">Sign out</a>
                         </li>
                         <li class="nav-item ">
-                            <a href="#" target="_blank"><i
+                            <a href="shoppingcart.html" target="_blank"><i
                                     class="bi bi-cart-check-fill display-6 icon-link mx-2"></i></a>
                         </li>
                     </ul>
@@ -151,7 +151,7 @@
                         <div class="form-row ">
                             <div class=" imageForm my-2 rounded p-4 ">
 
-                                <p>Please upload your image to t the product:</p>
+                                <p>Please upload your image to the product:</p>
                                 <label class="labelform">Image id:<span id="imageId"></span></label><br>
                                 <input type="text" name="imageTitle" class="form-control my-1"
                                     placeholder="Image title">
@@ -171,16 +171,28 @@
 
 
                 </form>
-                <!-- image upload panel -->
+
 
 
             </div>
 
+        </section>
 
-
+        <section class=" container-fluid row m-5">
+            <div class="OrderList editPane rounded col-md-7 mx-4 ">
+                <div class="ml-5">
+                    <h1 class="mt-4">Orders</h1>
+                    <div class="row">
+                        <hr class="solid">
+                    </div>
+                    <div id="orderList"></div>
+                </div>
+            </div>
 
 
         </section>
+
+
 
     </main>
     <footer>
