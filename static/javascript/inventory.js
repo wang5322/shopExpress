@@ -103,15 +103,16 @@ $(document).ready(function () {
         headers: {
           "x-auth-username": sessionUsername,
           "x-auth-password": sessionPassword,
+          "x-auth-role": role,
         },
         data: { stockNum: 0, available: 0 },
         error: function (jqxhr, status, errorThrown) {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        $("#myModalBody").html("Products archieved successfully");
-        $("#myModal").modal("show");
-        // alert("Products archieved successfully");
+        // $("#myModalBody").html("Products archieved successfully");
+        // $("#myModal").modal("show");
+        alert("Products archieved successfully");
         refreshInventoryList();
       });
     });

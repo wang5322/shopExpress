@@ -123,7 +123,7 @@ exports.updateStock = (req, res) => {
     const available = req.body.available;
 
     // Add validation for stockNum to make sure it >0
-    if (stockNum <= 0) {
+    if (stockNum < 0) {
       res.status(400).send({
         message: "Invalid stock number. It must be greater than zero.",
       });
