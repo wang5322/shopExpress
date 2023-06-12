@@ -1,6 +1,4 @@
 var available = 1;
-// var sellerId = "";
-// var deletId;
 var sessionUsername = sessionStorage.getItem("username");
 var sessionPassword = sessionStorage.getItem("password");
 var sellerId = sessionStorage.getItem("id");
@@ -12,7 +10,6 @@ $(document).ready(function () {
     alert("Access Forbidden: you are not logged in!");
     window.location.href = "index.html";
   } else {
-
     refreshInventoryList();
     console.log("page is fully loaded");
     console.log(sellerId);
@@ -25,6 +22,10 @@ $(document).ready(function () {
       $.ajax({
         url: "/api/products",
         type: "POST",
+        headers: {
+          "x-auth-username": sessionUsername,
+          "x-auth-password": sessionPassword,
+        },
         dataType: "json",
         data: productObj,
         error: function (jqxhr, status, errorThrown) {
@@ -45,9 +46,9 @@ $(document).ready(function () {
     //     .prop("checked", false);
     // });
 
-    $("#deselectAll").on("click", function () {
-      $(".form-check-input").prop("checked", false);
-    });
+    // $("#deselectAll").on("click", function () {
+    //   $(".form-check-input").prop("checked", false);
+    // });
 
     $("#clear").on("click", function () {
       $("#id").html("");
@@ -67,6 +68,10 @@ $(document).ready(function () {
       $.ajax({
         url: "/api/products/" + id,
         type: "PUT",
+        headers: {
+          "x-auth-username": sessionUsername,
+          "x-auth-password": sessionPassword,
+        },
         dataType: "json",
         data: product,
         error: function (jqxhr, status, errorThrown) {
@@ -84,6 +89,10 @@ $(document).ready(function () {
       $.ajax({
         url: "/api/products/" + id,
         type: "PATCH",
+        headers: {
+          "x-auth-username": sessionUsername,
+          "x-auth-password": sessionPassword,
+        },
         data: { stockNum: 0, available: 0 },
         error: function (jqxhr, status, errorThrown) {
           alert("AJAX error: " + jqxhr.responseText);
@@ -94,22 +103,37 @@ $(document).ready(function () {
       });
     });
 
-    $("#signout").click(function () {
-      ifLoggedIn = "false";
-      sessionStorage.clear();
-      window.open("index.html");
-    });
-
-    // add image
     $("#addImage").click(function () {
       // add or update
       let titleVal = $("input[name=imageTitle]").val();
       console.log($("input[name=uploadImage]").prop("files"));
       let file = $("input[name=uploadImage]").prop("files")[0];
-      //let filenameVal = file.name; // not used by me, but you can use it if you like, add 'filename' column to database
-      let mimeTypeVal = file.type;
       let productIdVal = $("input[name=productId]").val();
-      // https://javascript.info/file  (about FileReader, see readAsDataURL )
+
+      // Validation
+      if (!file) {
+        alert("Please select an image file.");
+        return;
+      }
+
+      if (titleVal.trim() === "" || productIdVal.trim() === "") {
+        alert("Please fill in all the fields.");
+        return;
+      }
+
+      console.log(existProductId);
+      if (existProductId.includes(productIdVal)) {
+        alert("This productId already has the image.");
+        return;
+      }
+      let mimeTypeVal = file.type;
+      const validMimeTypes = ["image/jpeg", "image/png"];
+      if (!validMimeTypes.includes(mimeTypeVal)) {
+        alert("Invalid file type. Only jpeg and png images are allowed.");
+        return;
+      }
+
+      // // https://javascript.info/file  (about FileReader, see readAsDataURL )
       let reader = new FileReader();
       reader.onload = function () {
         // console.log(reader.result); // careful, may print out hundreds of lines of binary
@@ -120,10 +144,14 @@ $(document).ready(function () {
           data: btoa(reader.result),
           productId: productIdVal,
         };
+
         $.ajax({
-          // FIXME: escape special characters using urlencode
           url: "/api/images",
           type: "POST",
+          headers: {
+            "x-auth-username": sessionUsername,
+            "x-auth-password": sessionPassword,
+          },
           dataType: "json",
           data: docObj,
           error: function (jqxhr, status, errorThrown) {
@@ -131,7 +159,6 @@ $(document).ready(function () {
           },
         }).done(function () {
           alert("upload successful");
-          // refreshList();
         });
       };
       reader.onerror = function () {
@@ -150,11 +177,6 @@ function refreshInventoryList() {
   $.ajax({
     url: `/api/products/?userName=${sessionUsername}`,
     type: "GET",
-    // async: false,
-    // headers: {
-    //   "x-auth-username": sessionUsername,
-    //   "x-auth-password": sessionPassword,
-    // },
     dataType: "json",
     success: function (response) {
       console.log("userName is : " + sessionUsername);
@@ -164,16 +186,17 @@ function refreshInventoryList() {
       // loop the info of products
       for (let i = 0; i < response.length; i++) {
         var product = response[i];
-        console.log(product);
+        // console.log(product);
         var imagepath;
         var imageId = product.image_id;
         if (imageId) {
           imagepath = `api/images/${imageId}`;
+          // existProductId.push(product.id);
         } else {
           // Handle case when no images are returned
           imagepath = "api/images/38";
         }
-
+        // console.log(existProductId);
         // insert to the DOM
         result +=
           `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
@@ -220,11 +243,11 @@ function refreshInventoryList() {
       }
       // $("#productList").html(result);
 
-      $('input[type="checkbox"]').on("change", function () {
-        $('input[name="' + this.name + '"]')
-          .not(this)
-          .prop("checked", false);
-      });
+      // $('input[type="checkbox"]').on("change", function () {
+      //   $('input[name="' + this.name + '"]')
+      //     .not(this)
+      //     .prop("checked", false);
+      // });
     },
     error: function (error) {
       console.log("Error: ", error);
@@ -271,7 +294,7 @@ function selectImage(id) {
   });
 }
 
-function creatObject() {
+function createObject() {
   var categoryVal = $("input[name=category]").val();
   var sellerIdVal = sellerId;
   var productCodeVal = $("input[name=productCode]").val();
@@ -297,4 +320,50 @@ function creatObject() {
     available: availableVal,
   };
   return productObj;
+}
+
+//Validation for product input
+function isValidProduct(object) {
+  var categoryArray = [
+    "Fashion",
+    "Home",
+    "Beauty",
+    "Books",
+    "Electronic",
+    "Baby",
+  ];
+  if (!categoryArray.includes(object.category)) {
+    alert(
+      "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
+    );
+    return false;
+  }
+  if (object.productCode.length < 1 || object.productCode.length > 45) {
+    alert("Product Code needs to be 1-45 characters");
+    return false;
+  }
+  if (!object.sellerId) {
+    alert("No sellerId provided. Please login first");
+    return false;
+  }
+  if (isNaN(object.price)) {
+    alert("Price needs to be a number");
+    return false;
+  }
+  let splitPrice = object.price.toString().split(".");
+  if (splitPrice.length > 1) {
+    if (splitPrice[1].length > 2) {
+      alert("Price can have only two decimals");
+      return false;
+    }
+  }
+  if (splitPrice[0].length > 8) {
+    alert("Price exceeds site limit");
+    return false;
+  }
+  if (isNaN(object.stockNum)) {
+    alert("Stock number needs to be a number");
+    return false;
+  }
+  return true;
 }
