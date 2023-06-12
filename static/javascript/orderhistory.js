@@ -12,6 +12,24 @@ $(document).ready(function () {
   } else {
     refreshProductList();
   }
+
+  // confirm button
+  $(document).on("click", '[id^="confirm-button-"]', function () {
+    const orderId = this.id.split("-")[2];
+
+    //status switch to BuyerConfirmed
+    $.ajax({
+      url: `api/orders/${orderId}`,
+      type: "PATCH",
+      data: {
+        status: "BuyerConfirmed", // TODO: finish the ajax , now the patch controller not finished
+      },
+    });
+  });
+
+  // pay button
+
+  //received-button
 });
 
 function refreshProductList() {
@@ -50,16 +68,6 @@ function refreshProductList() {
           );
         },
       }).done(function (orderitems, status, xhr) {
-        let productCount = {};
-
-        // Count each product in the order
-        for (let item of orderitems) {
-          if (productCount[item.productName]) {
-            productCount[item.productName]++;
-          } else {
-            productCount[item.productName] = 1;
-          }
-        }
         orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col">
                   <div class="card card-stepper" style="border-radius: 10px;">
@@ -69,14 +77,50 @@ function refreshProductList() {
                           <span class="text-muted small">order #${order.id}</span>
                           <span class="lead fw-normal" id="status">${order.status}</span>`;
 
-        // for (item of orderitems) {
+        // for (let item of orderitems) {
         //   orderCard += `<span class=" fw-normal" id="productName">${item.productName}</span>`;
         // }
 
-        // use the productCount object to list each product and its count
-        for (let productName in productCount) {
-          orderCard += `<span class="fw-normal" id="productName">${productName} (x${productCount[productName]})</span>`;
+        for (let item of orderitems) {
+          // Add label and select input for product amount
+          orderCard += `<div style="display: flex; align-items: center;">
+                            <span class="fw-normal" id="productName">${item.productName}</span>
+                            <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+                            <select id="productAmount" name="productAmount" style="margin-left: 10px;">`;
+
+          // Populate select options from 1 to 30
+          for (let i = 1; i <= 30; i++) {
+            if (i === item.amount) {
+              // If current count equals to the amount, make it selected
+              orderCard += `<option value="${i}" selected>${i}</option>`;
+            } else {
+              orderCard += `<option value="${i}">${i}</option>`;
+            }
+          }
+
+          orderCard += `</select></div>`;
         }
+        //dynamic button
+        let buttonType;
+        let buttonId;
+        switch (order.status) {
+          case "unSubmitted":
+            buttonType = "Confirm";
+            buttonId = `confirm-button-${order.id}`;
+            break;
+          case "BuyerConfirmed":
+            buttonType = "Pay";
+            buttonId = `pay-button-${order.id}`;
+            break;
+          default:
+            buttonType = "Received";
+            buttonId = `received-button-${order.id}`;
+            break;
+        }
+
+        // orderCard += `<div>
+        //                 <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+        //               </div>`;
 
         orderCard += `</div>
                         <div class="d-flex flex-column justify-content-between">
@@ -87,8 +131,12 @@ function refreshProductList() {
                           <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
                         </div>
                         <div>
-                          <button class="btn btn-outline-primary" type="button">Cancel order</button>
+                        <button id="cancel-button-${order.id}" class="btn btn-outline-primary" type="button">Cancel order</button>
                         </div>
+                        <div>
+                        <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+                      </div>
+                  
                       </div>
                       <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
                       </div>
