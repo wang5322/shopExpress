@@ -41,9 +41,9 @@ Users.findByUsername = (username, result) => {
     });
   };
 //update user by username
-Users.updateByUsername = (username, result) => {
-  let queryStr = 'UPDATE users SET userName =?, passwords =?, role =?, address =?, email =? WHERE username =?'
-  db.query(querystr, [users.userName, users.passwords, users.role, users.address, users.email, username], (err, res) => {
+Users.updateByUsername = (username, dataObj, result) => {
+  let queryStr = 'UPDATE users SET ? WHERE userName =?';
+  db.query(queryStr, [dataObj, username], (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -55,8 +55,8 @@ Users.updateByUsername = (username, result) => {
       return;
     }
 
-    console.log("updated user: ", { ...users });
-    result(null, { ...users });
+    console.log("updated user: ", { ...res });
+    result(null, { ...res });
   });
 };
 

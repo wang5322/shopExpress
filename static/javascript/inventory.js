@@ -1,8 +1,10 @@
-var available = 1;
-var sessionUsername = sessionStorage.getItem("username");
-var sessionPassword = sessionStorage.getItem("password");
-var sellerId = sessionStorage.getItem("id");
-let ifLoggedIn;
+let available = 1;
+let sessionUsername = sessionStorage.getItem("username");
+let sessionPassword = sessionStorage.getItem("password");
+let sellerId = sessionStorage.getItem("id");
+let role = sessionStorage.getItem("role");
+
+ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
 
 $(document).ready(function () {
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
@@ -11,6 +13,7 @@ $(document).ready(function () {
     window.location.href = "index.html";
   } else {
     refreshInventoryList();
+    refreshOrderList();
     console.log("page is fully loaded");
     console.log(sellerId);
 
@@ -170,6 +173,22 @@ $(document).ready(function () {
 
       return;
     });
+
+    // Handle click events for each type of button
+    $(document).on("click", '[id^="confirm-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "SellerConfirmed");
+    });
+
+    $(document).on("click", '[id^="transport-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "Transporting");
+    });
+
+    $(document).on("click", '[id^="cancel-button-"]', function () {
+      const orderId = this.id.split("-")[2];
+      updateOrderStatus(orderId, "Canceled");
+    });
   }
 });
 
@@ -322,6 +341,12 @@ function createObject() {
   return productObj;
 }
 
+$("#signout").click(function () {
+  ifLoggedIn = "false";
+  sessionStorage.clear();
+  window.open("index.html");
+});
+
 //Validation for product input
 function isValidProduct(object) {
   var categoryArray = [
@@ -366,4 +391,149 @@ function isValidProduct(object) {
     return false;
   }
   return true;
+}
+
+function refreshOrderList() {
+  // get orders by username
+  $.ajax({
+    url: `/api/orders/buyfrom`,
+    // url: `/api/orders/?username=${username}`,
+    type: "GET",
+    headers: {
+      "x-auth-username": sessionUsername,
+      "x-auth-password": sessionPassword,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done(function (orders, status, xhr) {
+    // create a string variable to store all card html of orders
+    let orderCard = "";
+
+    for (let order of orders) {
+      // get orderitem info from orderitems table
+
+      $.ajax({
+        url: "/api/orderItem/order/" + order.id,
+        type: "GET",
+        headers: {
+          "x-auth-username": sessionUsername,
+          "x-auth-password": sessionPassword,
+          "x-auth-role": role,
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+        },
+      }).done(function (orderitems, status, xhr) {
+        orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col">
+                  <div class="card card-stepper" style="border-radius: 10px;">
+                    <div class="card-body p-4">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                          <span class="text-muted small">order #${order.id}</span>
+                          <span class="lead fw-normal" id="status">${order.status}</span>`;
+
+        for (let item of orderitems) {
+          orderCard += `<div style="display: flex; align-items: center;">
+                              <span class="fw-normal" id="productName">${item.productName}</span>
+                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
+                              <span class="fw-normal" id="productAmount" style="margin-left: 10px;">${item.amount}</span>
+                          </div>`;
+          // }
+        }
+        //dynamic button
+        let buttonType;
+        let buttonId;
+        let buttonHTML = "";
+        switch (order.status) {
+          case "Paid":
+            buttonType = "Confirm";
+            buttonId = `confirm-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+          case "SellerConfirmed":
+            buttonType = "Ship";
+            buttonId = `transport-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+          case "Received":
+            // buttonType = "Received";
+            // buttonId = `received-button-${order.id}`;
+            break;
+          case "Canceled":
+            // buttonType = "N/A";
+            // buttonId = `N/A-button-${order.id}`;
+            break;
+          default:
+            buttonType = "Cancel";
+            buttonId = `cancel-button-${order.id}`;
+            buttonHTML = `<div>
+            <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
+          </div>`;
+            break;
+        }
+
+        orderCard += `</div>
+        <div class="d-flex flex-column justify-content-between">
+          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
+          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
+          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
+          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
+          <span class="fw-normal small" id="Order summary">Delivery Info: ${order.deliveryInfo}</span>
+        </div>`;
+
+        orderCard +=
+          buttonHTML +
+          `    
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+      <div class="d-flex flex-column align-items-start" id="order time">
+        <span>${order.orderTime}</span><span>Order placed</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>`;
+
+        $("#orderList").html(orderCard);
+      });
+    }
+  });
+}
+
+// A general function to handle status updates
+function updateOrderStatus(orderId, status) {
+  $.ajax({
+    url: `api/orders/${orderId}`,
+    type: "PATCH",
+    data: {
+      status: status,
+    },
+    headers: {
+      "x-auth-username": sessionUsername,
+      "x-auth-password": sessionPassword,
+      "x-auth-role": role,
+    },
+    dataType: "json",
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText);
+    },
+  }).done(function () {
+    alert("Status updated succesfully");
+    refreshOrderList();
+  });
 }
