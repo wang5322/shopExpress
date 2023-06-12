@@ -322,6 +322,12 @@ function createObject() {
   return productObj;
 }
 
+$("#signout").click(function () {
+  ifLoggedIn = "false";
+  sessionStorage.clear();
+  window.open("index.html");
+});
+
 //Validation for product input
 function isValidProduct(object) {
   var categoryArray = [
