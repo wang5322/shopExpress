@@ -4,7 +4,7 @@ module.exports = (app) => {
     
     router.post("/", orderItem.addToOrder);
     router.delete('/:id([0-9]+)', orderItem.delete);
-    router.get('/', orderItem.getAllByOrderId);
+    router.get('/order/:id([0-9]+)', orderItem.getAllByOrderId);
     router.get('/:id([0-9]+)', orderItem.getOne);
     router.patch('/:id([0-9]+)', orderItem.modifyAmount);
     

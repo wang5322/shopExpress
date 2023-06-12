@@ -7,12 +7,6 @@ const CartItem = require("../models/cartItems.model");
 const db = require("../models/db");
 const Auth = require("../utils/auth");
 const { error } = require("npmlog");
-/*
-//add an order into orders table
-exports.create = (req, res) => {
-
-};
-*/
 
 //get all orders with username and/or sellername
 exports.getAll = (req, res) => {
@@ -55,9 +49,9 @@ exports.getOne = (req, res) => {
 }
 
 //confirm an order, calculate price and fees
-exports.confirmOrder = (req, res) => { }
+exports.buyerConfirm = (req, res) => { }
 
-//delete order
+//delete order -- to be fixed
 exports.delete = (req, res) => {
   Auth.execIfAuthValid(req, res, null, (req, res, user) => {
     switch (user.role) {
@@ -106,7 +100,7 @@ exports.modifyStatus = (req, res) => { }
 
 
 
-
+//add cartitem or product with amount to exist order if permitted, or create a new order
 exports.create = (req, res) => {
 
   let from;
