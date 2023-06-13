@@ -211,7 +211,7 @@ function refreshProductList() {
           break;
         }
         case "Pay": {
-          $(`#${buttonId}`).click(() => { payOrder(order.id) })
+          $(`#${buttonId}`).click(() => { showPayment(order.id,false) })
           break;
         }
         case "Received": {
@@ -450,7 +450,7 @@ function confirmOrder(orderId) {
    })
 }
 
-function payOrder(orderId) {
+function showPayment(orderId,isPaid) {
   $("#newordercards").hide()
   $("#payment").children().remove();
   $("#payment").show();
@@ -523,8 +523,8 @@ function payOrder(orderId) {
       <span class="fw-normal small" id="Order summary">Shipping Fee: ${orderForPay.shippingFee}</span>
       <span class="fw-normal small" id="Order summary">Taxes: ${orderForPay.taxes}</span>
       <span class="fw-normal small" id="Order summary">Grand Total: ${orderForPay.finalTotalPay}</span>
-      <textarea rows="3" type="text" readonly="readonly">${orderForPay.deliveryInfo}</textarea>
-      <span class="fw-normal small" id="Order summary">Payment Info: ${orderForPay.paymentInfo}</span>
+      <textarea rows="3" type="text" id="pay-deliveryInfo">${orderForPay.deliveryInfo}</textarea>
+      <span class="fw-normal small" id="Order summary" style="color:red">Payment Info: ${orderForPay.paymentInfo}</span>
       </div>`);
 
       $(`#paycard-div5-${orderForPay.id}`).append(`<form>
@@ -534,8 +534,14 @@ function payOrder(orderId) {
       <input type="text" id ="cardName" name="cardName"><br>
       <label for="cardCvv">Input card CVV:</label><br>
       <input type="text" id ="cardCvv" name="cardCvv"><br>
-      <button id="pay" onclick="paybycard(${orderForPay.id})" class="btn btn-outline-primary" type="button">Pay</button>
+      <button id="pay" onclick="paybycard(${orderForPay.id},false)" class="btn btn-outline-primary" type="button">Pay</button>
+      <button id="return" onclick="backToOrder()" class="btn btn-outline-primary" type="button">Back to order list</button>
       </form>`)
+
+      if (isPaid) {
+        $("#pay").prop('disabled', true)
+        $(`#paycard-div5-${orderForPay.id}`).append("<p style='color:red'>Please keep your paymentInfo,<br>this is your important proof of payment</p>")
+      }
     
     }
 
@@ -546,7 +552,7 @@ function payOrder(orderId) {
 }
 
 function paybycard(orderId) {
-  return alert(orderId)
+  
   $.ajax({
     url: `/api/orders/pay/${orderId}`,
     // url: `/api/orders/?username=${username}`,
@@ -557,16 +563,20 @@ function paybycard(orderId) {
       "x-auth-role": role,
     },
     dataType: "JSON",
-    // data: { buyerName: username, sellerName: null },
+    data: { deliveryInfo: $("#pay-deliveryInfo").val()},
     error: function (jqxhr, status, errorThrown) {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     },
   }).done(function (orders, status, xhr) {
+    showPayment(orderId,true)
 
 
   })
-  
-
+}
+function backToOrder (){
+  $("#newordercards").show()
+  refreshProductList()
+  $("#payment").hide();
 }
 
 function receiveOrder(orderId) {

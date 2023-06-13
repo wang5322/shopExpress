@@ -226,15 +226,17 @@ exports.payOrder = (req, res) => {
           if (data.length == 0) {
             return res.status(500).send({message:"order not found"})
           } else {
-            if (!(data[0].buyerId==user.id && data[0].status == "buyerConfirmed")) {
+            if (!(data[0].buyerId==user.id && data[0].status == "BuyerConfirmed")) {
               return res.status(500).send({message:"pay not permitted"})
             } else {
               let order = data[0];
+              order.status = "Paid";
               order.paymentInfo = randomString(16);
               if (req.body.deliveryInfo) {
                 order.deliveryInfo = req.body.deliveryInfo;
               };
-              Orders.updateById(date[0].id, order, (err, data) => {
+              //console.log(order)
+              Orders.updateById(req.params.id, order, (err, data) => {
                 if (err) {
                   return res.status(500).send({
                     message: err.message || "get order error",
@@ -273,7 +275,7 @@ function randomString(e) {
   var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
   a = t.length,
   n = "";
-  for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+  for (let i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
   return n
 }
 
