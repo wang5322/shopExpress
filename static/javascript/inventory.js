@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     $("#add").on("click", function () {
       var productObj = createObject();
-      isValidProduct(productObj);
+      isValidProduct(product);
 
       $.ajax({
         url: "/api/products",
@@ -62,7 +62,10 @@ $(document).ready(function () {
       var id = $("#id").html();
       console.log(id);
       var product = creatObject();
-      isValidProduct(product);
+      if (!isValidProduct(product)) {
+        return;
+      }
+
       $.ajax({
         url: "/api/products/" + id,
         type: "PUT",
@@ -359,15 +362,13 @@ function isValidProduct(object) {
     "Baby",
   ];
   if (!categoryArray.includes(object.category)) {
-    // $("#myModalBody").html(
-    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
-    // );
-    // $("#myModal").modal("show");
-    alert(
+    $("#myModalBody").html(
       "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
     );
-
-    return false;
+    $("#myModal").modal("show");
+    // alert(
+    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
+    // );
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
     // $("#myModalBody").html("Product Code needs to be 1-45 characters");
