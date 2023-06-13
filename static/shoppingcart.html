@@ -102,7 +102,7 @@
         <span id="subtotalSpan"></span>
       </div>
       <div class="text-center">
-        <button type="button" class="btn btn-secondary my-2">Submit order</button>
+        <button type="button" id="submitOrder" class="btn btn-secondary my-2">Submit order</button>
       </div>
     </div>
 
@@ -118,12 +118,21 @@
     crossorigin="anonymous"></script>
   <script>
     let ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
-    let items = [];
+    // initiate page-scope variables
+    // these varaibles resets when page reloads
+    let cartItems = [];
+    let carts = [];
+
     $(document).ready(function () {
+      // retrieve session data
       ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
       username = sessionStorage.getItem("username");
       password = sessionStorage.getItem('password');
       role = sessionStorage.getItem('role');
+
+      // reset page-scoped variables
+      cartItems = [];
+      carts = [];
 
       if (ifLoggedIn !== "true") {
         alert("Access Forbidden: you are not logged in!");
@@ -146,7 +155,8 @@
         error: function (jqxhr, status, errorThrown) {
           alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
         }
-      }).done(function (carts, status, xhr) {
+      }).done(function (data, status, xhr) {
+        carts = data;
         // get item details of each cart
         for (cart of carts) {
           $.ajax({
@@ -160,12 +170,11 @@
             error: function (jqxhr, status, errorThrown) {
               alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
             }
-          }).done(function (cartItems, status, xhr) {
+          }).done(function (data, status, xhr) {
             let cartCard = "";
-            items = cartItems;
-            console.log(items);
-            for (var i = 0; i < cartItems.length; i++) {
-              let cartItem = cartItems[i];
+            cartItems = cartItems.concat(data);
+
+            for (cartItem of data) {
               $.ajax({
                 url: "/api/products/" + cartItem.productId,
                 type: "GET",
@@ -194,7 +203,7 @@
                   let image = allImages[0];
                   cartCard += `<div class="card mb-3" style="max-width: 800px; max-height:300px;">
                                 <div class="form-check">
-                                  <input id="${i}" class="form-check-input " type="checkbox" value=""/>
+                                  <input id="${cartItem.id}" class="form-check-input " type="checkbox" value=""/>
                                 </div>
                                 <div class="row g-0">
                                   <div class="col-md-4 ">
@@ -209,17 +218,16 @@
                                       <h5 class="card-title">
                                         ${cartItem.productName} </h5>
                                       <h4>Price: ${cartItem.price}</h4>
-                                      <em class="card-text">ProductId: ${cartItem.productCode}</em>
+                                        <p class="card-text">ProductId: ${cartItem.productCode}</p>                                      
                                       <input class="input-amout" type="number" min="0" value="${cartItem.amount}">
-                                      <button id="delete"type="button" class="btn btn-secondary btn-sm">Delete</button>
+                                      <button id="delete" type="button" class="btn btn-secondary btn-sm">Delete</button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>`;
-                  $("#container-carts").html(cartCard);
+                  $("#container-carts").append(cartCard);
                 })
-
               });
             }
           })
@@ -227,12 +235,15 @@
       })
     }
 
-    $('#shoppingCart').on("click", '#delete', function () {
-      let checkedboxes = $(".delete-order:checked");
-      for (box of checkedboxes) {
+    $('#container-carts').on("click", '#delete', function () {
+      let checkeds = $(".form-check-input:checked");
+      checkeds.each(function(index){
+        let i = $(this).id;
         $.ajax({
-          url: "/api/cartItem/" +,
+          url: "/api/cartItem/",
           type: "DELETE",
+          dataType: "JSON",
+          data: cartItems.find(x => x.id == i),
           headers: {
             'x-auth-username': sessionStorage.getItem('username'),
             'x-auth-password': sessionStorage.getItem('password'),
@@ -242,10 +253,43 @@
             alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
           }
         }).done(function () {
-          refreshOrderList(searchedUsername);
+          // remove this cart item from front-end array
+          cartItems.splice(i, 1);
+          refreshCart();
         })
       }
+      ) 
     });
+
+    $("#submitOrder").on("click", function(){
+      let checkeds = $(".form-check-input:checked");
+      checkeds.each(function(index){
+        let i = $(this).id;
+        let cartItem = cartItems.find(x => x.id == i);
+        let order = {
+          id: i,
+          productId: cartItem.productId,
+          amount: cartItem.amount
+        };
+        // add order to order table
+        $.ajax({
+          url: "/api/order/",
+          type: "POST",
+          dataType: "JSON",
+          data: order,
+          headers: {
+            'x-auth-username': sessionStorage.getItem('username'),
+            'x-auth-password': sessionStorage.getItem('password'),
+            'x-auth-role': sessionStorage.getItem('role')
+          },
+          error: function (jqxhr, status, errorThrown) {
+            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+          }
+        }).done(function(){
+          refreshCart();          
+        })
+      })
+    })
 
 
     $("#container-carts").on("change", ".form-check-input", function () {
@@ -255,6 +299,8 @@
     $("#container-carts").on("change", ".input-amout", function () {
       calculateSubTotal();
     })
+
+    
 
     function calculateSubTotal() {
       let checkeds = $(".form-check-input:checked");
