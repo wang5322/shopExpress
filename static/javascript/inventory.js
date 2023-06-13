@@ -66,8 +66,10 @@ $(document).ready(function () {
     $("#update").on("click", function () {
       var id = $("#id").html();
       console.log(id);
-      var product = creatObject();
-      isValidProduct(product);
+      var product = createObject();
+      if (!isValidProduct(product)) {
+        return;
+      }
 
       $.ajax({
         url: "/api/products/" + id,

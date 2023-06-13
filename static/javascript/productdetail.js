@@ -99,7 +99,7 @@ function refreshProducDetail() {
           },
           error: function (error) {
             $("#myModalBody").html(
-              "Error adding product to cart. Please login first!"
+              "Error adding product to cart. Please login as buyer first!"
             );
             $("#myModal").modal("show");
             setTimeout(function () {
