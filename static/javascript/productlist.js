@@ -1,5 +1,6 @@
 var myParam = "";
-// var myParam2 = "";
+// var searchFor = "";
+
 let sessionUsername = sessionStorage.getItem("username");
 let sessionPassword = sessionStorage.getItem("password");
 let sellerId = sessionStorage.getItem("id");
@@ -8,37 +9,19 @@ let role = sessionStorage.getItem("role");
 $(document).ready(function () {
   var urlParams = new URLSearchParams(window.location.search);
   myParam = urlParams.get("category");
+  // searchFor = urlParams.get("searchFor");
+
   // myParam2 = urlParams.get("searchFor");
   console.log(myParam);
+  // console.log(searchFor);
   refreshProductList();
-
-  // $(`#addToCart-${product.id}`).click(function () {
-  //   var selectedQuantity = $(`#quantitySelect-${product.id}`).val();
-  //   console.log("Selected Quantity: ", selectedQuantity);
-  //   $.ajax({
-  //     url: `/api/carts`,
-  //     type: "POST",
-  //     headers: {
-  //       "x-auth-username": sessionUsername,
-  //       "x-auth-password": sessionPassword,
-  //       "x-auth-role": role,
-  //     },
-  //     data: {
-  //       amount: selectedQuantity,
-  //       id: product.id,
-  //     },
-  //     success: function (response) {
-  //       $("#myModalBody").html("Product added to cart successfully!");
-  //       $("#myModal").modal("show");
-  //       console.log("Product added to cart successfully!");
-  //     },
-  //     error: function (error) {
-  //       $("#myModalBody").html("Error adding product to cart");
-  //       $("#myModal").modal("show");
-  //       console.log("Error adding product to cart:", error);
-  //     },
-  //   });
-  // });
+  // if (myParam && searchFor) {
+  //   var getUrl = `/api/products/?category=${myParam}&searchFor=${searchFor}`;
+  // } else if (searchFor) {
+  //   getUrl = `/api/products/?searchFor=${searchFor}`;
+  // } else if (myParam) {
+  //   getUrl = `/api/products/?category=${myParam}`;
+  // }
 
   function refreshProductList() {
     $.ajax({
@@ -79,7 +62,7 @@ $(document).ready(function () {
                 <a class="btn btn-outline-dark mt-auto" href="productdetail.html?productId=${product.id}">
                   View details
                 </a><select id="quantitySelect-${product.id}" class="form-control text-center me-3" style="width: 60px; display: inline;">
-                </select><button id="addToCart-${product.id}" class="btn btn-dark mt-1">
+                </select><button id="addToCart-${product.id}" data-product-id="${product.id}" class="btn btn-dark mt-1">
                   Add to cart
                 </button>
               </div>
@@ -96,7 +79,14 @@ $(document).ready(function () {
           // add events to addToCart button
           $(`#addToCart-${product.id}`).click(function () {
             var selectedQuantity = $(`#quantitySelect-${product.id}`).val();
-            console.log("Selected Quantity: ", selectedQuantity);
+
+            console.log(
+              "Product ID",
+              product.id,
+              "Selected Quantity: ",
+              selectedQuantity
+            );
+            var productId = $(this).data("product-id");
             $.ajax({
               url: `/api/carts`,
               type: "POST",
@@ -107,7 +97,7 @@ $(document).ready(function () {
               },
               data: {
                 amount: selectedQuantity,
-                id: product.id,
+                id: productId,
               },
               success: function (response) {
                 $("#myModalBody").html("Product added to cart successfully!");
@@ -115,7 +105,9 @@ $(document).ready(function () {
                 console.log("Product added to cart successfully!");
               },
               error: function (error) {
-                $("#myModalBody").html("Error adding product to cart");
+                $("#myModalBody").html(
+                  "Error adding product to cart. Please login first!"
+                );
                 $("#myModal").modal("show");
                 console.log("Error adding product to cart:", error);
               },

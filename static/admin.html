@@ -32,7 +32,7 @@
               <a class="btn btn-warning btn-sm mt-1 mx-1 px-2" id="signout">Sign out</a>
             </li>
             <li class="nav-item ">
-              <a href="#" target="_blank"><i class="bi bi-cart-check-fill display-6 icon-link mx-2"></i></a>
+              <a href="#" target="_self"><i class="bi bi-cart-check-fill display-6 icon-link mx-2"></i></a>
             </li>
           </ul>
         </div>
@@ -75,14 +75,25 @@
         <table id="tableOrders" class="table table-bordered">
         </table>
       </div>
-      <div id="productManage">
-        <h2>Product management</h2>
-        <table id="tableProducts" class="table table-bordered">
-        </table>
-      </div>
     </div>
 
   </section>
+
+  <!-- Modal -->
+  <div class="modal fade" id="AlertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Alert</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" id="CloseModal" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
   <script src="./javascript/admin.js"></script>
 </body>

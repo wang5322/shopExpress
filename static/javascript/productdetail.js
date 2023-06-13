@@ -60,8 +60,8 @@ function refreshProducDetail() {
         product.productDesc +
         ` </p>
           <div class="d-flex">
-              <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" name="inputQuantity" />
-              <button id="addToCart"class="btn btn-warning flex-shrink-0" type="button">
+              <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" name="inputQuantity-${product.id}" />
+              <button id="addToCart-${product.id}" data-product-id="${product.id}"class="btn btn-warning flex-shrink-0" type="button">
                   <i class="bi-cart-fill me-1"></i>
                   Add to cart
               </button>
@@ -70,9 +70,16 @@ function refreshProducDetail() {
 
       $("#productContainer").html(result);
 
-      $("#addToCart").on("click", function () {
-        var selectedQuantity = $("input[name=inputQuantity]").val();
+      $(`#addToCart-${product.id}`).on("click", function () {
+        var selectedQuantity = $(
+          `input[name=inputQuantity-${product.id}]`
+        ).val();
         console.log("Selected Quantity: ", selectedQuantity);
+        var productId = $(this).data("product-id");
+        console.log("productId: ", productId);
+        console.log(sessionUsername);
+        console.log(sessionPassword);
+        console.log(role);
         $.ajax({
           url: `/api/carts`,
           type: "POST",
@@ -83,7 +90,7 @@ function refreshProducDetail() {
           },
           data: {
             amount: selectedQuantity,
-            id: product.id,
+            id: productId,
           },
           success: function (response) {
             $("#myModalBody").html("Product added to cart successfully!");
@@ -91,7 +98,9 @@ function refreshProducDetail() {
             console.log("Product added to cart successfully!");
           },
           error: function (error) {
-            $("#myModalBody").html("Error adding product to cart");
+            $("#myModalBody").html(
+              "Error adding product to cart. Please login first!"
+            );
             $("#myModal").modal("show");
             console.log("Error adding product to cart:", error);
           },
