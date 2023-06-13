@@ -1,4 +1,8 @@
 var myParam = "";
+let sessionUsername = sessionStorage.getItem("username");
+let sessionPassword = sessionStorage.getItem("password");
+let sellerId = sessionStorage.getItem("id");
+let role = sessionStorage.getItem("role");
 
 $(document).ready(function () {
   var urlParams = new URLSearchParams(window.location.search);
@@ -31,33 +35,6 @@ function refreshProducDetail() {
         imagepath = "api/images/38";
       }
 
-      // // loop the info of products
-
-      // var product = response;
-      // var imagepath;
-      // var imageId;
-
-      // $.ajax({
-      //   // future: headers for authentication, url parameters for sorting, etc.
-      //   url: `/api/images/?productId=${myParam}`,
-      //   type: "GET",
-      //   async: false,
-      //   dataType: "json",
-      //   error: function (jqxhr, status, errorThrown) {
-      //     alert("AJAX error: " + jqxhr.responseText);
-      //   },
-      // }).done(function (image) {
-      //   if (image.length > 0) {
-      //     imagepath = `api/images/${image[0].id}`;
-      //     imageId = image[0].id;
-      //     console.log(imagepath);
-      //     console.log(image);
-      //   } else {
-      //     // Handle case when no images are returned
-      //     imagepath = "api/images/38";
-      //   }
-      // });
-
       // insert to the DOM
       result +=
         `<div class="col-md-6"><img id="imageUrl" class="card-img-top mb-5 mb-md-0" src="` +
@@ -83,7 +60,7 @@ function refreshProducDetail() {
         product.productDesc +
         ` </p>
           <div class="d-flex">
-              <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+              <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" name="inputQuantity" />
               <button id="addToCart"class="btn btn-warning flex-shrink-0" type="button">
                   <i class="bi-cart-fill me-1"></i>
                   Add to cart
@@ -92,6 +69,34 @@ function refreshProducDetail() {
       </div>`;
 
       $("#productContainer").html(result);
+
+      $("#addToCart").on("click", function () {
+        var selectedQuantity = $("input[name=inputQuantity]").val();
+        console.log("Selected Quantity: ", selectedQuantity);
+        $.ajax({
+          url: `/api/carts`,
+          type: "POST",
+          headers: {
+            "x-auth-username": sessionUsername,
+            "x-auth-password": sessionPassword,
+            "x-auth-role": role,
+          },
+          data: {
+            amount: selectedQuantity,
+            id: product.id,
+          },
+          success: function (response) {
+            $("#myModalBody").html("Product added to cart successfully!");
+            $("#myModal").modal("show");
+            console.log("Product added to cart successfully!");
+          },
+          error: function (error) {
+            $("#myModalBody").html("Error adding product to cart");
+            $("#myModal").modal("show");
+            console.log("Error adding product to cart:", error);
+          },
+        });
+      });
     },
   });
 }
