@@ -276,6 +276,7 @@ exports.getOne = (req, res) => {
 
 //modify amount of an orderItem
 exports.modifyAmount = (req, res) => {
+    
     //validata req
     if (!(req.body.amount)) {
         return res.status(500).send({ message: "no amount" })
@@ -301,7 +302,7 @@ exports.modifyAmount = (req, res) => {
                                         return res.status(500).send({ message: "get order item failed" })
                                     } else {
                                         let orderItem = data[0];
-                                        orderItem.amount = req.data.amount;
+                                        orderItem.amount = req.body.amount;
                                         //modify amount
                                         OrderItems.updateById(req.params.id, orderItem, (err, data) => {
                                             if (err) {
