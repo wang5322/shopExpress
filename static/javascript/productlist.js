@@ -76,6 +76,12 @@ $(document).ready(function () {
             $(`#quantitySelect-${product.id}`).append(new Option(i, i));
           }
 
+          $("#formSearch").submit(function (event) {
+            event.preventDefault();
+            var searchFor = $('#formSearch :input').val();
+            window.location.href = `productlist.html?category=${searchFor}`;
+          });
+
           // add events to addToCart button
           $(`#addToCart-${product.id}`).click(function () {
             var selectedQuantity = $(`#quantitySelect-${product.id}`).val();
@@ -117,4 +123,10 @@ $(document).ready(function () {
       },
     });
   } // refreshProductList ends here
+
+  $("#formSearch").submit(function (event) {
+    event.preventDefault();
+    var searchFor = $('#formSearch :input').val();
+    window.location.href = `productlist.html?category=${searchFor}`;
+  });
 });
