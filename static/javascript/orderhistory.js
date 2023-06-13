@@ -9,44 +9,13 @@ $(document).ready(function () {
   role = sessionStorage.getItem("role");
 
   if (ifLoggedIn !== "true") {
-    alert("Access Forbidden: you are not logged in!");
+    //alert("Access Forbidden: you are not logged in!");
+    $(".modal-body").html("Access Forbidden: you are not logged in!");
+    $("#AlertModal").modal("show");
     window.location.href = "index.html";
   } else {
     refreshProductList();
   }
-
-  //add button functions here
-
-
-
-
-
-
-  //button functions end
-
-
-
-
-
-
-
-  // confirm button
-  $(document).on("click", '[id^="confirm-button-"]', function () {
-    const orderId = this.id.split("-")[2];
-
-    //status switch to BuyerConfirmed
-    $.ajax({
-      url: `api/orders/${orderId}`,
-      type: "PATCH",
-      data: {
-        status: "BuyerConfirmed", // TODO: finish the ajax , now the patch controller not finished
-      },
-    });
-  });
-
-  // pay button
-
-  //received-button
 });
 
 function refreshProductList() {
@@ -101,7 +70,7 @@ function refreshProductList() {
         for (let item of orderitems) {
           $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;"></div>`)
           //$(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;"></div>`)
-            $(`#itemDiv-${item.id}`).append(`
+          $(`#itemDiv-${item.id}`).append(`
             <span class="fw-normal" id="item-id-${item.id}"># ${item.id}</span>
             <span class="fw-normal" id="item-productCode-${item.id}">Code: ${item.productCode}</span>
             <span class="fw-normal" id="item-productName-${item.id}">Product: ${item.productName}</span>
@@ -113,7 +82,7 @@ function refreshProductList() {
             <button id="item-delete-${item.id}" onclick="itemDelete(${item.id})" class="btn btn-outline-primary" type="button">delete</button>
             `)
           
-            $(`#itemDiv-${item.id}`).append(`<button id="item-refresh-${item.id}" onclick="itemRefresh(${item.id})" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
+          $(`#itemDiv-${item.id}`).append(`<button id="item-refresh-${item.id}" onclick="itemRefresh(${item.id})" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
 
 
           if (order.status === "unSubmitted") {
@@ -130,9 +99,8 @@ function refreshProductList() {
                 "x-auth-role": role,
               },
               error: function (jqxhr, status, errorThrown) {
-                alert(
-                  "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
-                );
+                $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                $("#AlertModal").modal("show");
               },
             }).done(function (orderItmeMatched, status, xhr) {
             
@@ -154,10 +122,10 @@ function refreshProductList() {
 
           if (order.status == "unSubmitted") {
             $(`#item-modify-amount-${item.id}`).prop("disabled", false)
-            $(`item-delete-${item.id}`).prop("disabled", false)
-          } else  {
+            $(`#item-delete-${item.id}`).prop("disabled", false)
+          } else {
             $(`#item-modify-amount-${item.id}`).prop("disabled", true)
-            $(`item-delete-${item.id}`).prop("disabled", true)
+            $(`#item-delete-${item.id}`).prop("disabled", true)
           }
             
           
@@ -221,7 +189,7 @@ function refreshProductList() {
           break;
         }
         case "Pay": {
-          $(`#${buttonId}`).click(() => { showPayment(order.id,false) })
+          $(`#${buttonId}`).click(() => { showPayment(order.id, false) })
           break;
         }
         case "Received": {
@@ -243,173 +211,8 @@ function refreshProductList() {
       
 
     
-      }//dom version end
-      
-    
-    
-    
-    
-    
-/*
-    // string version create a string variable to store all card html of orders
-    for (let order of orders) {
-      // get orderitem info from orderitems table
-
-      $.ajax({
-        url: "/api/orderItem/order/" + order.id,
-        type: "GET",
-        headers: {
-          "x-auth-username": username,
-          "x-auth-password": password,
-          "x-auth-role": role,
-        },
-        error: function (jqxhr, status, errorThrown) {
-          alert(
-            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
-          );
-        },
-      }).done(function (orderitems, status, xhr) {
-        orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col">
-                  <div class="card card-stepper" style="border-radius: 10px;">
-                    <div class="card-body p-4">
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex flex-column">
-                          <span class="text-muted small">order #${order.id}</span>
-                          <span class="lead fw-normal" id="status">${order.status}</span>
-                          <span class="lead fw-normal" id="sellerName">Seller: ${order.sellerName}</span>
-                          `;
-
-        for (let item of orderitems) {
-          if (order.status === "unSubmitted") {
-            orderCard += `<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
-                              <span class="fw-normal" id="item-id-${item.id}"># ${item.id}</span>
-                              <span class="fw-normal" id="productCode-${item.id}">Code: ${item.productCode}</span>
-                              <span class="fw-normal" id="productName-${item.id}">Product: ${item.productName}</span>
-                              <span class="fw-normal" id="price-${item.id}">Price: ${item.price}</span>
-                              <span class="fw-normal" id="amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
-                              <select id="productAmount" name="productAmount" style="margin-left: 10px;">`;
-                              //get matched status                 
-            //check matched , add refresh button if not matched
-            $.ajax({
-              url: "/api/orderItem/match/" + item.id,
-              type: "GET",
-              headers: {
-                "x-auth-username": username,
-                "x-auth-password": password,
-                "x-auth-role": role,
-              },
-              error: function (jqxhr, status, errorThrown) {
-                alert(
-                  "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
-                );
-              },
-            }).done(function (orderItmeMatched, status, xhr) {
-              console.log($(`#itemDiv-${item.id}`))
-              if (!(orderItmeMatched.matched)) {
-                $(`#itemDiv-${item.id}`).css({ "color": "red" });
-                $(`#itemDiv-${item.id}`).append(`<button id="refresh-${item.id}" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
-              } else {
-                $(`#itemDiv-${item.id}`).css({"color":"green"});
-              }
-            }
-            )
-            
-
-            // Populate select options from 1 to 30
-            // todo : number could be others
-            for (let i = 1; i <= 30; i++) {
-              if (i === item.amount) {
-                // If current count equals to the amount, make it selected
-                orderCard += `<option value="${i}" selected>${i}</option>`;
-              } else {
-                orderCard += `<option value="${i}">${i}</option>`;
-              }
-            }
-            orderCard += `</select>
-                          <button id="modify-amount-${item.id}" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">Modify Amount</button>
-                        </div>`;
-          } else {
-            orderCard += `<div style="display: flex; align-items: center;">
-                              <span class="fw-normal" id="productName">${item.productName}</span>
-                              <span class="fw-normal" id="amountLabel" style="margin-left: 10px;">Amount:</span>
-                              <span class="fw-normal" id="productAmount" style="margin-left: 10px;">${item.amount}</span>
-                          </div>`;
-          }
-        }
-        //dynamic button
-        let buttonType;
-        let buttonId;
-        switch (order.status) {
-          case "unSubmitted":
-            buttonType = "Confirm";
-            buttonId = `confirm-button-${order.id}`;
-            break;
-          case "BuyerConfirmed":
-            buttonType = "Pay";
-            buttonId = `pay-button-${order.id}`;
-            break;
-          /*case "Received":
-            buttonType = "unshown";
-            buttonId = `unshown-button-${order.id}`;
-            style.visibility = "hidden"
-            break;
-            *//*
-          default:
-            buttonType = "Receive";
-            buttonId = `receive-button-${order.id}`;
-            break;
-        }
-
-        // orderCard += `<div>
-        //                 <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
-        //               </div>`;
-
-        orderCard += `</div>
-        <div class="d-flex flex-column justify-content-between">
-          <span class="fw-normal pt-5" id="Order summary">Order summary</span>
-          <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${order.totalPrice}</span>
-          <span class="fw-normal small" id="Order summary">Shipping Fee: ${order.shippingFee}</span>
-          <span class="fw-normal small" id="Order summary">Taxes: ${order.taxes}</span>
-          <span class="fw-normal small" id="Order summary">Grand Total: ${order.finalTotalPay}</span>
-        </div>`;
-
-        // add cancel order button according to order.status
-        if (
-          order.status === "unSubmitted" ||
-          order.status === "BuyerConfirmed" /*||
-          order.status === "Received"*//*
-        ) {
-          orderCard += `<div>
-          <button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button">Delete</button>
-        </div>`;
-        }
-
-        orderCard += `<div>
-      <button id="${buttonId}" class="btn btn-outline-primary" type="button">${buttonType}</button>
-    </div>
-    </div>
-    <div class="d-flex flex-row justify-content-between align-items-center align-content-center">
-    </div>
-    <div class="d-flex flex-row justify-content-between align-items-center">
-      <div class="d-flex flex-column align-items-start" id="order time">
-        <span>${order.orderTime}</span><span>Order placed</span>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-</div>`;
-
-        $("#ordercards").html(orderCard);
-      })
-    }
-   
-    //string version code end
-    $("#ordercards").hide();
-    */
-
-  });
+    }//dom version end
+  })
 }
 
 $("#signout").click(function () {
@@ -431,7 +234,8 @@ function deleteOrder(orderId) {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -453,7 +257,8 @@ function confirmOrder(orderId) {
       deliveryInfo: $(`#deliveryInfo-${orderId}`).val()
     },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -476,7 +281,8 @@ function showPayment(orderId,isPaid) {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
     let orderForPay
@@ -506,9 +312,8 @@ function showPayment(orderId,isPaid) {
           "x-auth-role": role,
         },
         error: function (jqxhr, status, errorThrown) {
-          alert(
-            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
-          );
+          $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+          $("#AlertModal").modal("show");
         },
       }).done(function (orderitems, status, xhr) {
         console.log(orderitems)
@@ -575,7 +380,8 @@ function paybycard(orderId) {
     dataType: "JSON",
     data: { deliveryInfo: $("#pay-deliveryInfo").val()},
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
     showPayment(orderId,true)
@@ -602,7 +408,8 @@ function receiveOrder(orderId) {
     dataType: "JSON",
     data: { status:"Received" },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -623,7 +430,8 @@ function itemDelete(itemId) {
     dataType: "JSON",
     //data: { status:"Received" },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -650,7 +458,8 @@ function itemAmount(itemId) {
       amount: Number($(`#item-amount-${itemId}`).val())
     },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -670,7 +479,8 @@ function itemRefresh(itemId) {
     dataType: "JSON",
     //data: { amount:Number($(`#item-amount-${itemId}`).value()) },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
