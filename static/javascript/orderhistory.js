@@ -1,6 +1,6 @@
 let ifLoggedIn;
 let username, password, role;
-$("#payOrder").hide();
+$("#payment").hide();
 $(document).ready(function () {
 
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
@@ -99,19 +99,25 @@ function refreshProductList() {
         },
       }).done(function (orderitems, status, xhr) {
         for (let item of orderitems) {
-          if (order.status === "unSubmitted") {
-            $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
+          $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;"></div>`)
+          //$(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;"></div>`)
+            $(`#itemDiv-${item.id}`).append(`
             <span class="fw-normal" id="item-id-${item.id}"># ${item.id}</span>
             <span class="fw-normal" id="item-productCode-${item.id}">Code: ${item.productCode}</span>
             <span class="fw-normal" id="item-productName-${item.id}">Product: ${item.productName}</span>
             <span class="fw-normal" id="item-price-${item.id}">Price: ${item.price}</span>
             <span class="fw-normal" id="item-amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
-            <input type="number" style="width:60px" id="item-amount-${item.id}" value=${item.amount}>
+            <span class="fw-normal" id="item-amount-${item.id}" style="margin-left: 10px;">${item.amount}</span>
+            <input type="number" style="width:60px" id="item-amount-input-${item.id}" value=${item.amount}>
             <button id="item-modify-amount-${item.id}" onclick="itemAmount(${item.id})" class="btn btn-outline-primary" type="button">Modify</button>
             <button id="item-delete-${item.id}" onclick="itemDelete(${item.id})" class="btn btn-outline-primary" type="button">delete</button>
-            </div>
             `)
+          
+            $(`#itemDiv-${item.id}`).append(`<button id="item-refresh-${item.id}" onclick="itemRefresh(${item.id})" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
 
+
+          if (order.status === "unSubmitted") {
+            $(`#item-amount-${item.id}`).hide();
             //match the oringinal paroduct
 
             //check matched , add refresh button if not matched
@@ -129,27 +135,21 @@ function refreshProductList() {
                 );
               },
             }).done(function (orderItmeMatched, status, xhr) {
-              console.log($(`#itemDiv-${item.id}`))
-              if (!(orderItmeMatched.matched)) {
-                $(`#itemDiv-${item.id}`).css({ "color": "red" });
-                $(`#itemDiv-${item.id}`).append(`<button id="item-refresh-${item.id}" onclick="itemRefresh(${item.id})" class="btn btn-outline-primary" type="button" style="margin-left: 10px;">refresh</button>`)
-              } else {
+            
+              if (orderItmeMatched.matched) {
                 $(`#itemDiv-${item.id}`).css({ "color": "green" });
+                $(`#item-refresh-${item.id}`).prop('disabled', true)
+              } else {
+                $(`#itemDiv-${item.id}`).css({ "color": "red" });
+                $(`#item-refresh-${item.id}`).prop('disabled', false)
               }
             }
             ) //match end
 
           } else {
-            $(`#card-div6-${order.id}`).append(`<div id="itemDiv-${item.id}" style="display: flex; align-items: center;">
-            <span class="fw-normal" id="item-productName-${item.id}">${item.productName}</span>
-            <span class="fw-normal" id="item-amountLabel-${item.id}" style="margin-left: 10px;">Amount:</span>
-            <span class="fw-normal" id="item-amount-${item.id}" style="margin-left: 10px;">${item.amount}</span>
-        </div>`)
+            $(`#item-amount-input-${item.id}`).hide();
+            $(`#item-refresh-${item.id}`).prop('disabled', true)
             
-            
-            
-
-
           }
         }
       })//orderItems end
@@ -452,7 +452,8 @@ function confirmOrder(orderId) {
 
 function payOrder(orderId) {
   $("#newordercards").hide()
-  $("#payOrder").show();
+  $("#payment").children().remove();
+  $("#payment").show();
   $.ajax({
     url: `/api/orders/${orderId}`,
     // url: `/api/orders/?username=${username}`,
@@ -463,13 +464,109 @@ function payOrder(orderId) {
       "x-auth-role": role,
     },
     dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     },
-  }).done((data, status, xhr) => {
-      refreshProductList();
+  }).done(function (orders, status, xhr) {
+    let orderForPay
+    console.log({orderId,orders})
+    if (orders[0].id) {
+      orderForPay = orders[0];
+      console.log(orderForPay);
+      $("#payment").append(`<div id="paycard-div1-${orderForPay.id}" class="row d-flex justify-content-center align-items-center h-100"></div>`);
+      $(`#paycard-div1-${orderForPay.id}`).append(`<div id="paycard-div2-${orderForPay.id}" class="col"></div>`)
+      $(`#paycard-div2-${orderForPay.id}`).append(`<div id="paycard-div3-${orderForPay.id}" class="card card-stepper" style="border-radius: 10px;"></div>`)
+      $(`#paycard-div3-${orderForPay.id}`).append(`<div id="paycard-div4-${orderForPay.id}" class="card-body p-4"></div>`)
+      $(`#paycard-div4-${orderForPay.id}`).append(`<div id="paycard-div5-${orderForPay.id}" class="d-flex justify-content-between align-items-center"></div>`)
+      $(`#paycard-div5-${orderForPay.id}`).append(`<div id="paycard-div6-${orderForPay.id}" class="d-flex flex-column"></div>`)
+
+      $(`#paycard-div6-${orderForPay.id}`).append(`<span class="text-muted small">order #${orderForPay.id}</span>`)
+      $(`#paycard-div6-${orderForPay.id}`).append(`<span class="lead fw-normal" >${orderForPay.status}</span>`)
+      $(`#paycard-div6-${orderForPay.id}`).append(`<span class="lead fw-normal" >Seller: ${orderForPay.sellerName}</span>`)
+
+
+      //get orderItems
+      $.ajax({
+        url: "/api/orderItem/order/" + orderId,
+        type: "GET",
+        headers: {
+          "x-auth-username": username,
+          "x-auth-password": password,
+          "x-auth-role": role,
+        },
+        error: function (jqxhr, status, errorThrown) {
+          alert(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+        },
+      }).done(function (orderitems, status, xhr) {
+        console.log(orderitems)
+        for (let item of orderitems) {
+          console.log(item)
+          $(`#paycard-div6-${orderForPay.id}`).append(`<div id="paycard-itemDiv-${item.id}" style="display: flex; align-items: center;"></div>`)
+          $(`#paycard-itemDiv-${item.id}`).append(`
+              <span class="fw-normal"># ${item.id}</span>
+              <span class="fw-normal">Code: ${item.productCode}</span>
+              <span class="fw-normal">Product: ${item.productName}</span>
+              <span class="fw-normal">Price: ${item.price}</span>
+              <span class="fw-normal" style="margin-left: 10px;">Amount:</span>
+              <span class="fw-normal" style="margin-left: 10px;">${item.amount}</span>
+              `)
+        }
+      })//pay order Items end
+
+
+      $(`#paycard-div5-${orderForPay.id}`).append(`<div class="d-flex flex-column justify-content-between">
+      <span class="fw-normal pt-5" id="Order summary">Order summary</span>
+      <span class="fw-normal small pt-4" id="Order summary">Item(s) Subtotal: ${orderForPay.totalPrice}</span>
+      <span class="fw-normal small" id="Order summary">Shipping Fee: ${orderForPay.shippingFee}</span>
+      <span class="fw-normal small" id="Order summary">Taxes: ${orderForPay.taxes}</span>
+      <span class="fw-normal small" id="Order summary">Grand Total: ${orderForPay.finalTotalPay}</span>
+      <textarea rows="3" type="text" readonly="readonly">${orderForPay.deliveryInfo}</textarea>
+      <span class="fw-normal small" id="Order summary">Payment Info: ${orderForPay.paymentInfo}</span>
+      </div>`);
+
+      $(`#paycard-div5-${orderForPay.id}`).append(`<form>
+      <label for="cardNumber">Input your credit card number:</label><br>
+      <input type="text" id ="cardNumber" name="cardNumber"><br>
+      <label for="cardName">Input card owner's name :</label><br>
+      <input type="text" id ="cardName" name="cardName"><br>
+      <label for="cardCvv">Input card CVV:</label><br>
+      <input type="text" id ="cardCvv" name="cardCvv"><br>
+      <button id="pay" onclick="paybycard(${orderForPay.id})" class="btn btn-outline-primary" type="button">Pay</button>
+      </form>`)
+    
+    }
+
+
+    
    })
   
+}
+
+function paybycard(orderId) {
+  return alert(orderId)
+  $.ajax({
+    url: `/api/orders/pay/${orderId}`,
+    // url: `/api/orders/?username=${username}`,
+    type: "PATCH",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    // data: { buyerName: username, sellerName: null },
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done(function (orders, status, xhr) {
+
+
+  })
+  
+
 }
 
 function receiveOrder(orderId) {
