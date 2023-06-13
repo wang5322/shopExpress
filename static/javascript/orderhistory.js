@@ -1,6 +1,8 @@
 let ifLoggedIn;
 let username, password, role;
+$("#payOrder").hide();
 $(document).ready(function () {
+
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
   username = sessionStorage.getItem("username");
   password = sessionStorage.getItem("password");
@@ -439,7 +441,7 @@ function confirmOrder(orderId) {
     dataType: "JSON",
     data: {
       deliveryInfo: $(`#deliveryInfo-${orderId}`).val()
-    },//todo
+    },
     error: function (jqxhr, status, errorThrown) {
       alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
     },
@@ -449,6 +451,24 @@ function confirmOrder(orderId) {
 }
 
 function payOrder(orderId) {
+  $("#newordercards").hide()
+  $("#payOrder").show();
+  $.ajax({
+    url: `/api/orders/${orderId}`,
+    // url: `/api/orders/?username=${username}`,
+    type: "GET",
+    headers: {
+      "x-auth-username": username,
+      "x-auth-password": password,
+      "x-auth-role": role,
+    },
+    dataType: "JSON",
+    error: function (jqxhr, status, errorThrown) {
+      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+    },
+  }).done((data, status, xhr) => {
+      refreshProductList();
+   })
   
 }
 
