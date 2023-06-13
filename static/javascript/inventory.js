@@ -12,7 +12,10 @@ $(document).ready(function () {
     $("#myModalBody").html("Access Forbidden: you are not logged in!");
     $("#myModal").modal("show");
     // alert("Access Forbidden: you are not logged in!");
-    window.location.href = "index.html";
+    setTimeout(function () {
+      $(".modal-body").html("");
+      window.location.href = "index";
+    }, 3000);
   } else {
     refreshInventoryList();
     refreshOrderList();
