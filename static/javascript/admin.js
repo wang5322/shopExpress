@@ -7,36 +7,30 @@ $(document).ready(function () {
     if (ifLoggedIn !== "true") {
         $(".modal-body").html("Access Forbidden: you are not logged in!");
         $("#AlertModal").modal("show");
-        $("#CloseModal").click(function () {
-            setTimeout(function () {
-                $(".modal-body").html("");
-                window.location.href = "loginregister.html?register=0";
-            }, 1000);
-        });
+        setTimeout(function () {
+            $(".modal-body").html("");
+            window.location.href = "loginregister.html?register=0";
+        }, 5000);
     } else {
         if (sessionStorage.getItem('role') !== 'admin') {
             $("body").hide();
-            $(".modal-body").html("Access Forbidden: you are an admin!");
+            $(".modal-body").html("Access Forbidden: you are not an admin!");
             $("#AlertModal").modal("show");
-            $("#CloseModal").click(function () {
-                setTimeout(function () {
-                    $(".modal-body").html("");
-                    window.location.href = "loginregister.html?register=0";
-                }, 1000);
-            });
+            setTimeout(function () {
+                $(".modal-body").html("");
+                window.location.href = "index.html";
+            }, 5000);
         } else {
             $("#orders").show();
         }
     }
 });
 
-$("#CloseModal").
-
-    $("#signout").click(function () {
-        ifLoggedIn = "false";
-        sessionStorage.clear();
-        window.open("index.html");
-    });
+$("#signout").click(function () {
+    ifLoggedIn = "false";
+    sessionStorage.clear();
+    window.open("index.html");
+});
 
 $("#btnSearch").on("click", function () {
     console.log("search button is clicked");

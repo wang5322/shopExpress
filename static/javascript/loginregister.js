@@ -5,12 +5,10 @@ $(document).ready(function () {
   if (ifLoggedIn === "true") {
     $(".modal-body").html("Access Forbidden: you are already logged in!");
     $("#AlertModal").modal("show");
-    $("#CloseModal").click(function () {
-      setTimeout(function () {
-        $(".modal-body").html("");
-        window.location.href = "index.html";
-      }, 1000);
-    });
+    setTimeout(function () {
+      $(".modal-body").html("");
+      window.location.href = "index.html";
+    }, 5000);
   } else {
     const urlParams = new URLSearchParams(window.location.search);
     const myParam = urlParams.get("register");
