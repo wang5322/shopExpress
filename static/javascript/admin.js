@@ -10,7 +10,7 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".modal-body").html("");
             window.location.href = "loginregister.html?register=0";
-        }, 5000);
+        }, 3000);
     } else {
         if (sessionStorage.getItem('role') !== 'admin') {
             $("body").hide();
@@ -19,7 +19,7 @@ $(document).ready(function () {
             setTimeout(function () {
                 $(".modal-body").html("");
                 window.location.href = "index.html";
-            }, 5000);
+            }, 3000);
         } else {
             $("#orders").show();
         }

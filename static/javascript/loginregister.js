@@ -8,7 +8,7 @@ $(document).ready(function () {
     setTimeout(function () {
       $(".modal-body").html("");
       window.location.href = "index.html";
-    }, 5000);
+    }, 3000);
   } else {
     const urlParams = new URLSearchParams(window.location.search);
     const myParam = urlParams.get("register");
