@@ -14,7 +14,7 @@ $(document).ready(function () {
     // alert("Access Forbidden: you are not logged in!");
     setTimeout(function () {
       $(".modal-body").html("");
-      window.location.href = "index";
+      window.location.href = "index.html";
     }, 3000);
   } else {
     refreshInventoryList();
