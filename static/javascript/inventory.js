@@ -66,6 +66,7 @@ $(document).ready(function () {
       console.log(id);
       var product = creatObject();
       isValidProduct(product);
+
       $.ajax({
         url: "/api/products/" + id,
         type: "PUT",
@@ -362,14 +363,13 @@ function isValidProduct(object) {
     "Baby",
   ];
   if (!categoryArray.includes(object.category)) {
-    // $("#myModalBody").html(
-    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
-    // );
-    // $("#myModal").modal("show");
-    alert(
+    $("#myModalBody").html(
       "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
     );
-
+    $("#myModal").modal("show");
+    // alert(
+    //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
+    // );
     return false;
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
@@ -563,7 +563,7 @@ function updateOrderStatus(orderId, status) {
 
 $("#formSearch").submit(function (event) {
   event.preventDefault();
-  var searchFor = $('#formSearch :input').val();
+  var searchFor = $("#formSearch :input").val();
   window.location.href = `productlist.html?category=${searchFor}`;
 });
 
