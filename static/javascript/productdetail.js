@@ -102,6 +102,10 @@ function refreshProducDetail() {
               "Error adding product to cart. Please login first!"
             );
             $("#myModal").modal("show");
+            setTimeout(function () {
+              $("#myModalBody").html("");
+              window.location.href = "loginregister.html?register=0";
+            }, 3000);
             console.log("Error adding product to cart:", error);
           },
         });
