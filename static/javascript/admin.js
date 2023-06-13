@@ -5,24 +5,38 @@ let ifLoggedIn;
 $(document).ready(function () {
     ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
     if (ifLoggedIn !== "true") {
-        alert("Access Forbidden: you are not logged in!");
-        window.location.href = "index.html";
+        $(".modal-body").html("Access Forbidden: you are not logged in!");
+        $("#AlertModal").modal("show");
+        $("#CloseModal").click(function () {
+            setTimeout(function () {
+                $(".modal-body").html("");
+                window.location.href = "loginregister.html?register=0";
+            }, 1000);
+        });
     } else {
         if (sessionStorage.getItem('role') !== 'admin') {
             $("body").hide();
-            alert("Access Forbidden: you are not an admin!");
+            $(".modal-body").html("Access Forbidden: you are an admin!");
+            $("#AlertModal").modal("show");
+            $("#CloseModal").click(function () {
+                setTimeout(function () {
+                    $(".modal-body").html("");
+                    window.location.href = "loginregister.html?register=0";
+                }, 1000);
+            });
         } else {
             $("#orders").show();
-            $("#productManage").hide();
         }
     }
 });
 
-$("#signout").click(function () {
-    ifLoggedIn = "false";
-    sessionStorage.clear();
-    window.open("index.html");
-});
+$("#CloseModal").
+
+    $("#signout").click(function () {
+        ifLoggedIn = "false";
+        sessionStorage.clear();
+        window.open("index.html");
+    });
 
 $("#btnSearch").on("click", function () {
     console.log("search button is clicked");
@@ -42,7 +56,8 @@ function refreshDisplay(username) {
             'x-auth-role': sessionStorage.getItem('role')
         },
         error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $("#AlertModal").modal("show");
         }
     }).done(function (data, status, xhr) {
         searchedUserObj = data;
@@ -60,11 +75,9 @@ function refreshDisplay(username) {
         switch (searchedUserObj.role) {
             case "admin":
                 $("#orders").hide();
-                $("#productManage").hide();
                 break;
 
             default:
-                $("#productManage").hide();
                 $("#orders").show();
                 refreshOrderList(searchedUsername, searchedUserObj.role);
                 break;
@@ -84,7 +97,8 @@ function refreshOrderList(username, role) {
             'x-auth-role': sessionStorage.getItem('role')
         },
         error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $("#AlertModal").modal("show");
         }
     }).done(function (data, status, xhr) {
         var orders = "<tr class='table-primary'><th><button type='button' id='deleteOrder'>Delete order</button></th><th>orderID</th><th>sellerID</th><th>status</th><th>order time</th><th>product subtotal</th><th>taxes</th><th>shipping fee</th><th>ground total</th></tr>\n";
@@ -110,7 +124,8 @@ $("#tableUserinfo").on("click", "#resetPassword", function () {
             'x-auth-role': sessionStorage.getItem('role')
         },
         error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $("#AlertModal").modal("show");
         }
     }).done(function () {
         searchedUsername = undefined;
@@ -129,7 +144,8 @@ $("#tableUserinfo").on("click", "#deleteAccount", function () {
             'x-auth-role': sessionStorage.getItem('role')
         },
         error: function (jqxhr, status, errorThrown) {
-            alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+            $("#AlertModal").modal("show");
         }
     }).done(function () {
         searchedUsername = undefined;
@@ -140,7 +156,7 @@ $("#tableUserinfo").on("click", "#deleteAccount", function () {
 $("#tableOrders").on("click", "#deleteOrder", function () {
     console.log("delete order is clicked")
     let checkedboxes = $(".delete-order:checked");
-    checkedboxes.each(function(index){
+    checkedboxes.each(function (index) {
         let orderid = parseInt($(this).parent().parent().children().eq(1).text());
         $.ajax({
             url: "/api/orders/" + orderid,
@@ -151,11 +167,12 @@ $("#tableOrders").on("click", "#deleteOrder", function () {
                 'x-auth-role': sessionStorage.getItem('role')
             },
             error: function (jqxhr, status, errorThrown) {
-                alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+                $("#AlertModal").modal("show");
             }
         }).done(function () {
             refreshOrderList(searchedUsername, searchedRole);
         })
     })
-        
+
 });

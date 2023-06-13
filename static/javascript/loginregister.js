@@ -3,8 +3,14 @@ let ifLoggedIn;
 $(document).ready(function () {
   ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
   if (ifLoggedIn === "true") {
-    alert("Access Forbidden: you are already logged in!");
-    window.location.href = "index.html";
+    $(".modal-body").html("Access Forbidden: you are already logged in!");
+    $("#AlertModal").modal("show");
+    $("#CloseModal").click(function () {
+      setTimeout(function () {
+        $(".modal-body").html("");
+        window.location.href = "index.html";
+      }, 1000);
+    });
   } else {
     const urlParams = new URLSearchParams(window.location.search);
     const myParam = urlParams.get("register");
@@ -41,14 +47,8 @@ $("#btnLogin").on("click", function () {
     },
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
-      alert(
-        "AJAX error: " +
-        errorThrown +
-        "/" +
-        jqxhr.responseText +
-        ", status: " +
-        jqxhr.status
-      );
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
       loginFailedHandler();
     },
   }).done(function (data) {
@@ -101,7 +101,8 @@ $("#btnRegister").on("click", function () {
     dataType: "json",
     data: newUserObj,
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $("#AlertModal").modal("show");
     },
   }).done(function (data) {
     sessionStorage.setItem("ifLoggedIn", "true");
@@ -126,7 +127,8 @@ $("#btnRegister").on("click", function () {
 });
 
 function loginFailedHandler() {
-  alert("Authentication failed");
+  $(".modal-body").html("Authentication failed");
+  $("#AlertModal").modal("show");
   $("input[name=username]").val("");
   $("input[name=password]").val("");
   sessionStorage.clear();
