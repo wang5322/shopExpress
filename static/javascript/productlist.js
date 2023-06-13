@@ -50,7 +50,10 @@ $(document).ready(function () {
       type: "GET",
       dataType: "json",
       error: function (jqxhr, status, errorThrown) {
-        $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
+        $(".modal-body").html(
+          "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+        );
+        $("#AlertModal").modal("show");
       },
       success: function (response) {
         console.log("category is : " + myParam);

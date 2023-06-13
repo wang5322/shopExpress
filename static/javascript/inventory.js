@@ -40,8 +40,10 @@ $(document).ready(function () {
         dataType: "json",
         data: productObj,
         error: function (jqxhr, status, errorThrown) {
-          $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+          $(".modal-body").html(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+          $("#AlertModal").modal("show");
         },
       }).done(function (data) {
         console.log(productObj);
@@ -82,8 +84,10 @@ $(document).ready(function () {
         dataType: "json",
         data: product,
         error: function (jqxhr, status, errorThrown) {
-          $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+          $(".modal-body").html(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+          $("#AlertModal").modal("show");
         },
       }).done(function () {
         $("#myModalBody").html("Product updated succesfully");
@@ -106,8 +110,10 @@ $(document).ready(function () {
         },
         data: { stockNum: 0, available: 0 },
         error: function (jqxhr, status, errorThrown) {
-          $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+          $(".modal-body").html(
+            "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+          );
+          $("#AlertModal").modal("show");
         },
       }).done(function () {
         $("#myModalBody").html("Products archieved successfully");
@@ -173,11 +179,15 @@ $(document).ready(function () {
           dataType: "json",
           data: docObj,
           error: function (jqxhr, status, errorThrown) {
-            $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+            $(".modal-body").html(
+              "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+            );
+            $("#AlertModal").modal("show");
           },
         }).done(function () {
-          alert("upload successful");
+          $("#myModalBody").html("Image uploaded successfully");
+          $("#myModal").modal("show");
+          refreshInventoryList();
         });
       };
       reader.onerror = function () {
@@ -295,8 +305,10 @@ function selectItem(Id) {
     type: "GET",
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
-      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+      $(".modal-body").html(
+        "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+      );
+      $("#AlertModal").modal("show");
     },
   }).done(function (product) {
     console.log(Id);
@@ -318,8 +330,10 @@ function selectImage(id) {
     type: "GET",
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
-      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+      $(".modal-body").html(
+        "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+      );
+      $("#AlertModal").modal("show");
     },
   }).done(function (image) {
     // console.log(image);
@@ -440,7 +454,10 @@ function refreshOrderList() {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
+      $(".modal-body").html(
+        "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+      );
+      $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
     // create a string variable to store all card html of orders
@@ -563,8 +580,10 @@ function updateOrderStatus(orderId, status) {
     },
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
-      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
-
+      $(".modal-body").html(
+        "AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status
+      );
+      $("#AlertModal").modal("show");
     },
   }).done(function () {
     $("#myModalBody").html("Status updated succesfully");
