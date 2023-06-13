@@ -106,13 +106,13 @@ OrderItem.matchById = (id, result) => {
 }
 
 OrderItem.refreshFromProduct = (id, result) => {
-    db.query("update orderitems as oi, orders as o, products as p set oi.productCode=p.productCode, oi.productName= p.productName, oi.price = p.price where oi.orderId= o.id and o.status='unSubmitted' and oi.id = ?", id, (err, res) => {
+    db.query("update orderitems as oi, orders as o, products as p set oi.productCode=p.productCode, oi.productName= p.productName, oi.price = p.price where oi.productId=p.id and oi.orderId= o.id and o.status='unSubmitted' and oi.id = ?", id, (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);
             return;
         } else {
-            //console.log("refreshed orderItem from products");
+            console.log("refreshed orderItem from products");
             result(null, res);
         }
     })
