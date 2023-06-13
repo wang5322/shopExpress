@@ -92,6 +92,21 @@
     <div id="newordercards"></div>
     <div id="payment"></div>
   </div>
+    <!-- Modal -->
+    <div class="modal fade" id="AlertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Alert</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" id="CloseModal" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   <!-- <section class="vh-100" style="background-color: #eee;">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
@@ -160,7 +175,7 @@
         dataType: "JSON",
         data: { buyerName: username, sellerName: null },
         error: function (jqxhr, status, errorThrown) {
-          alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+          $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
         },
       }).done(function (orders, status, xhr) {
         // create a string variable to store all card html of orders
@@ -178,7 +193,7 @@
               'x-auth-role': role
             },
             error: function (jqxhr, status, errorThrown) {
-              alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+              $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
             }
           }).done(function (orderitems, status, xhr) {
             orderCard += `<div class="row d-flex justify-content-center align-items-center h-100">

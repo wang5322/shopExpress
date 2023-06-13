@@ -18,7 +18,8 @@ function refreshProducDetail() {
     async: false,
     dataType: "json",
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
+
     },
     success: function (response) {
       console.log("productId is : " + myParam);

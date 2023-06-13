@@ -65,7 +65,7 @@ function refreshProductList() {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
 
@@ -431,7 +431,7 @@ function deleteOrder(orderId) {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -453,7 +453,7 @@ function confirmOrder(orderId) {
       deliveryInfo: $(`#deliveryInfo-${orderId}`).val()
     },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -476,7 +476,7 @@ function showPayment(orderId,isPaid) {
     dataType: "JSON",
     // data: { buyerName: username, sellerName: null },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
     let orderForPay
@@ -575,7 +575,7 @@ function paybycard(orderId) {
     dataType: "JSON",
     data: { deliveryInfo: $("#pay-deliveryInfo").val()},
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done(function (orders, status, xhr) {
     showPayment(orderId,true)
@@ -602,7 +602,7 @@ function receiveOrder(orderId) {
     dataType: "JSON",
     data: { status:"Received" },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -623,7 +623,7 @@ function itemDelete(itemId) {
     dataType: "JSON",
     //data: { status:"Received" },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -650,7 +650,7 @@ function itemAmount(itemId) {
       amount: Number($(`#item-amount-${itemId}`).val())
     },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
@@ -670,7 +670,7 @@ function itemRefresh(itemId) {
     dataType: "JSON",
     //data: { amount:Number($(`#item-amount-${itemId}`).value()) },
     error: function (jqxhr, status, errorThrown) {
-      alert("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status);
+      $(".modal-body").html("AJAX error: " + jqxhr.responseText + ", status: " + jqxhr.status); $("#AlertModal").modal("show");
     },
   }).done((data, status, xhr) => {
       refreshProductList();
