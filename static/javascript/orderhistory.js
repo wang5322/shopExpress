@@ -168,14 +168,14 @@ function refreshProductList() {
       </div>`);
 
       //delete order button if allowed
-      if (
+      $(`#card-div5-${order.id}`).append(`<div><button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button" onclick="deleteOrder(${order.id})">Delete</button></div>`);
+      if (!(
         order.status === "unSubmitted" ||
         order.status === "BuyerConfirmed" /*||
         order.status === "Received"*/
-      ) {
-        $(`#card-div5-${order.id}`).append(`<div><button id="delete-button-${order.id}" class="btn btn-outline-primary" type="button" onclick="deleteOrder(${order.id})">Delete</button></div>`);
+      )) {
+        $(`#delete-button-${order.id}`).prop('disabled', true)
       }
-      //$(`#delete-button-${order.id}`).click(() => { deleteOrder(order.id) })
       //delete order button end
       
       
