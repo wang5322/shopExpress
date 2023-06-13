@@ -33,7 +33,7 @@ Orders.create = (newOrder, result) => {
 //get one order by id
 Orders.findById = (id, result) => {
 
-    db.query("SELECT * FROM orders WHERE id = ?", [id], (err, res) => {
+    db.query("SELECT orders.*, u1.userName as sellerName, u2.userName as buyerName FROM orders join users as u1 on (orders.sellerId=u1.id and u1.role='seller') join users as u2 on (orders.buyerId=u2.id and u2.role='buyer') WHERE orders.id = ?", [id], (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);

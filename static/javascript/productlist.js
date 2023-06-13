@@ -5,8 +5,29 @@ let sessionUsername = sessionStorage.getItem("username");
 let sessionPassword = sessionStorage.getItem("password");
 let sellerId = sessionStorage.getItem("id");
 let role = sessionStorage.getItem("role");
+let ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
 
 $(document).ready(function () {
+  ifLoggedIn = sessionStorage.getItem("ifLoggedIn");
+  if (ifLoggedIn === "true") {
+    $("#anchorLogin a").text("Sign Out");
+    $("#anchorRegister").hide();
+  } else {
+    // ifLoggedIn = false;
+    $("anchorLogin a").text("Hello, Sign In");
+    $("#anchorRegister").show();
+  }
+
+  $("#anchorLogin a").click(function () {
+    if (ifLoggedIn === "true") {
+      ifLoggedIn = "false";
+      sessionStorage.clear();
+      window.open("index.html");
+    } else {
+      window.location.replace("loginregister.html?register=0");
+    }
+  });
+
   var urlParams = new URLSearchParams(window.location.search);
   myParam = urlParams.get("category");
   // searchFor = urlParams.get("searchFor");
