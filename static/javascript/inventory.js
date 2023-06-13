@@ -26,7 +26,9 @@ $(document).ready(function () {
 
     $("#add").on("click", function () {
       var productObj = createObject();
-      isValidProduct(productObj);
+      if (!isValidProduct(productObj)) {
+        return;
+      }
 
       $.ajax({
         url: "/api/products",
@@ -43,9 +45,9 @@ $(document).ready(function () {
       }).done(function (data) {
         console.log(productObj);
         console.log(data);
-        // $("#myModalBody").html("Products added successfully");
-        // $("#myModal").modal("show");
-        alert("Products added successfully");
+        $("#myModalBody").html("Products added successfully");
+        $("#myModal").modal("show");
+        // alert("Products added successfully");
         refreshInventoryList();
       });
     });
@@ -103,9 +105,9 @@ $(document).ready(function () {
           alert("AJAX error: " + jqxhr.responseText);
         },
       }).done(function () {
-        // $("#myModalBody").html("Products archieved successfully");
-        // $("#myModal").modal("show");
-        alert("Products archieved successfully");
+        $("#myModalBody").html("Products archieved successfully");
+        $("#myModal").modal("show");
+        // alert("Products archieved successfully");
         refreshInventoryList();
       });
     });
@@ -119,25 +121,27 @@ $(document).ready(function () {
 
       // Validation
       if (!file) {
-        alert("Please select an image file.");
+        $("#myModalBody").html("Please select an image file.");
+        $("#myModal").modal("show");
+        // alert("Please select an image file.");
         return;
       }
 
       if (titleVal.trim() === "" || productIdVal.trim() === "") {
-        // $("#myModalBody").html("Please fill in all the fields.");
-        // $("#myModal").modal("show");
-        alert("Please fill in all the fields.");
+        $("#myModalBody").html("Please fill in all the fields.");
+        $("#myModal").modal("show");
+        // alert("Please fill in all the fields.");
         return;
       }
 
       let mimeTypeVal = file.type;
       const validMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!validMimeTypes.includes(mimeTypeVal)) {
-        // $("#myModalBody").html(
-        //   "Invalid file type. Only jpeg and png images are allowed."
-        // );
-        // $("#myModal").modal("show");
-        alert("Invalid file type. Only jpeg and png images are allowed.");
+        $("#myModalBody").html(
+          "Invalid file type. Only jpeg and png images are allowed."
+        );
+        $("#myModal").modal("show");
+        // alert("Invalid file type. Only jpeg and png images are allowed.");
         return;
       }
 
@@ -373,42 +377,42 @@ function isValidProduct(object) {
     return false;
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
-    // $("#myModalBody").html("Product Code needs to be 1-45 characters");
-    // $("#myModal").modal("show");
-    alert("Product Code needs to be 1-45 characters");
+    $("#myModalBody").html("Product Code needs to be 1-45 characters");
+    $("#myModal").modal("show");
+    // alert("Product Code needs to be 1-45 characters");
     return false;
   }
   if (!object.sellerId) {
-    // $("#myModalBody").html("No sellerId provided. Please login first");
-    // $("#myModal").modal("show");
-    alert("No sellerId provided. Please login first");
+    $("#myModalBody").html("No sellerId provided. Please login first");
+    $("#myModal").modal("show");
+    // alert("No sellerId provided. Please login first");
     return false;
   }
   if (isNaN(object.price)) {
-    // $("#myModalBody").html("Price needs to be a number");
-    // $("#myModal").modal("show");
-    alert("Price needs to be a number");
+    $("#myModalBody").html("Price needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Price needs to be a number");
     return false;
   }
   let splitPrice = object.price.toString().split(".");
   if (splitPrice.length > 1) {
     if (splitPrice[1].length > 2) {
-      // $("#myModalBody").html("Price can have only two decimals");
-      // $("#myModal").modal("show");
-      alert("Price can have only two decimals");
+      $("#myModalBody").html("Price can have only two decimals");
+      $("#myModal").modal("show");
+      // alert("Price can have only two decimals");
       return false;
     }
   }
   if (splitPrice[0].length > 8) {
-    // $("#myModalBody").html("Price exceeds site limit");
-    // $("#myModal").modal("show");
-    alert("Price exceeds site limit");
+    $("#myModalBody").html("Price exceeds site limit");
+    $("#myModal").modal("show");
+    // alert("Price exceeds site limit");
     return false;
   }
   if (isNaN(object.stockNum)) {
-    // $("#myModalBody").html("Stock number needs to be a number");
-    // $("#myModal").modal("show");
-    alert("Stock number needs to be a number");
+    $("#myModalBody").html("Stock number needs to be a number");
+    $("#myModal").modal("show");
+    // alert("Stock number needs to be a number");
     return false;
   }
   return true;
