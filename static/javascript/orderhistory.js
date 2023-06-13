@@ -151,7 +151,17 @@ function refreshProductList() {
             $(`#item-refresh-${item.id}`).prop('disabled', true)
             
           }
-        }
+
+          if (order.status == "unSubmitted") {
+            $(`#item-modify-amount-${item.id}`).prop("disabled", false)
+            $(`item-delete-${item.id}`).prop("disabled", false)
+          } else  {
+            $(`#item-modify-amount-${item.id}`).prop("disabled", true)
+            $(`item-delete-${item.id}`).prop("disabled", true)
+          }
+            
+          
+        }//for item end
       })//orderItems end
         
 
