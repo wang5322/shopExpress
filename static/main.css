@@ -14,6 +14,7 @@ em{
 
 a{
     color:black;
+    text-decoration: none;
 }
 
 .cropped { width: 150px; overflow: hidden; } 
