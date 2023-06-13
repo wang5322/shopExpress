@@ -23,7 +23,7 @@ $(document).ready(function () {
 
     $("#add").on("click", function () {
       var productObj = createObject();
-      isValidProduct(product);
+      isValidProduct(productObj);
 
       $.ajax({
         url: "/api/products",
@@ -62,9 +62,7 @@ $(document).ready(function () {
       var id = $("#id").html();
       console.log(id);
       var product = creatObject();
-      if (!isValidProduct(product)) {
-        return;
-      }
+      isValidProduct(product);
 
       $.ajax({
         url: "/api/products/" + id,
@@ -369,6 +367,7 @@ function isValidProduct(object) {
     // alert(
     //   "Category needs to be Fashion, Home, Beauty, Books, Electronic or Baby"
     // );
+    return false;
   }
   if (object.productCode.length < 1 || object.productCode.length > 45) {
     // $("#myModalBody").html("Product Code needs to be 1-45 characters");
@@ -561,7 +560,7 @@ function updateOrderStatus(orderId, status) {
 
 $("#formSearch").submit(function (event) {
   event.preventDefault();
-  var searchFor = $('#formSearch :input').val();
+  var searchFor = $("#formSearch :input").val();
   window.location.href = `productlist.html?category=${searchFor}`;
 });
 
