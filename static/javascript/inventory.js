@@ -558,5 +558,11 @@ function updateOrderStatus(orderId, status) {
   });
 }
 
+$("#formSearch").submit(function (event) {
+  event.preventDefault();
+  var searchFor = $('#formSearch :input').val();
+  window.location.href = `productlist.html?category=${searchFor}`;
+});
+
 //   }
 // });

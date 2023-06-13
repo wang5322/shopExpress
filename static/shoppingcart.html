@@ -27,7 +27,7 @@
 
         <a class="navbar-brand mb-1" href="index.html">ShopExpress</a>
         <form id="formSearch" class="form-inline my-2 my-lg-0 d-flex col-sm-7">
-          <input class="form-control mr-sm-2 " type="search" placeholder="Search any product">
+          <input class="form-control mr-sm-2 " type="search" placeholder="Search any category">
           <button class="btn btn-outline-success btn-sm my-2 my-sm-0 mx-2 mr-6" type="submit">Search</button>
         </form>
         <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
@@ -156,7 +156,7 @@
         setTimeout(function () {
             $(".modal-body").html("");
             window.location.href = "loginregister.html?register=0";
-        }, 5000);
+        }, 3000);
       } else {
         refreshCart()
       }
@@ -343,6 +343,12 @@
       ifLoggedIn = "false";
       sessionStorage.clear();
       window.open("index.html");
+    });
+
+    $("#formSearch").submit(function (event) {
+      event.preventDefault();
+      var searchFor = $('#formSearch :input').val();
+      window.location.href = `productlist.html?category=${searchFor}`;
     });
   </script>
 </body>
