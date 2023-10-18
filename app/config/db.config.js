@@ -3,5 +3,5 @@ module.exports = {
     PORT: 3306,
     USER: "adminW",
     PASSWORD: "a8gjVtxS5.",
-    DB: "dbshopexpress"
+    DB: "shopexpress"
   };
