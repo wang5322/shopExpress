@@ -132,3 +132,5 @@ dist
 
 # JetBrain configuration files
 .idea/
+
+.sql
