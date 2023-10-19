@@ -9,7 +9,7 @@ const Products = function (product) {
   this.productDesc = product.productDesc;
   this.price = product.price;
   this.stockNum = product.stockNum;
-  this.imageUrl = product.imageUrl;
+  // this.imageUrl = product.imageUrl;
   this.available = product.available;
 };
 
@@ -116,7 +116,7 @@ Products.getById = (id, result) => {
 };
 
 Products.updateById = (id, products, result) => {
-  let queryStr = `UPDATE products SET category =?,sellerId =?,productCode=?,productName=?,productDesc =?, price = ?, stockNum = ?, imageUrl=?, available=? WHERE id =?`;
+  let queryStr = `UPDATE products SET category =?,sellerId =?,productCode=?,productName=?,productDesc =?, price = ?, stockNum = ?, available=? WHERE id =?`;
   db.query(
     queryStr,
     [
@@ -127,7 +127,7 @@ Products.updateById = (id, products, result) => {
       products.productDesc,
       products.price,
       products.stockNum,
-      products.imageUrl,
+      // products.imageUrl,
       products.available,
       id,
     ],

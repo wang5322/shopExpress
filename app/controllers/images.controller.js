@@ -58,7 +58,7 @@ exports.create = (req, res) => {
   });
 };
 
-// Retrieve all Todos from the database (with condition).
+// Retrieve all images from the database (with condition).
 exports.findAll = (req, res) => {
   const validSortOrders = ["id", "title", "mimeType"];
   const sortOrder = req.query.sortOrder ? req.query.sortOrder : "id"; // sort by id if no sortOrder provided

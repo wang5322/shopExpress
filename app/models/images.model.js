@@ -43,7 +43,6 @@ ImageClass.findById = (id, result) => {
   });
 };
 
-// return all todo[serach by task and return all if any]
 // WARNING: when a table has BLOBs do *NOT* fetch blobs when fetching multiple records! Only all other fields
 ImageClass.getAll = (productId, sortOrder, result) => {
   let sql = "SELECT id, title, mimeType, productId FROM images";

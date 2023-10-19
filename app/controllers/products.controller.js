@@ -21,7 +21,7 @@ exports.create = (req, res) => {
       productDesc: req.body.productDesc,
       price: req.body.price,
       stockNum: req.body.stockNum,
-      imageUrl: req.body.imageUrl,
+      // imageUrl: req.body.imageUrl,
       available: req.body.available,
     });
 
@@ -95,7 +95,7 @@ exports.update = (req, res) => {
         message: "Content can not be empty!",
       });
     }
-    console.log(req.body);
+    console.log("=====req.body=====", req.body);
     Products.updateById(req.params.id, new Products(req.body), (err, data) => {
       if (err) {
         if (err.kind === "not_found") {
