@@ -93,7 +93,7 @@ OrderItem.getById = (id, result) => {
 }
 
 OrderItem.matchById = (id, result) => {
-    db.query("select o.id from orderitems as o join products as p on (o.productId = p.id) where (o.productCode <> p.productCode or o.productName <> o.productName or o.price <> p.price) and o.id = ?", id, (err, res) => {
+    db.query("select o.id from orderItems as o join products as p on (o.productId = p.id) where (o.productCode <> p.productCode or o.productName <> o.productName or o.price <> p.price) and o.id = ?", id, (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);
@@ -106,7 +106,7 @@ OrderItem.matchById = (id, result) => {
 }
 
 OrderItem.refreshFromProduct = (id, result) => {
-    db.query("update orderitems as oi, orders as o, products as p set oi.productCode=p.productCode, oi.productName= p.productName, oi.price = p.price where oi.productId=p.id and oi.orderId= o.id and o.status='unSubmitted' and oi.id = ?", id, (err, res) => {
+    db.query("update orderItems as oi, orders as o, products as p set oi.productCode=p.productCode, oi.productName= p.productName, oi.price = p.price where oi.productId=p.id and oi.orderId= o.id and o.status='unSubmitted' and oi.id = ?", id, (err, res) => {
         if (err) {
             console.log("error: ", err);
             result(err, null);
